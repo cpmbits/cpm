@@ -1,4 +1,4 @@
-class ProjectConstructor:
+class CreationService:
     def __init__(self, filesystem):
         self.filesystem = filesystem
 

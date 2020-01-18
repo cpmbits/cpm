@@ -1,0 +1,2 @@
+class NotAChromosProject(RuntimeError):
+    pass
