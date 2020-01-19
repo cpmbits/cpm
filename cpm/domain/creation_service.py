@@ -5,7 +5,7 @@ from cpm.domain.sample_code import CPP_HELLO_WORLD
 
 @dataclass
 class CreationOptions:
-    include_sample_code: bool = False
+    generate_sample_code: bool = False
 
 
 class CreationService:
@@ -21,7 +21,7 @@ class CreationService:
             f'{project_name}/project.yaml',
             f'project_name: {project_name}\n'
         )
-        if options.include_sample_code:
+        if options.generate_sample_code:
             self.filesystem.create_directory(f'{project_name}/sources')
             self.filesystem.create_file(
                 f'{project_name}/sources/main.cpp',

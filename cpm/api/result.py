@@ -1,5 +1,5 @@
-import collections
+from collections import namedtuple
 
 OK = 0
 FAIL = 1
-Result = collections.namedtuple('Result', ['status_code', 'message'])
+Result = namedtuple('Result', ['status_code', 'message'])

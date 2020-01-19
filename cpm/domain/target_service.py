@@ -1,4 +1,4 @@
-from cpm.domain import target
+from cpm.domain.target import Target
 
 
 class TargetService:
@@ -7,5 +7,5 @@ class TargetService:
 
     def add_target(self, target_name):
         project = self.project_loader.load()
-        project.add_target(target.Target(target_name))
+        project.add_target(Target(target_name))
         self.project_loader.save(project)

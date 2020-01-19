@@ -30,11 +30,11 @@ class TestCreationService(unittest.TestCase):
             'project_name: AwesomeProject\n'
         )
         
-    def test_creation_service_includes_default_sample_code_when_selected(self):
+    def test_creation_service_generates_default_sample_code_when_selected(self):
         filesystem = mock.MagicMock()
         creation_service = CreationService(filesystem)
 
-        creation_service.create('AwesomeProject', CreationOptions(include_sample_code=True))
+        creation_service.create('AwesomeProject', CreationOptions(generate_sample_code=True))
 
         filesystem.create_directory.assert_called_with('AwesomeProject/sources')
         filesystem.create_file.assert_called_with(

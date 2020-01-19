@@ -1,4 +1,4 @@
-ROOT_FILE = 'project.yaml'
+PROJECT_ROOT_FILE = 'project.yaml'
 
 
 class Target(object):

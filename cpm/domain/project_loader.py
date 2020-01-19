@@ -1,4 +1,4 @@
-from cpm.domain.project import ROOT_FILE
+from cpm.domain.project import PROJECT_ROOT_FILE
 from cpm.domain.project import Project
 from cpm.domain.project import Target
 
@@ -9,7 +9,7 @@ class ProjectLoader(object):
 
     def load(self):
         try:
-            description = self.yaml_handler.load(ROOT_FILE)
+            description = self.yaml_handler.load(PROJECT_ROOT_FILE)
             project = Project(description['project_name'])
             self.__parse_targets(description, project)
             return project
@@ -27,7 +27,7 @@ class ProjectLoader(object):
         }
         if project.targets:
             project_description['targets'] = self.__as_dict(project.targets)
-        self.yaml_handler.dump(ROOT_FILE, project_description)
+        self.yaml_handler.dump(PROJECT_ROOT_FILE, project_description)
 
     def __as_dict(self, targets):
         return {target: {} for target in targets}
