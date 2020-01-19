@@ -8,7 +8,7 @@ from cpm.domain import target_service, target
 class TestTargetService(unittest.TestCase):
     def test_target_service_creation(self):
         project_loader = mock.MagicMock()
-        service = target_service.TargetService(project_loader)
+        target_service.TargetService(project_loader)
 
     def test_target_service_raises_exception_adding_target_when_project_loader_fails(self):
         project_loader = mock.MagicMock()

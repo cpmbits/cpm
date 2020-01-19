@@ -11,3 +11,7 @@ class Filesystem:
 
     def directory_exists(self, name):
         return os.path.exists(name) and os.path.isdir(name)
+
+    def file_exists(self, name):
+        return os.path.exists(name) and os.path.isfile(name)
+
