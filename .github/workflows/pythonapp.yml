@@ -28,3 +28,11 @@ jobs:
       run: |
         pip install pytest
         pytest
+    - name: Test with Robot Framework
+      uses: actions/upload-artifact@v1
+        with:
+          name: log
+          path: log.html
+      run: |
+        pip install robotframework
+        robot .
