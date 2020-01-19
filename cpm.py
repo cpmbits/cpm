@@ -4,6 +4,7 @@ import sys
 from cpm.api import create
 from cpm.api import target
 from cpm.domain.creation_service import CreationService
+from cpm.domain.creation_service import CreationOptions
 from cpm.domain.project_loader import ProjectLoader
 from cpm.domain.target_service import TargetService
 from cpm.infrastructure.filesystem import Filesystem
@@ -31,10 +32,12 @@ def __finish(result):
 def __create():
     create_parser = argparse.ArgumentParser(prog='cpm create', description='Chromos Package Manager', add_help=False)
     create_parser.add_argument('project_name')
+    create_parser.add_argument('-s', '--include-sample-code', required=False, action='store_true', default=False)
     args = create_parser.parse_args(sys.argv[2:])
 
     constructor = CreationService(Filesystem())
-    result = create.new_project(constructor, args.project_name)
+    options = CreationOptions(include_sample_code=args.include_sample_code)
+    result = create.new_project(constructor, args.project_name, options)
 
     __finish(result)
 
