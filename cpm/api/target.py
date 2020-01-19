@@ -4,7 +4,7 @@ from cpm.api.result import FAIL
 from cpm.domain.project_loader import NotAChromosProject
 
 
-def add(target_service, target_name):
+def add_target(target_service, target_name):
     try:
         target_service.add_target(target_name)
     except NotAChromosProject:

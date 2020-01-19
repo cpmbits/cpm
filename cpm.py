@@ -1,8 +1,8 @@
 import argparse
 import sys
 
-from cpm.api import create
-from cpm.api import target
+from cpm.api.create import new_project
+from cpm.api.target import add_target
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
 from cpm.domain.project_loader import ProjectLoader
@@ -11,10 +11,10 @@ from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 
 
-def __main():
+def main():
     action = {
-        'create': __create,
-        'target': __target,
+        'create': create,
+        'target': target,
     }
 
     action_parser = argparse.ArgumentParser(description='Chromos Package Manager')
@@ -24,27 +24,22 @@ def __main():
     action[args.action]()
 
 
-def __finish(result):
-    print(result.message)
-    sys.exit(result.status_code)
-
-
-def __create():
+def create():
     create_parser = argparse.ArgumentParser(prog='cpm create', description='Chromos Package Manager', add_help=False)
     create_parser.add_argument('project_name')
     create_parser.add_argument('-s', '--generate-sample-code', required=False, action='store_true', default=False)
     args = create_parser.parse_args(sys.argv[2:])
 
-    constructor = CreationService(Filesystem())
+    service = CreationService(Filesystem())
     options = CreationOptions(generate_sample_code=args.generate_sample_code)
-    result = create.new_project(constructor, args.project_name, options)
+    result = new_project(service, args.project_name, options)
 
-    __finish(result)
+    finish(result)
 
 
-def __target():
+def target():
     target_action = {
-        'add': __add_target,
+        'add': target_add,
     }
     target_parser = argparse.ArgumentParser(prog='cpm target', description='Chromos Package Manager', add_help=False)
     target_parser.add_argument('target_action', choices=target_action.keys())
@@ -53,18 +48,23 @@ def __target():
     target_action[args.target_action]()
 
 
-def __add_target():
+def target_add():
     add_target_parser = argparse.ArgumentParser(prog='cpm target add', description='Chromos Package Manager', add_help=False)
     add_target_parser.add_argument('target_name')
     args = add_target_parser.parse_args(sys.argv[3:])
 
     yaml_loader = YamlHandler(Filesystem())
     loader = ProjectLoader(yaml_loader)
-    targets = TargetService(loader)
+    service = TargetService(loader)
 
-    result = target.add(targets, args.target_name)
+    result = add_target(service, args.target_name)
 
-    __finish(result)
+    finish(result)
 
 
-__main()
+def finish(result):
+    print(result.message)
+    sys.exit(result.status_code)
+
+
+main()
