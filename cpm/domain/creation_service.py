@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from cpm.domain.project import Project
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 
 
@@ -16,14 +17,28 @@ class CreationService:
         return self.filesystem.directory_exists(project_name)
 
     def create(self, project_name, options=CreationOptions()):
-        self.filesystem.create_directory(project_name)
+        project = Project(project_name)
+        self.create_project_directory(project_name)
+        self.create_project_descriptor_file(project_name)
+
+        if options.generate_sample_code:
+            self.generate_sample_code(project)
+
+        return project
+
+    def generate_sample_code(self, project):
+        project.add_sources(['sources/main.cpp'])
+        self.filesystem.create_directory(f'{project.name}/sources')
+        self.filesystem.create_file(
+            f'{project.name}/sources/main.cpp',
+            CPP_HELLO_WORLD
+        )
+
+    def create_project_descriptor_file(self, project_name):
         self.filesystem.create_file(
             f'{project_name}/project.yaml',
             f'project_name: {project_name}\n'
         )
-        if options.generate_sample_code:
-            self.filesystem.create_directory(f'{project_name}/sources')
-            self.filesystem.create_file(
-                f'{project_name}/sources/main.cpp',
-                CPP_HELLO_WORLD
-            )
+
+    def create_project_directory(self, project_name):
+        self.filesystem.create_directory(project_name)

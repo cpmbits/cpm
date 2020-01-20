@@ -1,8 +1,12 @@
+#!/usr/local/bin/python3.7
 import argparse
 import sys
 
 from cpm.api.create import new_project
 from cpm.api.target import add_target
+from cpm.api.build import build_project
+from cpm.domain.build_service import BuildService
+from cpm.domain.compilation_recipes.build import BuildRecipe
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
 from cpm.domain.project_loader import ProjectLoader
@@ -14,6 +18,7 @@ from cpm.infrastructure.yaml_handler import YamlHandler
 def main():
     action = {
         'create': create,
+        'build': build,
         'target': target,
     }
 
@@ -33,6 +38,18 @@ def create():
     service = CreationService(Filesystem())
     options = CreationOptions(generate_sample_code=args.generate_sample_code)
     result = new_project(service, args.project_name, options)
+
+    finish(result)
+
+
+def build():
+    filesystem = Filesystem()
+    yaml_loader = YamlHandler(filesystem)
+    loader = ProjectLoader(yaml_loader)
+    service = BuildService(loader)
+    recipe = BuildRecipe(filesystem)
+
+    result = build_project(service, recipe)
 
     finish(result)
 

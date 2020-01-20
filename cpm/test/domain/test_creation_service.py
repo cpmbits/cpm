@@ -41,3 +41,13 @@ class TestCreationService(unittest.TestCase):
             'AwesomeProject/sources/main.cpp',
             CPP_HELLO_WORLD
         )
+
+    def test_creation_service_returns_generated_project(self):
+        filesystem = mock.MagicMock()
+        creation_service = CreationService(filesystem)
+
+        project = creation_service.create('AwesomeProject', CreationOptions(generate_sample_code=True))
+
+        assert project.name == 'AwesomeProject'
+        assert project.sources == ['sources/main.cpp']
+

@@ -11,7 +11,11 @@ class Project(object):
     def __init__(self, name):
         self.name = name
         self.targets = {}
+        self.sources = []
 
     def add_target(self, target):
         self.targets[target.name] = target
+
+    def add_sources(self, source):
+        self.sources.extend(source)
 

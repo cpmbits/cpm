@@ -21,7 +21,13 @@ Test-Target-Addition
     ${result}=    Get Process Result    add_target
     Should Be Equal 	${result.rc} 	${0}
 
+Test-Project-Build-With-Sample-Code
+    Run Process    python3.7    ./cpm.py    create    -s    ${PROJECT_NAME}
+    Run Process    python3.7    ../cpm.py    build    cwd=${PROJECT_NAME}    alias=build
+    ${result}=    Get Process Result    build
+    Should Be Equal 	${result.rc} 	${0}
 
 *** Keywords ***
 Delete Project
     Remove Directory 	${PROJECT_NAME} 	recursive=True
+
