@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 
 class Filesystem:
@@ -14,3 +15,9 @@ class Filesystem:
 
     def file_exists(self, name):
         return os.path.exists(name) and os.path.isfile(name)
+
+    def find(self, path, pattern):
+        return [str(filename) for filename in Path(path).rglob(pattern)]
+
+    def symlink(self, source, destination):
+        os.symlink(source, destination, target_is_directory=True)

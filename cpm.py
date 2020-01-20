@@ -6,7 +6,7 @@ from cpm.api.create import new_project
 from cpm.api.target import add_target
 from cpm.api.build import build_project
 from cpm.domain.build_service import BuildService
-from cpm.domain.compilation_recipes.build import BuildRecipe
+from cpm.domain.compilation_recipes.build import MacOsXBuildRecipe
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
 from cpm.domain.project_loader import ProjectLoader
@@ -44,10 +44,10 @@ def create():
 
 def build():
     filesystem = Filesystem()
-    yaml_loader = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_loader)
+    yaml_handler = YamlHandler(filesystem)
+    loader = ProjectLoader(yaml_handler, filesystem)
     service = BuildService(loader)
-    recipe = BuildRecipe(filesystem)
+    recipe = MacOsXBuildRecipe(filesystem)
 
     result = build_project(service, recipe)
 
@@ -70,8 +70,9 @@ def target_add():
     add_target_parser.add_argument('target_name')
     args = add_target_parser.parse_args(sys.argv[3:])
 
-    yaml_loader = YamlHandler(Filesystem())
-    loader = ProjectLoader(yaml_loader)
+    filesystem = Filesystem()
+    yaml_handler = YamlHandler(filesystem)
+    loader = ProjectLoader(yaml_handler, filesystem)
     service = TargetService(loader)
 
     result = add_target(service, args.target_name)

@@ -4,7 +4,8 @@ from cpm.domain.project import Target
 
 
 class ProjectLoader(object):
-    def __init__(self, yaml_handler):
+    def __init__(self, yaml_handler, filesystem):
+        self.filesystem = filesystem
         self.yaml_handler = yaml_handler
 
     def load(self):
@@ -12,9 +13,14 @@ class ProjectLoader(object):
             description = self.yaml_handler.load(PROJECT_ROOT_FILE)
             project = Project(description['project_name'])
             self.__parse_targets(description, project)
+            project.add_sources(self.project_sources())
             return project
         except FileNotFoundError:
             raise NotAChromosProject()
+
+    def project_sources(self):
+        sources = self.filesystem.find('sources', '*.cpp')
+        return sources
 
     def __parse_targets(self, description, project):
         if 'targets' in description:
