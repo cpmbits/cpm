@@ -15,6 +15,7 @@ CMAKE_RECIPE = (
     '    COMMAND COMMAND ${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:${{PROJECT_NAME}}> ${{PROJECT_SOURCE_DIR}}/../../${{PROJECT_NAME}}\n'
     ')\n'
 )
+BUILD_DIRECTORY = f'{RECIPES_DIRECTORY}/build'
 
 
 class BuildRecipe(CompilationRecipe):
@@ -24,9 +25,11 @@ class BuildRecipe(CompilationRecipe):
         self.filesystem = filesystem
 
     def generate(self, project):
-        self.filesystem.create_directory(self.__recipe_directory())
+        if self._recipe_files_up_to_date():
+            return
+        self.filesystem.create_directory(BUILD_DIRECTORY)
         self.filesystem.create_file(
-            f'{RECIPES_DIRECTORY}/build/CMakeLists.txt',
+            f'{BUILD_DIRECTORY}/CMakeLists.txt',
             CMAKE_RECIPE.format(
                 project_name=project.name,
                 sources_list=' '.join(project.sources)
@@ -34,18 +37,19 @@ class BuildRecipe(CompilationRecipe):
         )
         self.filesystem.symlink('../../sources', 'recipes/build/sources')
 
+    def _recipe_files_up_to_date(self):
+        return self.filesystem.directory_exists(BUILD_DIRECTORY) and \
+               self.filesystem.file_exists(f'{BUILD_DIRECTORY}/CMakeLists.txt')
+
     def compile(self, project):
         subprocess.run(
             [self.CMAKE_COMMAND, '-G', 'Ninja', '.'],
-            cwd=self.__recipe_directory()
+            cwd=BUILD_DIRECTORY
         )
         subprocess.run(
             ['ninja', project.name],
-            cwd=self.__recipe_directory()
+            cwd=BUILD_DIRECTORY
         )
-
-    def __recipe_directory(self):
-        return f'{RECIPES_DIRECTORY}/build'
 
 
 class MacOsXBuildRecipe(BuildRecipe):

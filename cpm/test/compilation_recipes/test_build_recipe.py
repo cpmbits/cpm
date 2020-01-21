@@ -11,10 +11,8 @@ class TestBuildRecipe(unittest.TestCase):
         BuildRecipe(filesystem)
 
     def test_recipe_creates_recipes_directory_and_symlinks_sources(self):
-        filesystem = mock.MagicMock()
-        project = mock.MagicMock()
-        project.name = 'DeathStarBackend'
-        project.sources = ['sources/main.cpp']
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = self.deathStarBackend()
         build_recipe = BuildRecipe(filesystem)
 
         build_recipe.generate(project)
@@ -36,11 +34,20 @@ class TestBuildRecipe(unittest.TestCase):
         )
         filesystem.symlink.assert_called_once_with('../../sources', 'recipes/build/sources')
 
+    def test_recipe_is_not_regenerated_if_up_to_date_files_are_found(self):
+        filesystem = self.filesystemMockWithRecipeFiles()
+        project = self.deathStarBackend()
+        build_recipe = BuildRecipe(filesystem)
+
+        build_recipe.generate(project)
+
+        filesystem.create_directory.assert_not_called()
+        filesystem.create_file.assert_not_called()
+
     @mock.patch('subprocess.run')
     def test_recipe_compiles_with_cmake_and_ninja(self, subprocess_run):
-        filesystem = mock.MagicMock()
-        project = mock.MagicMock()
-        project.name = 'DeathStarBackend'
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = self.deathStarBackend()
         build_recipe = MacOsXBuildRecipe(filesystem)
 
         build_recipe.compile(project)
@@ -55,4 +62,22 @@ class TestBuildRecipe(unittest.TestCase):
                 cwd='recipes/build'
             )
         ])
+
+    def deathStarBackend(self):
+        project = mock.MagicMock()
+        project.name = 'DeathStarBackend'
+        project.sources = ['sources/main.cpp']
+        return project
+
+    def filesystemMockWithoutRecipeFiles(self):
+        filesystem = mock.MagicMock()
+        filesystem.directory_exists.return_value = False
+        filesystem.file_exists.return_value = False
+        return filesystem
+
+    def filesystemMockWithRecipeFiles(self):
+        filesystem = mock.MagicMock()
+        filesystem.directory_exists.return_value = True
+        filesystem.file_exists.return_value = True
+        return filesystem
 
