@@ -1,29 +1,31 @@
 *** Settings ***
 Library    Process
 Library    OperatingSystem
+Test Setup    Set Python Path
 Test Teardown    Delete Project
 
 *** Variables ***
 ${PROJECT_NAME}     AwesomeProject
+${CPM}    ${EXECDIR}/scripts/cpm
 
 *** Test Cases ***
 Test-Project-Creation
-    ${result}=    Run Process    python3.7    ./cpm.py    create    ${PROJECT_NAME}
+    ${result}=    Run Process    ${CPM}    create    ${PROJECT_NAME}
     Should Be Equal 	${result.rc} 	${0}
 
 Test-Target-Addition-Failure-When-No-Project
-    ${result}=    Run Process    python3.7    ./cpm.py    target    add    ${PROJECT_NAME}
+    ${result}=    Run Process    ${CPM}    target    add    ${PROJECT_NAME}
     Should Be Equal 	${result.rc} 	${1}
 
 Test-Target-Addition
-    Run Process    python3.7    ./cpm.py    create    ${PROJECT_NAME}
-    Run Process    python3.7    ../cpm.py    target    add    ubuntu    cwd=${PROJECT_NAME}    alias=add_target
+    Run Process    ${CPM}    create    ${PROJECT_NAME}
+    Run Process    ${CPM}    target    add    ubuntu    cwd=${PROJECT_NAME}    alias=add_target
     ${result}=    Get Process Result    add_target
     Should Be Equal 	${result.rc} 	${0}
 
 Test-Project-Build-With-Sample-Code
-    Run Process    python3.7    ./cpm.py    create    -s    ${PROJECT_NAME}
-    Run Process    python3.7    ../cpm.py    build    cwd=${PROJECT_NAME}    alias=build
+    Run Process    ${CPM}    create    -s    ${PROJECT_NAME}
+    Run Process    ${CPM}    build    cwd=${PROJECT_NAME}    alias=build
     ${result}=    Get Process Result    build
     Should Be Equal 	${result.rc} 	${0}
 
@@ -31,3 +33,5 @@ Test-Project-Build-With-Sample-Code
 Delete Project
     Remove Directory 	${PROJECT_NAME} 	recursive=True
 
+Set Python Path
+    Set Environment Variable    PYTHONPATH    ${EXECDIR}
