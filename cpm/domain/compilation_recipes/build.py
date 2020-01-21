@@ -7,6 +7,7 @@ CMAKE_RECIPE = (
     'cmake_minimum_required (VERSION 3.7)\n'
     'set(PROJECT_NAME {project_name})\n'
     'project(${{PROJECT_NAME}})\n'
+    'include_directories(sources)\n'
     'add_executable(${{PROJECT_NAME}} {sources_list})\n'
     'add_custom_command(\n'
     '    TARGET ${{PROJECT_NAME}}\n'

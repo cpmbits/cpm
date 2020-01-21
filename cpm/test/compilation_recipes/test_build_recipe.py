@@ -26,6 +26,7 @@ class TestBuildRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'set(PROJECT_NAME DeathStarBackend)\n'
             'project(${PROJECT_NAME})\n'
+            'include_directories(sources)\n'
             'add_executable(${PROJECT_NAME} sources/main.cpp)\n'
             'add_custom_command(\n'
             '    TARGET ${PROJECT_NAME}\n'

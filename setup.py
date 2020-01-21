@@ -6,6 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="cpm",
     version="0.1",
+    scripts=['scripts/cpm'],
     author="Jordi Sánchez",
     description="Chromos Package Manager",
     long_description=long_description,
@@ -17,5 +18,5 @@ setuptools.setup(
         "License :: OSI Approved :: GPLv3 License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
 )
