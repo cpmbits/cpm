@@ -13,8 +13,8 @@ class TestBuildService(unittest.TestCase):
         BuildService(project_loader)
 
     def test_build_service_fails_when_project_loader_fails_to_load_project(self):
-        project_loader = mock.MagicMock()
         compilation_recipe = mock.MagicMock()
+        project_loader = mock.MagicMock()
         project_loader.load.side_effect = NotAChromosProject
         service = BuildService(project_loader)
 
