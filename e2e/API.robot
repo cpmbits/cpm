@@ -13,7 +13,7 @@ Test-Project-Creation
     ${result}=    Run Process    ${CPM}    create    ${PROJECT_NAME}
     Should Be Equal 	${result.rc} 	${0}
 
-Test-Target-Addition-Failure-When-No-Project
+Test-Target-Addition-Fails-When-Directory-Does-Not-Contain-A-CPM-Project
     ${result}=    Run Process    ${CPM}    target    add    ${PROJECT_NAME}
     Should Be Equal 	${result.rc} 	${1}
 
@@ -28,6 +28,33 @@ Test-Project-Build-With-Sample-Code
     Run Process    ${CPM}    build    cwd=${PROJECT_NAME}    alias=build
     ${result}=    Get Process Result    build
     Should Be Equal 	${result.rc} 	${0}
+
+Test-Project-Build-Fails-When-Directory-Does-Not-Contain-A-CPM-Project
+    Run Process    ${CPM}    build    alias=build
+    ${result}=    Get Process Result    build
+    Should Be Equal 	${result.rc} 	${1}
+
+Test-Project-Build-And-Clean-With-Sample-Code
+    Run Process    ${CPM}    create    -s    ${PROJECT_NAME}
+    Run Process    ${CPM}    build    cwd=${PROJECT_NAME}
+    Run Process    ${CPM}    clean    cwd=${PROJECT_NAME}    alias=clean
+    ${result}=    Get Process Result    clean
+    Should Be Equal 	${result.rc} 	${0}
+
+Test-Project-Build-And-Repeated-Clean-With-Sample-Code
+    Run Process    ${CPM}    create    -s    ${PROJECT_NAME}
+    Run Process    ${CPM}    build    cwd=${PROJECT_NAME}
+    Run Process    ${CPM}    clean    cwd=${PROJECT_NAME}
+    Run Process    ${CPM}    clean    cwd=${PROJECT_NAME}    alias=clean
+    ${result}=    Get Process Result    clean
+    Should Be Equal 	${result.rc} 	${0}
+
+Test-Project-Clean-Fails-When-Directory-Does-Not-Contain-A-CPM-Project
+    Run Process    ${CPM}    clean    alias=clean
+    ${result}=    Get Process Result    build
+    Should Be Equal 	${result.rc} 	${1}
+
+
 
 *** Keywords ***
 Delete Project
