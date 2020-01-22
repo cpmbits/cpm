@@ -4,17 +4,19 @@ from cpm.domain.compilation_recipes import CompilationRecipe
 from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
 
 CMAKE_RECIPE = (
-    'cmake_minimum_required (VERSION 3.7)\n'
-    'set(PROJECT_NAME {project_name})\n'
-    'project(${{PROJECT_NAME}})\n'
-    'include_directories(sources)\n'
-    'add_executable(${{PROJECT_NAME}} {sources_list})\n'
-    'add_custom_command(\n'
-    '    TARGET ${{PROJECT_NAME}}\n'
-    '    POST_BUILD\n'
-    '    COMMAND COMMAND ${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:${{PROJECT_NAME}}> ${{PROJECT_SOURCE_DIR}}/../../${{PROJECT_NAME}}\n'
-    ')\n'
+    '''cmake_minimum_required (VERSION 3.7)
+set(PROJECT_NAME {project_name})
+project(${{PROJECT_NAME}})
+include_directories(sources)
+add_executable(${{PROJECT_NAME}} {sources_list})
+add_custom_command(
+    TARGET ${{PROJECT_NAME}}
+    POST_BUILD
+    COMMAND COMMAND ${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:${{PROJECT_NAME}}> ${{PROJECT_SOURCE_DIR}}/../../${{PROJECT_NAME}}
 )
+'''
+)
+
 BUILD_DIRECTORY = f'{RECIPES_DIRECTORY}/build'
 
 

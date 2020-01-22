@@ -23,8 +23,8 @@ class TestBuildService(unittest.TestCase):
         project_loader.load.assert_called_once()
 
     def test_build_service_generates_compilation_recipe_from_project_sources_and_compiles_project(self):
-        project_loader = mock.MagicMock()
         compilation_recipe = mock.MagicMock()
+        project_loader = mock.MagicMock()
         project = Project('ProjectName')
         project_loader.load.return_value = project
         service = BuildService(project_loader)

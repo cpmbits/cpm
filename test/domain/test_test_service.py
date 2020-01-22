@@ -1,6 +1,7 @@
 import unittest
 import mock
 
+from cpm.domain.project import Project
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.test_service import TestService
 
@@ -19,3 +20,18 @@ class TestTestService(unittest.TestCase):
         self.assertRaises(NotAChromosProject, service.run_tests, test_recipe)
 
         project_loader.load.assert_called_once()
+
+    def test_service_generates_the_recipe_then_compiles_and_runs_the_tests(self):
+        test_recipe = mock.MagicMock()
+        project_loader = mock.MagicMock()
+        project = Project('ProjectName')
+        project_loader.load.return_value = project
+        service = TestService(project_loader)
+
+        service.run_tests(test_recipe)
+
+        project_loader.load.assert_called_once()
+        test_recipe.generate.assert_called_once_with(project)
+        test_recipe.compile.assert_called_once_with(project)
+        test_recipe.run.assert_called_once_with(project)
+

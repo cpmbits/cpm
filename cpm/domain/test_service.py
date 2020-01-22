@@ -4,3 +4,6 @@ class TestService(object):
 
     def run_tests(self, recipe):
         project = self.project_loader.load()
+        recipe.generate(project)
+        recipe.compile(project)
+        recipe.run(project)
