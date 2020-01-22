@@ -19,8 +19,7 @@ class ProjectLoader(object):
             raise NotAChromosProject()
 
     def project_sources(self):
-        sources = self.filesystem.find('sources', '*.cpp')
-        return sources
+        return self.filesystem.find('sources', '*.cpp') + self.filesystem.find('sources', '*.c')
 
     def __parse_targets(self, description, project):
         if 'targets' in description:

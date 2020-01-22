@@ -55,14 +55,17 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         yaml_handler.load.return_value = {'project_name': 'Project'}
-        filesystem.find.return_value = ['sources/main.cpp']
+        filesystem.find.side_effect = [['sources/main.cpp'], []]
         loader = ProjectLoader(yaml_handler, filesystem)
 
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
         assert loaded_project.sources == ['sources/main.cpp']
-        filesystem.find.assert_called_once_with('sources', '*.cpp')
+        filesystem.find.assert_has_calls([
+            mock.call('sources', '*.cpp'),
+            mock.call('sources', '*.c'),
+        ])
 
     def test_saving_project_without_targets(self):
         yaml_handler = mock.MagicMock()
