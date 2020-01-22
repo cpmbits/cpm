@@ -5,7 +5,9 @@ import sys
 from cpm.api.create import new_project
 from cpm.api.target import add_target
 from cpm.api.build import build_project
+from cpm.api.clean import clean_project
 from cpm.domain.build_service import BuildService
+from cpm.domain.clean_service import CleanService
 from cpm.domain.compilation_recipes.build import MacOsXBuildRecipe
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
@@ -19,6 +21,7 @@ def main():
     action = {
         'create': create,
         'build': build,
+        'clean': clean,
         'target': target,
     }
 
@@ -50,6 +53,17 @@ def build():
     recipe = MacOsXBuildRecipe(filesystem)
 
     result = build_project(service, recipe)
+
+    finish(result)
+
+
+def clean():
+    filesystem = Filesystem()
+    yaml_handler = YamlHandler(filesystem)
+    loader = ProjectLoader(yaml_handler, filesystem)
+    service = CleanService(filesystem, loader)
+
+    result = clean_project(service)
 
     finish(result)
 

@@ -1,10 +1,11 @@
 import os
+import shutil
 from pathlib import Path
 
 
 class Filesystem:
-    def create_directory(self, name):
-        os.makedirs(name)
+    def create_directory(self, path):
+        os.makedirs(path)
 
     def create_file(self, name, contents=''):
         with open(name, 'w') as f:
@@ -12,6 +13,9 @@ class Filesystem:
 
     def directory_exists(self, name):
         return os.path.exists(name) and os.path.isdir(name)
+
+    def remove_directory(self, path):
+        shutil.rmtree(path)
 
     def file_exists(self, name):
         return os.path.exists(name) and os.path.isfile(name)
