@@ -10,7 +10,7 @@ class TestBuildRecipe(unittest.TestCase):
         filesystem = mock.MagicMock()
         BuildRecipe(filesystem)
 
-    def test_recipe_creates_recipes_directory_and_symlinks_sources(self):
+    def test_recipe_generation(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = self.deathStarBackend()
         build_recipe = BuildRecipe(filesystem)

@@ -3,6 +3,7 @@ import subprocess
 from cpm.domain.compilation_recipes import CompilationRecipe
 from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
 
+BUILD_DIRECTORY = f'{RECIPES_DIRECTORY}/build'
 CMAKE_RECIPE = (
     '''cmake_minimum_required (VERSION 3.7)
 set(PROJECT_NAME {project_name})
@@ -16,8 +17,6 @@ add_custom_command(
 )
 '''
 )
-
-BUILD_DIRECTORY = f'{RECIPES_DIRECTORY}/build'
 
 
 class BuildRecipe(CompilationRecipe):
