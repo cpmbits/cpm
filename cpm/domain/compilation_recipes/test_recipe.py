@@ -52,5 +52,5 @@ class TestRecipe(object):
         )
 
 
-class MacOsTestRecipe(object):
+class MacOsTestRecipe(TestRecipe):
     CMAKE_COMMAND = '/Applications/CMake.app/Contents/bin/cmake'
