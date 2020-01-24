@@ -12,43 +12,49 @@ class ProjectLoader(object):
         try:
             description = self.yaml_handler.load(PROJECT_ROOT_FILE)
             project = Project(description['project_name'])
-            self.__parse_targets(description, project)
-            self.__parse_plugins(description, project)
-            project.add_sources(self.__find_c_cpp_sources_at('sources'))
-            project.add_sources(self.__plugin_sources(project))
+            for target in self.described_targets(description):
+                project.add_target(target)
+            for plugin in self.described_plugins(description):
+                project.add_plugin(plugin)
+            project.add_sources(self.project_sources() + self.plugin_sources(project.plugins))
+            project.add_tests(self.test_suites())
             return project
         except FileNotFoundError:
             raise NotAChromosProject()
 
-    def __find_c_cpp_sources_at(self, path):
-        return self.filesystem.find(path, '*.cpp') + self.filesystem.find(path, '*.c')
-
-    def __plugin_sources(self, project):
-        plugin_sources = []
-        for plugin in project.plugins:
-            plugin_sources += self.__find_c_cpp_sources_at(f'plugins/{plugin}/sources')
-        return plugin_sources
-
-    def __parse_targets(self, description, project):
+    def described_targets(self, description):
         if 'targets' in description:
             for target in description['targets']:
-                project.add_target(Target(target, description['targets'][target]))
+                yield Target(target, description['targets'][target])
 
-    def __parse_plugins(self, description, project):
+    def described_plugins(self, description):
         if 'plugins' in description:
             for plugin in description['plugins']:
-                project.add_plugin(Plugin(plugin, description['plugins'][plugin]))
+                yield Plugin(plugin, description['plugins'][plugin])
+
+    def project_sources(self):
+        return self.all_sources('sources')
+
+    def plugin_sources(self, plugins):
+        return [source for plugin in plugins for source in self.all_sources(f'plugins/{plugin.name}/sources')]
+
+    def test_suites(self):
+        return self.filesystem.find('tests', 'test_*.cpp')
+
+    def all_sources(self, path):
+        return self.filesystem.find(path, '*.cpp') + self.filesystem.find(path, '*.c')
 
     def save(self, project):
         project_description = {
             'project_name': project.name
         }
         if project.targets:
-            project_description['targets'] = self.__as_dict(project.targets)
+            project_description['targets'] = {target: {} for target in project.targets}
+        if project.plugins:
+            project_description['plugins'] = {
+                plugin.name: plugin.properties for plugin in project.plugins
+            }
         self.yaml_handler.dump(PROJECT_ROOT_FILE, project_description)
-
-    def __as_dict(self, targets):
-        return {target: {} for target in targets}
 
 
 class NotAChromosProject(RuntimeError):

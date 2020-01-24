@@ -19,14 +19,18 @@ class Project(object):
     def __init__(self, name):
         self.name = name
         self.sources = []
+        self.tests = []
+        self.plugins = []
         self.targets = {}
-        self.plugins = {}
 
     def add_target(self, target):
         self.targets[target.name] = target
 
     def add_plugin(self, plugin):
-        self.plugins[plugin.name] = plugin
+        self.plugins.append(plugin)
 
     def add_sources(self, source):
         self.sources.extend(source)
+
+    def add_tests(self, tests):
+        self.tests.extend(tests)

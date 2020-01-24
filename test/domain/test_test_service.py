@@ -33,5 +33,5 @@ class TestTestService(unittest.TestCase):
         project_loader.load.assert_called_once()
         test_recipe.generate.assert_called_once_with(project)
         test_recipe.compile.assert_called_once_with(project)
-        test_recipe.run.assert_called_once_with(project)
+        test_recipe.run_tests.assert_called_once_with(project)
 

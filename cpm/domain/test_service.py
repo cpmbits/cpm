@@ -6,4 +6,4 @@ class TestService(object):
         project = self.project_loader.load()
         recipe.generate(project)
         recipe.compile(project)
-        recipe.run(project)
+        recipe.run_tests(project)
