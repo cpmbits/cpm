@@ -1,4 +1,4 @@
-# cpm: Chromos Project Manager
+# cpm: The Chromos Project Manager
 A modern project management tool for C/C++ projects.
 
 ## Installation
@@ -6,18 +6,27 @@ A modern project management tool for C/C++ projects.
 
 ## Getting started
 ```
-cpm create DeathStartBackend
+cpm create xWingConsoleFrontend
 cd DeathStartBackend
 cpm build
+```
+
+After creating the project, the binary will be available in the project root directory. 
+```
+./xWingConsoleFrontend
+```
+
+## Manage dependencies
+CPM manages your project dependencies through CPM-Hub. In order to install a package, simply run:
+
+```
+cpm install R2D2-API
+```
+
+## Run your tests
+```
 cpm test
 ```
 
-```
-cd Project
-cpm build
-```
-
-## Share plugins
-
-## Build for many targets
-
+Test sources reside in the `tests` directory. They are found recursively from the root directory
+ using the expression `test_*.cpp`.
