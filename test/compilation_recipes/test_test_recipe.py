@@ -29,6 +29,7 @@ class TestTestRecipe(unittest.TestCase):
             'include_directories(sources plugins/cest/sources)\n'
             'add_library(${PROJECT_NAME}_test_library OBJECT sources/main.cpp)\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
             'set(UNIT_TEST_EXECUTABLES ${UNIT_TEST_EXECUTABLES} test_suite)\n'
             'add_custom_target(unit\n'
             '    COMMAND echo "> Done"\n'

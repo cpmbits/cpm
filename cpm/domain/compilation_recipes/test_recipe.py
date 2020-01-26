@@ -10,6 +10,7 @@ project(${{PROJECT_NAME}})
 include_directories(sources {plugin_include_directories})
 add_library(${{PROJECT_NAME}}_test_library OBJECT {sources_list})
 add_executable({test_suite_executable} {test_suite} $<TARGET_OBJECTS:${{PROJECT_NAME}}_test_library>)
+set_target_properties({test_suite_executable} PROPERTIES COMPILE_FLAGS -std=c++11)
 set(UNIT_TEST_EXECUTABLES ${{UNIT_TEST_EXECUTABLES}} {test_suite_executable})
 add_custom_target(unit
     COMMAND echo "> Done"
@@ -63,7 +64,6 @@ class TestRecipe(object):
         if plugins:
             return ' '.join([f'plugins/{plugin.name}/sources' for plugin in plugins])
         return ''
-
 
 
 class MacOsTestRecipe(TestRecipe):
