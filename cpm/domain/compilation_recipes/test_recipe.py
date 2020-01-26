@@ -55,7 +55,7 @@ class TestRecipe(object):
 
     def run_tests(self, project):
         subprocess.run(
-            [self.executables[0]],
+            [f'./{self.executables[0]}'],
             cwd=TEST_DIRECTORY
         )
 

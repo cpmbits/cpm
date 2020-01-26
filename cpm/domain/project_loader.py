@@ -1,4 +1,5 @@
-from cpm.domain.project import PROJECT_ROOT_FILE, Plugin
+from cpm.domain.plugin_loader import PluginLoader
+from cpm.domain.project import PROJECT_ROOT_FILE
 from cpm.domain.project import Project
 from cpm.domain.project import Target
 
@@ -7,6 +8,7 @@ class ProjectLoader(object):
     def __init__(self, yaml_handler, filesystem):
         self.filesystem = filesystem
         self.yaml_handler = yaml_handler
+        self.plugin_loader = PluginLoader(yaml_handler, filesystem)
 
     def load(self):
         try:
@@ -14,9 +16,9 @@ class ProjectLoader(object):
             project = Project(description['project_name'])
             for target in self.described_targets(description):
                 project.add_target(target)
-            for plugin in self.described_plugins(description):
+            for plugin in self.load_plugins(description):
                 project.add_plugin(plugin)
-            project.add_sources(self.project_sources() + self.plugin_sources(project.plugins))
+            project.add_sources(self.project_sources())
             project.add_tests(self.test_suites())
             return project
         except FileNotFoundError:
@@ -27,16 +29,13 @@ class ProjectLoader(object):
             for target in description['targets']:
                 yield Target(target, description['targets'][target])
 
-    def described_plugins(self, description):
+    def load_plugins(self, description):
         if 'plugins' in description:
             for plugin in description['plugins']:
-                yield Plugin(plugin, description['plugins'][plugin])
+                yield self.plugin_loader.load(plugin, description['plugins'][plugin])
 
     def project_sources(self):
         return self.all_sources('sources')
-
-    def plugin_sources(self, plugins):
-        return [source for plugin in plugins for source in self.all_sources(f'plugins/{plugin.name}/sources')]
 
     def test_suites(self):
         return self.filesystem.find('tests', 'test_*.cpp')

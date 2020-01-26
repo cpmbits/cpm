@@ -4,7 +4,7 @@ from mock import call
 from mock import patch
 
 from cpm.domain.compilation_recipes.test_recipe import TestRecipe
-from cpm.domain.project import Plugin
+from cpm.domain.plugin import Plugin
 
 
 class TestTestRecipe(unittest.TestCase):
@@ -72,7 +72,7 @@ class TestTestRecipe(unittest.TestCase):
 
         subprocess_run.assert_has_calls([
             call(
-                ['test_suite'],
+                ['./test_suite'],
                 cwd='recipes/tests'
             )
         ])

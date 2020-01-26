@@ -9,12 +9,6 @@ class Target:
     properties: dict
 
 
-@dataclass
-class Plugin:
-    name: str
-    properties: dict
-
-
 class Project(object):
     def __init__(self, name):
         self.name = name

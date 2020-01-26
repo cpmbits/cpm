@@ -39,11 +39,11 @@ def main():
 def create():
     create_parser = argparse.ArgumentParser(prog='cpm create', description='Chromos Package Manager', add_help=False)
     create_parser.add_argument('project_name')
-    create_parser.add_argument('-s', '--generate-sample-code', required=False, action='store_true', default=False)
+    create_parser.add_argument('-s', '--no-sample-code', required=False, action='store_true', default=False)
     args = create_parser.parse_args(sys.argv[2:])
 
     service = CreationService(Filesystem())
-    options = CreationOptions(generate_sample_code=args.generate_sample_code)
+    options = CreationOptions(generate_sample_code=not args.no_sample_code)
     result = new_project(service, args.project_name, options)
 
     finish(result)

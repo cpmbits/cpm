@@ -3,13 +3,14 @@ import mock
 
 from cpm.domain.project_loader import ProjectLoader
 from cpm.domain.project_loader import NotAChromosProject
-from cpm.domain.project import Project, Plugin
+from cpm.domain.project import Project
+from cpm.domain.plugin import Plugin
 from cpm.domain.project import PROJECT_ROOT_FILE
 from cpm.domain.target import Target
 
 
 class TestProjectLoader(unittest.TestCase):
-    def test_project_loader_creation(self):
+    def test_creating_project_loader(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         ProjectLoader(yaml_handler, filesystem)
@@ -51,19 +52,26 @@ class TestProjectLoader(unittest.TestCase):
         assert loaded_project.name == 'Project'
         assert 'ubuntu' in loaded_project.targets
 
-    def test_loading_project_with_one_plugin(self):
-        yaml_handler = mock.MagicMock()
+    @mock.patch('cpm.domain.project_loader.PluginLoader')
+    def test_loading_project_with_one_plugin(self, PluginLoader):
         filesystem = mock.MagicMock()
-        yaml_handler.load.return_value = {
+        plugin_loader = mock.MagicMock()
+        plugin_loader.load.return_value = Plugin('cest', {'plugin_name': 'Cest', 'cflags': ['-std=c++11']})
+        PluginLoader.return_value = plugin_loader
+        yaml_handler = mock.MagicMock()
+        yaml_handler.load.return_value ={
             'project_name': 'Project',
-            'plugins': {'cest': {}}
+            'plugins': {'cest': '2.3'}
         }
         loader = ProjectLoader(yaml_handler, filesystem)
 
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
-        assert loaded_project.plugins == [Plugin('cest', {})]
+        assert loaded_project.plugins == [
+            Plugin('cest', {'plugin_name': 'Cest', 'cflags': ['-std=c++11']})
+        ]
+        plugin_loader.load.assert_called_once_with('cest', '2.3')
 
     def test_saving_project_without_targets(self):
         yaml_handler = mock.MagicMock()
@@ -99,7 +107,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         test_project = Project('Project')
-        test_project.add_plugin(Plugin('cest', {}))
+        test_project.add_plugin(Plugin('cest', '1.2'))
         loader = ProjectLoader(yaml_handler, filesystem)
 
         loader.save(test_project)
@@ -108,7 +116,7 @@ class TestProjectLoader(unittest.TestCase):
             PROJECT_ROOT_FILE,
             {
                 'project_name': 'Project',
-                'plugins': {'cest': {}}
+                'plugins': {'cest': '1.2'}
             }
         )
 
@@ -124,21 +132,6 @@ class TestProjectLoader(unittest.TestCase):
         filesystem.find.assert_has_calls([
             mock.call('sources', '*.cpp'),
             mock.call('sources', '*.c'),
-        ])
-
-    def test_finding_plugin_sources(self):
-        filesystem = mock.MagicMock()
-        filesystem.find.side_effect = [['plugin.cpp'], ['plugin.c']]
-        yaml_handler = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-        plugins = [Plugin('cest', {})]
-
-        sources = loader.plugin_sources(plugins)
-
-        assert sources == ['plugin.cpp', 'plugin.c']
-        filesystem.find.assert_has_calls([
-            mock.call('plugins/cest/sources', '*.cpp'),
-            mock.call('plugins/cest/sources', '*.c'),
         ])
 
     def test_finding_project_test_suites(self):

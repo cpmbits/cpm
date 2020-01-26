@@ -6,7 +6,7 @@ from cpm.domain.sample_code import CPP_HELLO_WORLD
 
 @dataclass
 class CreationOptions:
-    generate_sample_code: bool = False
+    generate_sample_code: bool = True
 
 
 class CreationService:
