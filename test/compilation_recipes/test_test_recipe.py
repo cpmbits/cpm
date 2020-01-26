@@ -14,6 +14,7 @@ class TestTestRecipe(unittest.TestCase):
 
     def test_recipe_generation(self):
         filesystem = MagicMock()
+        filesystem.directory_exists.return_value = False
         project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
 
@@ -42,6 +43,17 @@ class TestTestRecipe(unittest.TestCase):
             call('../../plugins', 'recipes/tests/plugins'),
             call('../../tests', 'recipes/tests/tests'),
         ])
+
+    def test_recipe_is_updated_when_recipe_files_are_found(self):
+        filesystem = MagicMock()
+        filesystem.directory_exists.return_value = True
+        project = self.xWingConsoleFrontendWithOneTest()
+        test_recipe = TestRecipe(filesystem)
+
+        test_recipe.generate(project)
+
+        filesystem.create_directory.assert_not_called()
+        filesystem.symlink.assert_not_called()
 
     @patch('subprocess.run')
     def test_recipe_compiles_with_cmake_and_ninja(self, subprocess_run):

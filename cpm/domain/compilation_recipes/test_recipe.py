@@ -28,10 +28,11 @@ class TestRecipe(object):
         self.executables = []
 
     def generate(self, project):
-        self.filesystem.create_directory(TEST_DIRECTORY)
-        self.filesystem.symlink('../../sources', 'recipes/tests/sources')
-        self.filesystem.symlink('../../plugins', 'recipes/tests/plugins')
-        self.filesystem.symlink('../../tests', 'recipes/tests/tests')
+        if not self.filesystem.directory_exists(TEST_DIRECTORY):
+            self.filesystem.create_directory(TEST_DIRECTORY)
+            self.filesystem.symlink('../../sources', 'recipes/tests/sources')
+            self.filesystem.symlink('../../plugins', 'recipes/tests/plugins')
+            self.filesystem.symlink('../../tests', 'recipes/tests/tests')
         self.executables = [test_file.split('/')[-1].split('.')[0] for test_file in project.tests]
         self.filesystem.create_file(
             f'{TEST_DIRECTORY}/CMakeLists.txt',
