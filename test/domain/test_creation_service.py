@@ -22,7 +22,7 @@ class TestCreationService(unittest.TestCase):
         filesystem = mock.MagicMock()
         creation_service = CreationService(filesystem)
 
-        creation_service.create('AwesomeProject')
+        creation_service.create('AwesomeProject', CreationOptions(generate_sample_code=False))
 
         filesystem.create_directory.assert_called_once_with('AwesomeProject')
         filesystem.create_file.assert_called_once_with(
@@ -34,7 +34,7 @@ class TestCreationService(unittest.TestCase):
         filesystem = mock.MagicMock()
         creation_service = CreationService(filesystem)
 
-        creation_service.create('AwesomeProject', CreationOptions(generate_sample_code=True))
+        creation_service.create('AwesomeProject')
 
         filesystem.create_directory.assert_called_with('AwesomeProject/sources')
         filesystem.create_file.assert_called_with(
