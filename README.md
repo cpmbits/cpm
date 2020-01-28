@@ -6,14 +6,14 @@ A modern project management tool for C/C++ projects.
 
 ## Getting started
 ```
-cpm create xWingConsoleFrontend
-cd DeathStartBackend
+cpm create DeathStartLaserBackend
+cd DeathStartLaserBackend
 cpm build
 ```
 
 After creating the project, the binary will be available in the project root directory. 
 ```
-./xWingConsoleFrontend
+./DeathStartLaserBackend
 ```
 
 ## Manage dependencies
