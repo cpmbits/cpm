@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from cpm.domain.plugin_loader import PluginLoader
 from cpm.domain.project import PROJECT_ROOT_FILE
 from cpm.domain.project import Package
@@ -42,7 +40,7 @@ class ProjectLoader(object):
         if 'packages' in description:
             for package in description['packages']:
                 yield Package(package)
-g
+
     def project_sources(self):
         return self.all_sources('sources')
 
