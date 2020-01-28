@@ -26,9 +26,11 @@ class BuildRecipe(CompilationRecipe):
         self.filesystem = filesystem
 
     def generate(self, project):
-        if self._recipe_files_up_to_date():
-            return
-        self.filesystem.create_directory(BUILD_DIRECTORY)
+        if not self.filesystem.directory_exists(BUILD_DIRECTORY):
+            self.filesystem.create_directory(BUILD_DIRECTORY)
+        self.filesystem.symlink('../../main.cpp', 'recipes/build/main.cpp')
+        for package in project.packages:
+            self.filesystem.symlink(f'../../{package.path}', f'recipes/build/{package.path}')
         self.filesystem.create_file(
             f'{BUILD_DIRECTORY}/CMakeLists.txt',
             CMAKE_RECIPE.format(
@@ -37,9 +39,6 @@ class BuildRecipe(CompilationRecipe):
                 include_directories=' '.join(project.include_directories)
             )
         )
-        self.filesystem.symlink('../../main.cpp', 'recipes/build/main.cpp')
-        for package in project.packages:
-            self.filesystem.symlink(f'../../{package.path}', f'recipes/build/{package.path}')
 
     def _recipe_files_up_to_date(self):
         return self.filesystem.directory_exists(BUILD_DIRECTORY) and \

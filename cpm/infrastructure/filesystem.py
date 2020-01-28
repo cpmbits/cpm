@@ -27,4 +27,6 @@ class Filesystem:
         return [str(filename) for filename in Path(path).rglob(pattern)]
 
     def symlink(self, source, destination):
-        os.symlink(source, destination, target_is_directory=True)
+        if Path(destination).is_symlink():
+            return
+        os.symlink(source, destination, target_is_directory=Path(source).is_dir())

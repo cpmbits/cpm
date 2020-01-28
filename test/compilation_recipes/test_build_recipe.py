@@ -88,7 +88,7 @@ class TestBuildRecipe(unittest.TestCase):
             ')\n'
         )
 
-    def test_recipe_is_not_regenerated_if_up_to_date_files_are_found(self):
+    def test_recipe_is_updated_when_recipe_files_are_found(self):
         filesystem = self.filesystemMockWithRecipeFiles()
         project = self.deathStarBackend()
         build_recipe = BuildRecipe(filesystem)
@@ -96,7 +96,7 @@ class TestBuildRecipe(unittest.TestCase):
         build_recipe.generate(project)
 
         filesystem.create_directory.assert_not_called()
-        filesystem.create_file.assert_not_called()
+        filesystem.create_file.assert_called_once()
 
     @mock.patch('subprocess.run')
     def test_recipe_compiles_with_cmake_and_ninja(self, subprocess_run):
