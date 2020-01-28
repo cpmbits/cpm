@@ -9,12 +9,18 @@ class Target:
     properties: dict
 
 
+@dataclass
+class Package:
+    path: str
+
+
 class Project(object):
     def __init__(self, name):
         self.name = name
         self.sources = []
         self.tests = []
         self.plugins = []
+        self.packages = []
         self.targets = {}
 
     def add_target(self, target):
@@ -28,3 +34,6 @@ class Project(object):
 
     def add_tests(self, tests):
         self.tests.extend(tests)
+
+    def add_packages(self, packages):
+        self.packages = packages

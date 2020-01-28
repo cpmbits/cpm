@@ -3,7 +3,7 @@ import mock
 
 from cpm.domain.project_loader import ProjectLoader
 from cpm.domain.project_loader import NotAChromosProject
-from cpm.domain.project import Project
+from cpm.domain.project import Project, Package
 from cpm.domain.plugin import Plugin
 from cpm.domain.project import PROJECT_ROOT_FILE
 from cpm.domain.target import Target
@@ -59,7 +59,7 @@ class TestProjectLoader(unittest.TestCase):
         plugin_loader.load.return_value = Plugin('cest', {'plugin_name': 'Cest', 'cflags': ['-std=c++11']})
         PluginLoader.return_value = plugin_loader
         yaml_handler = mock.MagicMock()
-        yaml_handler.load.return_value ={
+        yaml_handler.load.return_value = {
             'project_name': 'Project',
             'plugins': {'cest': '2.3'}
         }
@@ -144,3 +144,17 @@ class TestProjectLoader(unittest.TestCase):
 
         assert tests == ['tests/test_project.cpp']
         filesystem.find.assert_called_once_with('tests', 'test_*.cpp')
+
+    def test_loading_project_with_one_package(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'packages': ['cpm-hub'],
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        project = loader.load()
+
+        assert project.name == 'Project'
+        assert Package('cpm-hub') in project.packages

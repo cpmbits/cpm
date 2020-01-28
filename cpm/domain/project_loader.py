@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from cpm.domain.plugin_loader import PluginLoader
 from cpm.domain.project import PROJECT_ROOT_FILE
+from cpm.domain.project import Package
 from cpm.domain.project import Project
 from cpm.domain.project import Target
 
@@ -18,6 +21,7 @@ class ProjectLoader(object):
                 project.add_target(target)
             for plugin in self.load_plugins(description):
                 project.add_plugin(plugin)
+            project.add_packages(self.project_packages(description))
             project.add_sources(self.project_sources())
             project.add_tests(self.test_suites())
             return project
@@ -34,6 +38,11 @@ class ProjectLoader(object):
             for plugin in description['plugins']:
                 yield self.plugin_loader.load(plugin, description['plugins'][plugin])
 
+    def project_packages(self, description):
+        if 'packages' in description:
+            for package in description['packages']:
+                yield Package(package)
+g
     def project_sources(self):
         return self.all_sources('sources')
 
