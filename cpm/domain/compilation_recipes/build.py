@@ -8,7 +8,7 @@ CMAKE_RECIPE = (
     '''cmake_minimum_required (VERSION 3.7)
 set(PROJECT_NAME {project_name})
 project(${{PROJECT_NAME}})
-include_directories(sources)
+include_directories({include_directories})
 add_executable(${{PROJECT_NAME}} {sources_list})
 add_custom_command(
     TARGET ${{PROJECT_NAME}}
@@ -33,10 +33,13 @@ class BuildRecipe(CompilationRecipe):
             f'{BUILD_DIRECTORY}/CMakeLists.txt',
             CMAKE_RECIPE.format(
                 project_name=project.name,
-                sources_list=' '.join(project.sources)
+                sources_list=' '.join(project.sources),
+                include_directories=' '.join(project.include_directories)
             )
         )
-        self.filesystem.symlink('../../sources', 'recipes/build/sources')
+        self.filesystem.symlink('../../main.cpp', 'recipes/build/main.cpp')
+        for package in project.packages:
+            self.filesystem.symlink(f'../../{package.path}', f'recipes/build/{package.path}')
 
     def _recipe_files_up_to_date(self):
         return self.filesystem.directory_exists(BUILD_DIRECTORY) and \

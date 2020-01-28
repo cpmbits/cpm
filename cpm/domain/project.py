@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 PROJECT_ROOT_FILE = 'project.yaml'
 
@@ -21,6 +22,7 @@ class Project(object):
         self.tests = []
         self.plugins = []
         self.packages = []
+        self.include_directories = []
         self.targets = {}
 
     def add_target(self, target):
@@ -35,5 +37,8 @@ class Project(object):
     def add_tests(self, tests):
         self.tests.extend(tests)
 
-    def add_packages(self, packages):
-        self.packages = packages
+    def add_package(self, package):
+        self.packages.append(package)
+
+    def add_include_directory(self, directory):
+        self.include_directories.append(directory)

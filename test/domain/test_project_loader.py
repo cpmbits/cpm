@@ -36,6 +36,22 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.load.assert_called_once_with(PROJECT_ROOT_FILE)
         assert loaded_project.name == 'Project'
 
+    def test_loading_project_with_one_package(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        filesystem.parent_directory.return_value = '.'
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'packages': ['cpm-hub'],
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        project = loader.load()
+
+        assert project.name == 'Project'
+        assert Package(path='cpm-hub') in project.packages
+        assert project.include_directories == ['.']
+
     def test_loading_project_with_one_target(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
@@ -55,8 +71,10 @@ class TestProjectLoader(unittest.TestCase):
     @mock.patch('cpm.domain.project_loader.PluginLoader')
     def test_loading_project_with_one_plugin(self, PluginLoader):
         filesystem = mock.MagicMock()
+        plugin = Plugin('cest', '2.3')
+        plugin.add_include_directory('plugins/cest')
         plugin_loader = mock.MagicMock()
-        plugin_loader.load.return_value = Plugin('cest', {'plugin_name': 'Cest', 'cflags': ['-std=c++11']})
+        plugin_loader.load.return_value = plugin
         PluginLoader.return_value = plugin_loader
         yaml_handler = mock.MagicMock()
         yaml_handler.load.return_value = {
@@ -69,7 +87,10 @@ class TestProjectLoader(unittest.TestCase):
 
         assert loaded_project.name == 'Project'
         assert loaded_project.plugins == [
-            Plugin('cest', {'plugin_name': 'Cest', 'cflags': ['-std=c++11']})
+            Plugin('cest', '2.3')
+        ]
+        assert loaded_project.include_directories == [
+            'plugins/cest'
         ]
         plugin_loader.load.assert_called_once_with('cest', '2.3')
 
@@ -122,16 +143,16 @@ class TestProjectLoader(unittest.TestCase):
 
     def test_finding_project_sources(self):
         filesystem = mock.MagicMock()
-        filesystem.find.side_effect = [['sources/main.cpp'], ['source.c']]
+        filesystem.find.side_effect = [['package/file.cpp'], ['package/file.c']]
         yaml_handler = mock.MagicMock()
         loader = ProjectLoader(yaml_handler, filesystem)
 
-        sources = loader.project_sources()
+        sources = loader.project_sources([Package('package')])
 
-        assert sources == ['sources/main.cpp', 'source.c']
+        assert sources == ['main.cpp', 'package/file.cpp', 'package/file.c']
         filesystem.find.assert_has_calls([
-            mock.call('sources', '*.cpp'),
-            mock.call('sources', '*.c'),
+            mock.call('package', '*.cpp'),
+            mock.call('package', '*.c'),
         ])
 
     def test_finding_project_test_suites(self):
@@ -144,17 +165,3 @@ class TestProjectLoader(unittest.TestCase):
 
         assert tests == ['tests/test_project.cpp']
         filesystem.find.assert_called_once_with('tests', 'test_*.cpp')
-
-    def test_loading_project_with_one_package(self):
-        yaml_handler = mock.MagicMock()
-        filesystem = mock.MagicMock()
-        yaml_handler.load.return_value = {
-            'project_name': 'Project',
-            'packages': ['cpm-hub'],
-        }
-        loader = ProjectLoader(yaml_handler, filesystem)
-
-        project = loader.load()
-
-        assert project.name == 'Project'
-        assert Package('cpm-hub') in project.packages

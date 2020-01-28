@@ -14,6 +14,9 @@ class Filesystem:
     def directory_exists(self, name):
         return os.path.exists(name) and os.path.isdir(name)
 
+    def parent_directory(self, path):
+        return str(Path(path).parent)
+
     def remove_directory(self, path):
         shutil.rmtree(path)
 

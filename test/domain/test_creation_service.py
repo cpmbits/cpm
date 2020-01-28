@@ -36,9 +36,8 @@ class TestCreationService(unittest.TestCase):
 
         creation_service.create('AwesomeProject')
 
-        filesystem.create_directory.assert_called_with('AwesomeProject/sources')
         filesystem.create_file.assert_called_with(
-            'AwesomeProject/sources/main.cpp',
+            'AwesomeProject/main.cpp',
             CPP_HELLO_WORLD
         )
 
@@ -49,5 +48,5 @@ class TestCreationService(unittest.TestCase):
         project = creation_service.create('AwesomeProject', CreationOptions(generate_sample_code=True))
 
         assert project.name == 'AwesomeProject'
-        assert project.sources == ['sources/main.cpp']
+        assert project.sources == ['main.cpp']
 

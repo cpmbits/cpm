@@ -11,7 +11,7 @@ class TestPluginLoader(unittest.TestCase):
         filesystem = MagicMock()
         PluginLoader(yaml_handler, filesystem)
 
-    def test_loading_simple_plugin_without_cflags(self):
+    def test_loading_simple_plugin_without_cflags_or_packages(self):
         filesystem = MagicMock()
         yaml_handler = MagicMock()
         yaml_handler.load.return_value = {
@@ -23,6 +23,7 @@ class TestPluginLoader(unittest.TestCase):
 
         yaml_handler.load.assert_called_once_with('plugins/cest/plugin.yaml')
         assert plugin.name == 'cest'
+        assert plugin.include_directories == ['plugins/cest']
 
     def test_finding_plugin_sources(self):
         filesystem = MagicMock()

@@ -3,7 +3,7 @@ import mock
 
 from cpm.domain.compilation_recipes.build import BuildRecipe
 from cpm.domain.compilation_recipes.build import MacOsBuildRecipe
-from cpm.domain.project import Project
+from cpm.domain.project import Project, Package
 
 
 class TestBuildRecipe(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestBuildRecipe(unittest.TestCase):
         filesystem = mock.MagicMock()
         BuildRecipe(filesystem)
 
-    def test_recipe_generation_without_plugins(self):
+    def test_recipe_generation_without_plugins_or_packages(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = self.deathStarBackend()
         build_recipe = BuildRecipe(filesystem)
@@ -19,15 +19,44 @@ class TestBuildRecipe(unittest.TestCase):
         build_recipe.generate(project)
 
         filesystem.create_directory.assert_called_once_with('recipes/build')
-        filesystem.symlink.assert_called_once_with('../../sources', 'recipes/build/sources')
+        filesystem.symlink.assert_called_once_with('../../main.cpp', 'recipes/build/main.cpp')
         filesystem.create_file.assert_called_once_with(
             'recipes/build/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
             'set(PROJECT_NAME DeathStarBackend)\n'
             'project(${PROJECT_NAME})\n'
-            'include_directories(sources)\n'
-            'add_executable(${PROJECT_NAME} sources/main.cpp)\n'
+            'include_directories()\n'
+            'add_executable(${PROJECT_NAME} main.cpp)\n'
+            'add_custom_command(\n'
+            '    TARGET ${PROJECT_NAME}\n'
+            '    POST_BUILD\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/../../${PROJECT_NAME}\n'
+            ')\n'
+        )
+
+    def test_recipe_generation_with_one_package(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = self.deathStarBackend()
+        project.add_package(Package('package'))
+        project.add_include_directory('package')
+        build_recipe = BuildRecipe(filesystem)
+
+        build_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('recipes/build')
+        filesystem.symlink.assert_has_calls([
+            mock.call('../../main.cpp', 'recipes/build/main.cpp'),
+            mock.call('../../package', 'recipes/build/package'),
+        ])
+        filesystem.create_file.assert_called_once_with(
+            'recipes/build/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'set(PROJECT_NAME DeathStarBackend)\n'
+            'project(${PROJECT_NAME})\n'
+            'include_directories(package)\n'
+            'add_executable(${PROJECT_NAME} main.cpp)\n'
             'add_custom_command(\n'
             '    TARGET ${PROJECT_NAME}\n'
             '    POST_BUILD\n'
@@ -43,15 +72,15 @@ class TestBuildRecipe(unittest.TestCase):
         build_recipe.generate(project)
 
         filesystem.create_directory.assert_called_once_with('recipes/build')
-        filesystem.symlink.assert_called_once_with('../../sources', 'recipes/build/sources')
+        filesystem.symlink.assert_called_once_with('../../main.cpp', 'recipes/build/main.cpp')
         filesystem.create_file.assert_called_once_with(
             'recipes/build/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
             'set(PROJECT_NAME DeathStarBackend)\n'
             'project(${PROJECT_NAME})\n'
-            'include_directories(sources)\n'
-            'add_executable(${PROJECT_NAME} sources/main.cpp)\n'
+            'include_directories()\n'
+            'add_executable(${PROJECT_NAME} main.cpp)\n'
             'add_custom_command(\n'
             '    TARGET ${PROJECT_NAME}\n'
             '    POST_BUILD\n'
@@ -90,7 +119,7 @@ class TestBuildRecipe(unittest.TestCase):
 
     def deathStarBackend(self):
         project = Project('DeathStarBackend')
-        project.sources = ['sources/main.cpp']
+        project.sources = ['main.cpp']
         return project
 
     def filesystemMockWithoutRecipeFiles(self):
