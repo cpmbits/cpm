@@ -4,6 +4,12 @@ class TestService(object):
 
     def run_tests(self, recipe):
         project = self.project_loader.load()
+        if not project.tests:
+            raise NoTestsFound()
         recipe.generate(project)
         recipe.compile(project)
         recipe.run_tests(project)
+
+
+class NoTestsFound(RuntimeError):
+    pass
