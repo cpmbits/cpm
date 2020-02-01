@@ -1,5 +1,6 @@
 import subprocess
 
+from cpm.domain.compilation_recipes import CompilationError
 from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
 
 TEST_DIRECTORY = f'{RECIPES_DIRECTORY}/tests'
@@ -47,14 +48,19 @@ class TestRecipe(object):
         )
 
     def compile(self, project):
-        subprocess.run(
+        generate_result = subprocess.run(
             [self.CMAKE_COMMAND, '-G', 'Ninja', '.'],
             cwd=TEST_DIRECTORY
         )
-        subprocess.run(
+        if generate_result.returncode != 0:
+            raise CompilationError('failed to generate CMake recipe')
+
+        compile_result = subprocess.run(
             ['ninja', 'unit'],
             cwd=TEST_DIRECTORY
         )
+        if compile_result.returncode != 0:
+            raise CompilationError('compilation failed')
 
     def run_tests(self, project):
         subprocess.run(

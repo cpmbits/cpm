@@ -1,11 +1,15 @@
 import unittest
+from subprocess import CompletedProcess
+
 from mock import MagicMock
 from mock import call
 from mock import patch
 
+from cpm.domain.compilation_recipes import CompilationError
 from cpm.domain.compilation_recipes.test_recipe import TestRecipe
 from cpm.domain.plugin import Plugin
-from cpm.domain.project import Project, Package
+from cpm.domain.project import Project
+from cpm.domain.project import Package
 
 
 class TestTestRecipe(unittest.TestCase):
@@ -94,6 +98,7 @@ class TestTestRecipe(unittest.TestCase):
         filesystem = MagicMock()
         project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
+        subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, 0)]
 
         recipe.compile(project)
 
@@ -107,6 +112,24 @@ class TestTestRecipe(unittest.TestCase):
                 cwd='recipes/tests'
             )
         ])
+
+    @patch('subprocess.run')
+    def test_recipe_raises_exception_upon_cmake_generation_failure(self, subprocess_run):
+        filesystem = MagicMock()
+        project = self.xWingConsoleFrontendWithOneTest()
+        recipe = TestRecipe(filesystem)
+        subprocess_run.side_effect = [CompletedProcess(None, -1)]
+
+        self.assertRaises(CompilationError, recipe.compile, project)
+
+    @patch('subprocess.run')
+    def test_recipe_raises_exception_upon_compilation_failure(self, subprocess_run):
+        filesystem = MagicMock()
+        project = self.xWingConsoleFrontendWithOneTest()
+        recipe = TestRecipe(filesystem)
+        subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, -1)]
+
+        self.assertRaises(CompilationError, recipe.compile, project)
 
     @patch('subprocess.run')
     def test_recipe_runs_list_of_generated_executable_for_project_with_one_test(self, subprocess_run):

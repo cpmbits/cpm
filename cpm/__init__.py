@@ -111,5 +111,5 @@ def test():
 
 
 def finish(result):
-    print(result.message)
+    print(f'CPM: {result.message}')
     sys.exit(result.status_code)

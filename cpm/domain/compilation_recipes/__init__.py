@@ -7,3 +7,7 @@ class CompilationRecipe(object):
 
     def compile(self, project):
         raise NotImplementedError()
+
+
+class CompilationError(RuntimeError):
+    pass
