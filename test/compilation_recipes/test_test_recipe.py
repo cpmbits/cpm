@@ -17,7 +17,7 @@ class TestTestRecipe(unittest.TestCase):
         filesystem = MagicMock()
         TestRecipe(filesystem)
 
-    def test_recipe_generation(self):
+    def test_recipe_generation_with_one_test_suite(self):
         filesystem = MagicMock()
         filesystem.directory_exists.return_value = False
         project = self.xWingConsoleFrontendWithOneTest()
@@ -37,10 +37,41 @@ class TestTestRecipe(unittest.TestCase):
             'add_library(${PROJECT_NAME}_test_library OBJECT )\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
-            'set(UNIT_TEST_EXECUTABLES ${UNIT_TEST_EXECUTABLES} test_suite)\n'
             'add_custom_target(unit\n'
             '    COMMAND echo "> Done"\n'
-            '    DEPENDS ${UNIT_TEST_EXECUTABLES}\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+
+        )
+        filesystem.symlink.assert_has_calls([
+            call('../../plugins', 'recipes/tests/plugins'),
+            call('../../tests', 'recipes/tests/tests'),
+        ])
+
+    def test_recipe_generation_with_many_test_suites(self):
+        filesystem = MagicMock()
+        filesystem.directory_exists.return_value = False
+        project = self.xWingConsoleFrontendWithManyTests()
+        recipe = TestRecipe(filesystem)
+
+        recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('recipes/tests')
+        filesystem.create_file.assert_called_once_with(
+            'recipes/tests/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'set(PROJECT_NAME xWingConsoleFrontend)\n'
+            'project(${PROJECT_NAME})\n'
+            'include_directories()\n'
+            'add_library(${PROJECT_NAME}_test_library OBJECT )\n'
+            'add_executable(test_suite_1 tests/test_suite_1.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
+            'set_target_properties(test_suite_1 PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'add_executable(test_suite_2 tests/test_suite_2.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
+            'set_target_properties(test_suite_2 PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'add_custom_target(unit\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite_1 test_suite_2\n'
             ')\n'
 
         )
@@ -69,10 +100,9 @@ class TestTestRecipe(unittest.TestCase):
             'add_library(${PROJECT_NAME}_test_library OBJECT )\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
-            'set(UNIT_TEST_EXECUTABLES ${UNIT_TEST_EXECUTABLES} test_suite)\n'
             'add_custom_target(unit\n'
             '    COMMAND echo "> Done"\n'
-            '    DEPENDS ${UNIT_TEST_EXECUTABLES}\n'
+            '    DEPENDS test_suite\n'
             ')\n'
 
         )
@@ -149,7 +179,28 @@ class TestTestRecipe(unittest.TestCase):
         ])
 
     @patch('subprocess.run')
-    def test_recipe_raises_exception_test_execution_failure(self, subprocess_run):
+    def test_recipe_runs_list_of_generated_executables_for_project_with_many_tests(self, subprocess_run):
+        filesystem = MagicMock()
+        project = self.xWingConsoleFrontendWithOneTest()
+        recipe = TestRecipe(filesystem)
+        recipe.executables = ['test_suite_1', 'test_suite_2']
+        subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, 0)]
+
+        recipe.run_tests(project)
+
+        subprocess_run.assert_has_calls([
+            call(
+                ['./test_suite_1'],
+                cwd='recipes/tests'
+            ),
+            call(
+                ['./test_suite_2'],
+                cwd='recipes/tests'
+            )
+        ])
+
+    @patch('subprocess.run')
+    def test_recipe_raises_exception_when_test_execution_fails_in_project_with_one_test(self, subprocess_run):
         filesystem = MagicMock()
         project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
@@ -158,9 +209,37 @@ class TestTestRecipe(unittest.TestCase):
 
         self.assertRaises(TestsFailed, recipe.run_tests, project)
 
+    @patch('subprocess.run')
+    def test_recipe_runs_all_tests_before_raising_exception_when_tests_fail(self, subprocess_run):
+        filesystem = MagicMock()
+        project = self.xWingConsoleFrontendWithOneTest()
+        recipe = TestRecipe(filesystem)
+        recipe.executables = ['test_suite_1', 'test_suite_2']
+        subprocess_run.side_effect = [CompletedProcess(None, -1), CompletedProcess(None, 0)]
+
+        self.assertRaises(TestsFailed, recipe.run_tests, project)
+
+        subprocess_run.assert_has_calls([
+            call(
+                ['./test_suite_1'],
+                cwd='recipes/tests'
+            ),
+            call(
+                ['./test_suite_2'],
+                cwd='recipes/tests'
+            )
+        ])
+
     def xWingConsoleFrontendWithOneTest(self):
         project = Project('xWingConsoleFrontend')
         project.sources = ['main.cpp']
         project.tests = ['tests/test_suite.cpp']
+        project.plugins = [Plugin('cest', {})]
+        return project
+
+    def xWingConsoleFrontendWithManyTests(self):
+        project = Project('xWingConsoleFrontend')
+        project.sources = ['main.cpp']
+        project.tests = ['tests/test_suite_1.cpp', 'tests/test_suite_2.cpp']
         project.plugins = [Plugin('cest', {})]
         return project
