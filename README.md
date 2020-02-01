@@ -4,6 +4,8 @@ A modern project management tool for C/C++ projects.
 ## Installation
 `pip3 install cpm`
 
+CPM depends on [CMake](https://cmake.org/) and [ninja](https://ninja-build.org/) for the build process.
+
 ## Getting started
 ```
 cpm create DeathStartLaserBackend
