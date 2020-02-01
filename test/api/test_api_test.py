@@ -26,7 +26,7 @@ class TestApiBuild(unittest.TestCase):
 
         result = run_tests(test_service, recipe)
 
-        assert result.status_code == 1
+        assert result.status_code == 0
         test_service.run_tests.assert_called_once_with(recipe)
 
     def test_run_tests_fails_when_compilation_fails(self):
