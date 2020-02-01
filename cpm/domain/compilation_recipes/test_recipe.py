@@ -63,11 +63,17 @@ class TestRecipe(object):
             raise CompilationError('compilation failed')
 
     def run_tests(self, project):
-        subprocess.run(
+        run_result = subprocess.run(
             [f'./{self.executables[0]}'],
             cwd=TEST_DIRECTORY
         )
+        if run_result.returncode != 0:
+            raise TestsFailed('tests failed')
 
 
 class MacOsTestRecipe(TestRecipe):
     CMAKE_COMMAND = '/Applications/CMake.app/Contents/bin/cmake'
+
+
+class TestsFailed(RuntimeError):
+    pass

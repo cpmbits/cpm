@@ -6,7 +6,7 @@ from mock import call
 from mock import patch
 
 from cpm.domain.compilation_recipes import CompilationError
-from cpm.domain.compilation_recipes.test_recipe import TestRecipe
+from cpm.domain.compilation_recipes.test_recipe import TestRecipe, TestsFailed
 from cpm.domain.plugin import Plugin
 from cpm.domain.project import Project
 from cpm.domain.project import Package
@@ -137,6 +137,7 @@ class TestTestRecipe(unittest.TestCase):
         project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         recipe.executables = ['test_suite']
+        subprocess_run.return_value = CompletedProcess(None, 0)
 
         recipe.run_tests(project)
 
@@ -146,6 +147,16 @@ class TestTestRecipe(unittest.TestCase):
                 cwd='recipes/tests'
             )
         ])
+
+    @patch('subprocess.run')
+    def test_recipe_raises_exception_test_execution_failure(self, subprocess_run):
+        filesystem = MagicMock()
+        project = self.xWingConsoleFrontendWithOneTest()
+        recipe = TestRecipe(filesystem)
+        recipe.executables = ['test_suite']
+        subprocess_run.return_value = CompletedProcess(None, -1)
+
+        self.assertRaises(TestsFailed, recipe.run_tests, project)
 
     def xWingConsoleFrontendWithOneTest(self):
         project = Project('xWingConsoleFrontend')
