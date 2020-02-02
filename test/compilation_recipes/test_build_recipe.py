@@ -62,7 +62,7 @@ class TestBuildRecipe(unittest.TestCase):
             ')\n'
         )
 
-    def test_recipe_generation_with_plugins(self):
+    def test_recipe_generation_with_one_plugin(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = self.deathStarBackend()
         build_recipe = BuildRecipe(filesystem)

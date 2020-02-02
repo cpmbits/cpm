@@ -62,9 +62,15 @@ Clean-Fails-When-Directory-Does-Not-Contain-A-CPM-Project
     Should Be Equal 	${result.rc} 	${1}
 
 Test-Fails-When-Directory-Does-Not-Contain-A-CPM-Project
-    Run Process    ${CPM}    build    alias=build
-    ${result}=    Get Process Result    build
+    Run Process    ${CPM}    test    alias=test
+    ${result}=    Get Process Result    test
     Should Be Equal 	${result.rc} 	${1}
+
+Test-Command-Returns-0-When-Project-Has-No-Tests
+    Run Process    ${CPM}    create    ${PROJECT_NAME}
+    Run Process    ${CPM}    test      cwd=${PROJECT_NAME}    alias=test
+    ${result}=    Get Process Result    test
+    Should Be Equal 	${result.rc} 	${0}
 
 *** Keywords ***
 Delete Project
