@@ -1,22 +1,10 @@
 import subprocess
 
 from cpm.domain.compilation_recipes import CompilationRecipe
+from cpm.domain.compilation_recipes import cmake
 from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
 
 BUILD_DIRECTORY = f'{RECIPES_DIRECTORY}/build'
-CMAKE_RECIPE = (
-    '''cmake_minimum_required (VERSION 3.7)
-set(PROJECT_NAME {project_name})
-project(${{PROJECT_NAME}})
-include_directories({include_directories})
-add_executable(${{PROJECT_NAME}} {sources_list})
-add_custom_command(
-    TARGET ${{PROJECT_NAME}}
-    POST_BUILD
-    COMMAND COMMAND ${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:${{PROJECT_NAME}}> ${{PROJECT_SOURCE_DIR}}/../../${{PROJECT_NAME}}
-)
-'''
-)
 
 
 class BuildRecipe(CompilationRecipe):
@@ -31,14 +19,23 @@ class BuildRecipe(CompilationRecipe):
         self.filesystem.symlink('../../main.cpp', 'recipes/build/main.cpp')
         for package in project.packages:
             self.filesystem.symlink(f'../../{package.path}', f'recipes/build/{package.path}')
+
         self.filesystem.create_file(
             f'{BUILD_DIRECTORY}/CMakeLists.txt',
-            CMAKE_RECIPE.format(
-                project_name=project.name,
-                sources_list=' '.join(project.sources),
-                include_directories=' '.join(project.include_directories)
-            )
+            self.build_cmakelists(project)
         )
+
+    def build_cmakelists(self, project):
+        return cmake.a_cmake() \
+            .minimum_required('3.7') \
+            .project(project.name) \
+            .include(project.include_directories) \
+            .add_executable(project.name, project.sources) \
+            .add_custom_command(
+                    project.name,
+                    'POST_BUILD',
+                    f'${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:{project.name}> ${{PROJECT_SOURCE_DIR}}/../../{project.name}') \
+            .contents
 
     def _recipe_files_up_to_date(self):
         return self.filesystem.directory_exists(BUILD_DIRECTORY) and \

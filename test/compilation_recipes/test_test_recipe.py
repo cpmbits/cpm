@@ -31,11 +31,10 @@ class TestTestRecipe(unittest.TestCase):
             'recipes/tests/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
-            'set(PROJECT_NAME xWingConsoleFrontend)\n'
-            'project(${PROJECT_NAME})\n'
+            'project(xWingConsoleFrontend)\n'
             'include_directories(plugins/cest)\n'
-            'add_library(${PROJECT_NAME}_test_library OBJECT )\n'
-            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
+            'add_library(xWingConsoleFrontend_object_library OBJECT )\n'
+            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:xWingConsoleFrontend_object_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
             'add_custom_target(unit\n'
             '    COMMAND echo "> Done"\n'
@@ -61,13 +60,12 @@ class TestTestRecipe(unittest.TestCase):
             'recipes/tests/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
-            'set(PROJECT_NAME xWingConsoleFrontend)\n'
-            'project(${PROJECT_NAME})\n'
+            'project(xWingConsoleFrontend)\n'
             'include_directories()\n'
-            'add_library(${PROJECT_NAME}_test_library OBJECT )\n'
-            'add_executable(test_suite_1 tests/test_suite_1.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
+            'add_library(xWingConsoleFrontend_object_library OBJECT )\n'
+            'add_executable(test_suite_1 tests/test_suite_1.cpp $<TARGET_OBJECTS:xWingConsoleFrontend_object_library>)\n'
             'set_target_properties(test_suite_1 PROPERTIES COMPILE_FLAGS -std=c++11)\n'
-            'add_executable(test_suite_2 tests/test_suite_2.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
+            'add_executable(test_suite_2 tests/test_suite_2.cpp $<TARGET_OBJECTS:xWingConsoleFrontend_object_library>)\n'
             'set_target_properties(test_suite_2 PROPERTIES COMPILE_FLAGS -std=c++11)\n'
             'add_custom_target(unit\n'
             '    COMMAND echo "> Done"\n'
@@ -94,11 +92,10 @@ class TestTestRecipe(unittest.TestCase):
             'recipes/tests/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
-            'set(PROJECT_NAME xWingConsoleFrontend)\n'
-            'project(${PROJECT_NAME})\n'
+            'project(xWingConsoleFrontend)\n'
             'include_directories()\n'
-            'add_library(${PROJECT_NAME}_test_library OBJECT )\n'
-            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:${PROJECT_NAME}_test_library>)\n'
+            'add_library(xWingConsoleFrontend_object_library OBJECT )\n'
+            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:xWingConsoleFrontend_object_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
             'add_custom_target(unit\n'
             '    COMMAND echo "> Done"\n'

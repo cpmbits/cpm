@@ -24,14 +24,13 @@ class TestBuildRecipe(unittest.TestCase):
             'recipes/build/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
-            'set(PROJECT_NAME DeathStarBackend)\n'
-            'project(${PROJECT_NAME})\n'
+            'project(DeathStarBackend)\n'
             'include_directories()\n'
-            'add_executable(${PROJECT_NAME} main.cpp)\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
             'add_custom_command(\n'
-            '    TARGET ${PROJECT_NAME}\n'
+            '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/../../${PROJECT_NAME}\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
             ')\n'
         )
 
@@ -53,14 +52,13 @@ class TestBuildRecipe(unittest.TestCase):
             'recipes/build/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
-            'set(PROJECT_NAME DeathStarBackend)\n'
-            'project(${PROJECT_NAME})\n'
+            'project(DeathStarBackend)\n'
             'include_directories(package)\n'
-            'add_executable(${PROJECT_NAME} main.cpp)\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
             'add_custom_command(\n'
-            '    TARGET ${PROJECT_NAME}\n'
+            '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/../../${PROJECT_NAME}\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
             ')\n'
         )
 
@@ -77,14 +75,13 @@ class TestBuildRecipe(unittest.TestCase):
             'recipes/build/CMakeLists.txt',
 
             'cmake_minimum_required (VERSION 3.7)\n'
-            'set(PROJECT_NAME DeathStarBackend)\n'
-            'project(${PROJECT_NAME})\n'
+            'project(DeathStarBackend)\n'
             'include_directories()\n'
-            'add_executable(${PROJECT_NAME} main.cpp)\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
             'add_custom_command(\n'
-            '    TARGET ${PROJECT_NAME}\n'
+            '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/../../${PROJECT_NAME}\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
             ')\n'
         )
 

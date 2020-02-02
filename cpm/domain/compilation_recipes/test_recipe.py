@@ -2,20 +2,9 @@ import subprocess
 
 from cpm.domain.compilation_recipes import CompilationError
 from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
+from cpm.domain.compilation_recipes import cmake
 
 TEST_DIRECTORY = f'{RECIPES_DIRECTORY}/tests'
-
-CMAKE_RECIPE = (
-    '''set(UNIT_TEST_EXECUTABLES {test_suite_executables})
-add_custom_target(unit
-    COMMAND echo "> Done"
-    DEPENDS ${{UNIT_TEST_EXECUTABLES}}
-)
-''')
-
-CMAKE_TEST_EXECUTABLE = (
-    '''add_executable({test_suite_executable} {test_suite} $<TARGET_OBJECTS:${{PROJECT_NAME}}_test_library>)
-set_target_properties({test_suite_executable} PROPERTIES COMPILE_FLAGS -std=c++11)''')
 
 
 class TestRecipe(object):
@@ -33,47 +22,29 @@ class TestRecipe(object):
             self.filesystem.symlink('../../tests', 'recipes/tests/tests')
             for package in project.packages:
                 self.filesystem.symlink(f'../../{package.path}', f'recipes/tests/{package.path}')
+
         self.executables = [test_file.split('/')[-1].split('.')[0] for test_file in project.tests]
+
         self.filesystem.create_file(
             f'{TEST_DIRECTORY}/CMakeLists.txt',
-            self._cmake_minimum_required() +
-            self._project(project) +
-            self._include_directories(project) +
-            self._project_library(project) +
-            self._test_executables(project) +
-            self._unit_custom_target()
+            self.build_cmakelists(project)
         )
 
-    def _cmake_minimum_required(self):
-        return 'cmake_minimum_required (VERSION 3.7)\n'
+    def build_cmakelists(self, project):
+        project_object_library = project.name + '_object_library'
+        cmake_builder = cmake.a_cmake() \
+            .minimum_required('3.7') \
+            .project(project.name) \
+            .include(project.include_directories) \
+            .add_object_library(project_object_library, self._sources_without_main(project))
+        for executable, test_file in zip(self.executables, project.tests):
+            cmake_builder.add_executable(executable, [test_file], [project_object_library]) \
+                .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11'])
+        cmake_builder.add_custom_target('unit', 'echo "> Done', self.executables)
+        return cmake_builder.contents
 
-    def _project(self, project):
-        return f'set(PROJECT_NAME {project.name})\n' \
-               f'project(${{PROJECT_NAME}})\n'
-
-    def _include_directories(self, project):
-        include_directories = ' '.join(project.include_directories)
-        return f'include_directories({include_directories})\n'
-
-    def _project_library(self, project):
-        sources_list = ' '.join(filter(lambda x: x != "main.cpp", project.sources))
-        return f'add_library(${{PROJECT_NAME}}_test_library OBJECT {sources_list})\n'
-
-    def _test_executables(self, project):
-        return ''.join([
-            self._add_executable(executable, test_file) for executable, test_file in zip(self.executables, project.tests)
-        ])
-
-    def _add_executable(self, executable, test_file):
-        return f'add_executable({executable} {test_file} $<TARGET_OBJECTS:${{PROJECT_NAME}}_test_library>)\n' \
-               f'set_target_properties({executable} PROPERTIES COMPILE_FLAGS -std=c++11)\n'
-
-    def _unit_custom_target(self):
-        executables = ' '.join(self.executables)
-        return f'add_custom_target(unit\n' \
-               f'    COMMAND echo "> Done"\n' \
-               f'    DEPENDS {executables}\n' \
-               f')\n'
+    def _sources_without_main(self, project):
+        return filter(lambda x: x != "main.cpp", project.sources)
 
     def compile(self, project):
         generate_result = subprocess.run(
