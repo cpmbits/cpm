@@ -3,6 +3,7 @@ import mock
 
 from cpm.domain.compilation_recipes.build import BuildRecipe
 from cpm.domain.compilation_recipes.build import MacOsBuildRecipe
+from cpm.domain.plugin import Plugin
 from cpm.domain.project import Project, Package
 
 
@@ -64,13 +65,16 @@ class TestBuildRecipe(unittest.TestCase):
 
     def test_recipe_generation_with_one_plugin(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
-        project = self.deathStarBackend()
+        project = self.deathStarBackendWithOnePlugin()
         build_recipe = BuildRecipe(filesystem)
 
         build_recipe.generate(project)
 
         filesystem.create_directory.assert_called_once_with('recipes/build')
-        filesystem.symlink.assert_called_once_with('../../main.cpp', 'recipes/build/main.cpp')
+        filesystem.symlink.assert_has_calls([
+            mock.call('../../main.cpp', 'recipes/build/main.cpp'),
+            mock.call('../../plugins', 'recipes/build/plugins')
+        ])
         filesystem.create_file.assert_called_once_with(
             'recipes/build/CMakeLists.txt',
 
@@ -117,6 +121,12 @@ class TestBuildRecipe(unittest.TestCase):
     def deathStarBackend(self):
         project = Project('DeathStarBackend')
         project.sources = ['main.cpp']
+        return project
+
+    def deathStarBackendWithOnePlugin(self):
+        project = Project('DeathStarBackend')
+        project.sources = ['main.cpp']
+        project.add_plugin(Plugin('cest', '1.0'))
         return project
 
     def filesystemMockWithoutRecipeFiles(self):
