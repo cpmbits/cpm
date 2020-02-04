@@ -24,6 +24,7 @@ class ProjectLoader(object):
                 project.add_target(target)
             for plugin in self.load_plugins(description):
                 project.add_plugin(plugin)
+                project.add_sources(plugin.sources)
                 for directory in plugin.include_directories:
                     project.add_include_directory(directory)
             return project

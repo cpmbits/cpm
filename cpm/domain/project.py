@@ -18,9 +18,9 @@ class Package:
 class Project(object):
     def __init__(self, name):
         self.name = name
-        self.sources = []
         self.tests = []
         self.plugins = []
+        self.sources = []
         self.packages = []
         self.include_directories = []
         self.targets = {}

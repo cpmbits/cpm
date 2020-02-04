@@ -19,6 +19,7 @@ class BuildRecipe(CompilationRecipe):
         self.filesystem.symlink('../../main.cpp', 'recipes/build/main.cpp')
         for package in project.packages:
             self.filesystem.symlink(f'../../{package.path}', f'recipes/build/{package.path}')
+        self.filesystem.symlink('../../plugins', 'recipes/build/plugins')
 
         self.filesystem.create_file(
             f'{BUILD_DIRECTORY}/CMakeLists.txt',
