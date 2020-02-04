@@ -1,3 +1,5 @@
+ ![Python application](https://github.com/jorsanpe/cpm/workflows/Python%20application/badge.svg)
+ 
 # cpm: The Chromos Project Manager
 A modern project management tool for C/C++ projects.
 
