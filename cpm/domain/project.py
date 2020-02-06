@@ -13,6 +13,7 @@ class Target:
 @dataclass
 class Package:
     path: str
+    sources: list = field(default_factory=list)
     cflags: list = field(default_factory=list)
 
 
