@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from pathlib import Path
+from dataclasses import field
 
 PROJECT_ROOT_FILE = 'project.yaml'
 
@@ -13,6 +13,7 @@ class Target:
 @dataclass
 class Package:
     path: str
+    cflags: list = field(default_factory=list)
 
 
 class Project(object):

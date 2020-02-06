@@ -18,10 +18,15 @@ class PluginLoader(object):
         return plugin
 
     def plugin_packages(self, description, plugin_path):
-        if 'packages' in description:
-            for package in description['packages']:
-                yield Package(f'{plugin_path}/{package}')
+        for package in description.get('packages', []):
+            yield self._load_package(package, description['packages'][package], plugin_path)
         return []
+
+    def _load_package(self, package, package_description, plugin_path):
+        if package_description is None:
+            return Package(f'{plugin_path}/{package}')
+        cflags = package_description.get('cflags', [])
+        return Package(f'{plugin_path}/{package}', cflags=cflags)
 
     def plugin_sources(self, packages):
         return [source for package in packages for source in self.all_sources(package.path)]

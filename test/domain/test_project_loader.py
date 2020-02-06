@@ -42,7 +42,7 @@ class TestProjectLoader(unittest.TestCase):
         filesystem.parent_directory.return_value = '.'
         yaml_handler.load.return_value = {
             'project_name': 'Project',
-            'packages': ['cpm-hub'],
+            'packages': {'cpm-hub': None},
         }
         loader = ProjectLoader(yaml_handler, filesystem)
 
@@ -51,6 +51,23 @@ class TestProjectLoader(unittest.TestCase):
         assert project.name == 'Project'
         assert Package(path='cpm-hub') in project.packages
         assert project.include_directories == ['.']
+
+    def test_loading_project_with_one_package_with_cflags(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'packages': {
+                'cpm-hub': {
+                    'cflags': ['-std=c++11']
+                }
+            },
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        project = loader.load()
+
+        assert Package(path='cpm-hub', cflags=['-std=c++11']) in project.packages
 
     def test_loading_project_with_one_target(self):
         yaml_handler = mock.MagicMock()

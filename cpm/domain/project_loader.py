@@ -44,10 +44,15 @@ class ProjectLoader(object):
         return []
 
     def project_packages(self, description):
-        if 'packages' in description:
-            for package in description['packages']:
-                yield Package(package)
+        for package in description.get('packages', []):
+            yield self._load_package(package, description['packages'][package])
         return []
+
+    def _load_package(self, package, package_description):
+        if package_description is None:
+            return Package(f'{package}')
+        cflags = package_description.get('cflags', [])
+        return Package(f'{package}', cflags=cflags)
 
     def project_sources(self, packages):
         return ['main.cpp'] + [source for package in packages for source in self.all_sources(package.path)]
