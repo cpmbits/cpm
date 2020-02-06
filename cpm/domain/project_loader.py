@@ -18,7 +18,7 @@ class ProjectLoader(object):
             for package in self.project_packages(description):
                 project.add_package(package)
                 project.add_include_directory(self.filesystem.parent_directory(package.path))
-            project.add_sources(self.project_sources(project.packages))
+                project.add_sources(package.sources)
             project.add_tests(self.test_suites())
             for target in self.described_targets(description):
                 project.add_target(target)

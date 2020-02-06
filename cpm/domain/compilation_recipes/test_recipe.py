@@ -35,8 +35,12 @@ class TestRecipe(object):
         cmake_builder = cmake.a_cmake() \
             .minimum_required('3.7') \
             .project(project.name) \
-            .include(project.include_directories) \
-            .add_object_library(project_object_library, self._sources_without_main(project))
+            .include(project.include_directories)
+
+        for package in project.packages:
+            if package.cflags:
+                cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
+        cmake_builder.add_object_library(project_object_library, self._sources_without_main(project))
         for executable, test_file in zip(self.executables, project.tests):
             cmake_builder.add_executable(executable, [test_file], [project_object_library]) \
                 .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11'])

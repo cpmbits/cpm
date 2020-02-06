@@ -14,6 +14,10 @@ class CMakeBuilder(object):
         self.contents += f'include_directories({" ".join(directories)})\n'
         return self
 
+    def set_source_files_properties(self, sources, property, values):
+        self.contents += f'set_source_files_properties({" ".join(sources)} PROPERTIES {property} {" ".join(values)})\n'
+        return self
+
     def add_object_library(self, name, sources):
         self.contents += f'add_library({name} OBJECT {" ".join(sources)})\n'
         return self
