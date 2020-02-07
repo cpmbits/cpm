@@ -39,10 +39,11 @@ class TestProjectLoader(unittest.TestCase):
     def test_loading_project_with_one_package(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
+        filesystem.find.return_value = []
         filesystem.parent_directory.return_value = '.'
         yaml_handler.load.return_value = {
             'project_name': 'Project',
-            'packages': ['cpm-hub'],
+            'packages': {'cpm-hub': None},
         }
         loader = ProjectLoader(yaml_handler, filesystem)
 
@@ -51,6 +52,24 @@ class TestProjectLoader(unittest.TestCase):
         assert project.name == 'Project'
         assert Package(path='cpm-hub') in project.packages
         assert project.include_directories == ['.']
+
+    def test_loading_project_with_one_package_with_cflags(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        filesystem.find.return_value = []
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'packages': {
+                'cpm-hub': {
+                    'cflags': ['-std=c++11']
+                }
+            },
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        project = loader.load()
+
+        assert Package(path='cpm-hub', cflags=['-std=c++11']) in project.packages
 
     def test_loading_project_with_one_target(self):
         yaml_handler = mock.MagicMock()
@@ -141,15 +160,15 @@ class TestProjectLoader(unittest.TestCase):
             }
         )
 
-    def test_finding_project_sources(self):
+    def test_loading_package_with_sources(self):
         filesystem = mock.MagicMock()
         filesystem.find.side_effect = [['package/file.cpp'], ['package/file.c']]
         yaml_handler = mock.MagicMock()
         loader = ProjectLoader(yaml_handler, filesystem)
 
-        sources = loader.project_sources([Package('package')])
+        package = loader.load_package('package', {})
 
-        assert sources == ['main.cpp', 'package/file.cpp', 'package/file.c']
+        assert package == Package(path='package', sources=['package/file.cpp', 'package/file.c'])
         filesystem.find.assert_has_calls([
             mock.call('package', '*.cpp'),
             mock.call('package', '*.c'),

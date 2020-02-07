@@ -40,7 +40,6 @@ class TestTestRecipe(unittest.TestCase):
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'
             ')\n'
-
         )
         filesystem.symlink.assert_has_calls([
             call('../../plugins', 'recipes/tests/plugins'),
@@ -71,7 +70,6 @@ class TestTestRecipe(unittest.TestCase):
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite_1 test_suite_2\n'
             ')\n'
-
         )
         filesystem.symlink.assert_has_calls([
             call('../../plugins', 'recipes/tests/plugins'),
@@ -101,13 +99,68 @@ class TestTestRecipe(unittest.TestCase):
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'
             ')\n'
-
         )
         filesystem.symlink.assert_has_calls([
             call('../../plugins', 'recipes/tests/plugins'),
             call('../../tests', 'recipes/tests/tests'),
             call('../../api', 'recipes/tests/api'),
         ])
+
+    def test_recipe_generation_with_one_package_with_cflags(self):
+        filesystem = MagicMock()
+        filesystem.directory_exists.return_value = False
+        project = self.xWingConsoleFrontendWithOneTest()
+        project.add_package(Package('api', sources=['file.cpp'], cflags=['-std=c++11']))
+        project.add_sources(['file.cpp'])
+        recipe = TestRecipe(filesystem)
+
+        recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('recipes/tests')
+        filesystem.create_file.assert_called_once_with(
+            'recipes/tests/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(xWingConsoleFrontend)\n'
+            'include_directories()\n'
+            'set_source_files_properties(file.cpp PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'add_library(xWingConsoleFrontend_object_library OBJECT file.cpp)\n'
+            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:xWingConsoleFrontend_object_library>)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'add_custom_target(unit\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+        )
+
+    def test_recipe_generation_with_many_packages_with_cflags(self):
+        filesystem = MagicMock()
+        filesystem.directory_exists.return_value = False
+        project = self.xWingConsoleFrontendWithOneTest()
+        project.add_package(Package('api', sources=['api.cpp'], cflags=['-std=c++11']))
+        project.add_package(Package('domain', sources=['domain.cpp'], cflags=['-Wall']))
+        project.add_sources(['api.cpp', 'domain.cpp'])
+        recipe = TestRecipe(filesystem)
+
+        recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('recipes/tests')
+        filesystem.create_file.assert_called_once_with(
+            'recipes/tests/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(xWingConsoleFrontend)\n'
+            'include_directories()\n'
+            'set_source_files_properties(api.cpp PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_source_files_properties(domain.cpp PROPERTIES COMPILE_FLAGS -Wall)\n'
+            'add_library(xWingConsoleFrontend_object_library OBJECT api.cpp domain.cpp)\n'
+            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:xWingConsoleFrontend_object_library>)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'add_custom_target(unit\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+        )
 
     def test_recipe_is_updated_when_recipe_files_are_found(self):
         filesystem = MagicMock()

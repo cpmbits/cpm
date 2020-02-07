@@ -63,6 +63,59 @@ class TestBuildRecipe(unittest.TestCase):
             ')\n'
         )
 
+    def test_recipe_generation_with_one_package_with_cflags(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = self.deathStarBackend()
+        project.add_package(Package('package', cflags=['-std=c++11'], sources=['package.cpp']))
+        project.add_include_directory('package')
+        project.add_sources(['package.cpp'])
+        build_recipe = BuildRecipe(filesystem)
+
+        build_recipe.generate(project)
+
+        filesystem.create_file.assert_called_once_with(
+            'recipes/build/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories(package)\n'
+            'set_source_files_properties(package.cpp PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'add_executable(DeathStarBackend main.cpp package.cpp)\n'
+            'add_custom_command(\n'
+            '    TARGET DeathStarBackend\n'
+            '    POST_BUILD\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            ')\n'
+        )
+
+    def test_recipe_generation_with_many_packages_with_cflags(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = self.deathStarBackend()
+        project.add_package(Package('package1', cflags=['-std=c++11'], sources=['package1.cpp']))
+        project.add_package(Package('package2', cflags=['-Wall'], sources=['package2.cpp']))
+        project.add_include_directory('package')
+        project.add_sources(['package1.cpp'])
+        project.add_sources(['package2.cpp'])
+        build_recipe = BuildRecipe(filesystem)
+
+        build_recipe.generate(project)
+
+        filesystem.create_file.assert_called_once_with(
+            'recipes/build/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories(package)\n'
+            'set_source_files_properties(package1.cpp PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_source_files_properties(package2.cpp PROPERTIES COMPILE_FLAGS -Wall)\n'
+            'add_executable(DeathStarBackend main.cpp package1.cpp package2.cpp)\n'
+            'add_custom_command(\n'
+            '    TARGET DeathStarBackend\n'
+            '    POST_BUILD\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            ')\n'
+        )
+
     def test_recipe_generation_with_one_plugin(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = self.deathStarBackendWithOnePlugin()

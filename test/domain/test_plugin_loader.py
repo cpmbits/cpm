@@ -12,7 +12,7 @@ class TestPluginLoader(unittest.TestCase):
         filesystem = MagicMock()
         PluginLoader(yaml_handler, filesystem)
 
-    def test_loading_plugin_without_cflags_or_packages(self):
+    def test_loading_plugin_without_packages(self):
         filesystem = MagicMock()
         yaml_handler = MagicMock()
         yaml_handler.load.return_value = {
@@ -33,7 +33,7 @@ class TestPluginLoader(unittest.TestCase):
         filesystem.find.side_effect = [['plugins/cest/plugin.cpp'], ['plugins/cest/plugin.c']]
         yaml_handler.load.return_value = {
             'plugin_name': 'cest',
-            'packages': ['cest'],
+            'packages': {'cest': None},
         }
         loader = PluginLoader(yaml_handler, filesystem)
 
@@ -43,6 +43,26 @@ class TestPluginLoader(unittest.TestCase):
         assert Package(path='plugins/cest/cest') in plugin.packages
         assert plugin.include_directories == ['plugins/cest']
         assert plugin.sources == ['plugins/cest/plugin.cpp', 'plugins/cest/plugin.c']
+
+    def test_loading_plugin_with_one_package_with_cflags(self):
+        yaml_handler = MagicMock()
+        filesystem = MagicMock()
+        filesystem.parent_directory.return_value = 'plugins/cest'
+        filesystem.find.side_effect = [['plugins/cest/plugin.cpp'], ['plugins/cest/plugin.c']]
+        yaml_handler.load.return_value = {
+            'plugin_name': 'cest',
+            'packages': {
+                'cest': {
+                    'cflags': ['-std=c++11']
+                }
+            },
+        }
+        loader = PluginLoader(yaml_handler, filesystem)
+
+        plugin = loader.load('cest', '1.0')
+
+        assert plugin.name == 'cest'
+        assert Package(path='plugins/cest/cest', cflags=['-std=c++11']) in plugin.packages
 
     def test_finding_plugin_sources(self):
         filesystem = MagicMock()
