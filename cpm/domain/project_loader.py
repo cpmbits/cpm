@@ -15,6 +15,7 @@ class ProjectLoader(object):
         try:
             description = self.yaml_handler.load(PROJECT_ROOT_FILE)
             project = Project(description['project_name'])
+            project.add_sources(['main.cpp'])
             for package in self.project_packages(description):
                 project.add_package(package)
                 project.add_include_directory(self.filesystem.parent_directory(package.path))
@@ -49,14 +50,9 @@ class ProjectLoader(object):
         return []
 
     def load_package(self, package, package_description):
-        if package_description is None:
-            return Package(f'{package}')
+        cflags = package_description.get('cflags', []) if package_description is not None else []
         sources = self.all_sources(package)
-        cflags = package_description.get('cflags', [])
         return Package(f'{package}', sources=sources, cflags=cflags)
-
-    def project_sources(self, packages):
-        return ['main.cpp'] + [source for package in packages for source in self.all_sources(package.path)]
 
     def test_suites(self):
         return self.filesystem.find('tests', 'test_*.cpp')

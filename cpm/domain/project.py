@@ -33,8 +33,8 @@ class Project(object):
     def add_plugin(self, plugin):
         self.plugins.append(plugin)
 
-    def add_sources(self, source):
-        self.sources.extend(source)
+    def add_sources(self, sources):
+        self.sources.extend(sources)
 
     def add_tests(self, tests):
         self.tests.extend(tests)

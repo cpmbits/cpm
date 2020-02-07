@@ -39,6 +39,7 @@ class TestProjectLoader(unittest.TestCase):
     def test_loading_project_with_one_package(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
+        filesystem.find.return_value = []
         filesystem.parent_directory.return_value = '.'
         yaml_handler.load.return_value = {
             'project_name': 'Project',
@@ -158,20 +159,6 @@ class TestProjectLoader(unittest.TestCase):
                 'plugins': {'cest': '1.2'}
             }
         )
-
-    def test_finding_project_sources(self):
-        filesystem = mock.MagicMock()
-        filesystem.find.side_effect = [['package/file.cpp'], ['package/file.c']]
-        yaml_handler = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-
-        sources = loader.project_sources([Package('package')])
-
-        assert sources == ['main.cpp', 'package/file.cpp', 'package/file.c']
-        filesystem.find.assert_has_calls([
-            mock.call('package', '*.cpp'),
-            mock.call('package', '*.c'),
-        ])
 
     def test_loading_package_with_sources(self):
         filesystem = mock.MagicMock()
