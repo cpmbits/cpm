@@ -99,13 +99,17 @@ def target_add():
 
 
 def test():
+    add_target_parser = argparse.ArgumentParser(prog='cpm test', description='Chromos Package Manager', add_help=False)
+    add_target_parser.add_argument('patterns', nargs=argparse.REMAINDER)
+    args = add_target_parser.parse_args(sys.argv[2:])
+
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
     service = TestService(loader)
     recipe = MacOsTestRecipe(filesystem)
 
-    result = run_tests(service, recipe)
+    result = run_tests(service, recipe, args.patterns)
 
     finish(result)
 

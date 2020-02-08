@@ -7,9 +7,9 @@ from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.test_service import NoTestsFound
 
 
-def run_tests(test_service, recipe):
+def run_tests(test_service, recipe, patterns=[]):
     try:
-        test_service.run_tests(recipe)
+        test_service.run_tests(recipe, patterns)
     except NotAChromosProject:
         return Result(FAIL, 'not a Chromos project')
     except CompilationError as e:

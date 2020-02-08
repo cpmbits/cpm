@@ -1,6 +1,8 @@
 # cpm: The Chromos Project Manager  ![CI](https://github.com/jorsanpe/cpm/workflows/CI/badge.svg)
 A modern project management tool for C/C++ projects.
 
+The [docs](https://github.com/jorsanpe/cpm/wiki) are currently maintained in the repository wiki.
+
 ## Installation
 `pip3 install cpm`
 
@@ -18,14 +20,14 @@ After creating the project, the binary will be available in the project root dir
 ./DeathStartLaserBackend
 ```
 
-## Manage dependencies
+### Manage dependencies
 CPM manages your project dependencies through CPM-Hub. In order to install a package, simply run:
 
 ```
 cpm install R2D2-API
 ```
 
-## Run your tests
+### Run your tests
 ```
 cpm test
 ```
