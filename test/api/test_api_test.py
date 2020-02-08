@@ -17,7 +17,7 @@ class TestApiBuild(unittest.TestCase):
         result = run_tests(test_service, recipe)
 
         assert result.status_code == 1
-        test_service.run_tests.assert_called_once_with(recipe)
+        test_service.run_tests.assert_called_once_with(recipe, [])
 
     def test_run_tests_fails_when_no_tests_are_found(self):
         recipe = mock.MagicMock()
@@ -27,7 +27,7 @@ class TestApiBuild(unittest.TestCase):
         result = run_tests(test_service, recipe)
 
         assert result.status_code == 0
-        test_service.run_tests.assert_called_once_with(recipe)
+        test_service.run_tests.assert_called_once_with(recipe, [])
 
     def test_run_tests_fails_when_compilation_fails(self):
         recipe = mock.MagicMock()
@@ -37,7 +37,7 @@ class TestApiBuild(unittest.TestCase):
         result = run_tests(test_service, recipe)
 
         assert result.status_code == 1
-        test_service.run_tests.assert_called_once_with(recipe)
+        test_service.run_tests.assert_called_once_with(recipe, [])
 
     def test_run_tests_fails_when_tests_fail(self):
         recipe = mock.MagicMock()
@@ -47,7 +47,7 @@ class TestApiBuild(unittest.TestCase):
         result = run_tests(test_service, recipe)
 
         assert result.status_code == 1
-        test_service.run_tests.assert_called_once_with(recipe)
+        test_service.run_tests.assert_called_once_with(recipe, [])
 
     def test_run_project_tests(self):
         recipe = mock.MagicMock()
@@ -56,4 +56,13 @@ class TestApiBuild(unittest.TestCase):
         result = run_tests(test_service, recipe)
 
         assert result.status_code == 0
-        test_service.run_tests.assert_called_once_with(recipe)
+        test_service.run_tests.assert_called_once_with(recipe, [])
+
+    def test_run_project_tests_with_patterns(self):
+        recipe = mock.MagicMock()
+        test_service = mock.MagicMock()
+
+        result = run_tests(test_service, recipe, patterns=['test_pattern'])
+
+        assert result.status_code == 0
+        test_service.run_tests.assert_called_once_with(recipe, ['test_pattern'])

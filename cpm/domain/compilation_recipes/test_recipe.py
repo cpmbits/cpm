@@ -50,7 +50,7 @@ class TestRecipe(object):
     def _sources_without_main(self, project):
         return filter(lambda x: x != "main.cpp", project.sources)
 
-    def compile(self, project):
+    def compile(self):
         generate_result = subprocess.run(
             [self.CMAKE_COMMAND, '-G', 'Ninja', '.'],
             cwd=TEST_DIRECTORY
@@ -65,12 +65,12 @@ class TestRecipe(object):
         if compile_result.returncode != 0:
             raise CompilationError('compilation failed')
 
-    def run_tests(self, project):
-        test_results = [self._run_test(executable) for executable in self.executables]
+    def run_tests(self):
+        test_results = [self.run_test(executable) for executable in self.executables]
         if any(result.returncode != 0 for result in test_results):
             raise TestsFailed('tests failed')
 
-    def _run_test(self, executable):
+    def run_test(self, executable):
         return subprocess.run(
             [f'./{executable}'],
             cwd=TEST_DIRECTORY

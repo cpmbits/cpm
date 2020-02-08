@@ -176,11 +176,10 @@ class TestTestRecipe(unittest.TestCase):
     @patch('subprocess.run')
     def test_recipe_compiles_with_cmake_and_ninja(self, subprocess_run):
         filesystem = MagicMock()
-        project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, 0)]
 
-        recipe.compile(project)
+        recipe.compile()
 
         subprocess_run.assert_has_calls([
             call(
@@ -196,30 +195,27 @@ class TestTestRecipe(unittest.TestCase):
     @patch('subprocess.run')
     def test_recipe_raises_exception_upon_cmake_generation_failure(self, subprocess_run):
         filesystem = MagicMock()
-        project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         subprocess_run.side_effect = [CompletedProcess(None, -1)]
 
-        self.assertRaises(CompilationError, recipe.compile, project)
+        self.assertRaises(CompilationError, recipe.compile)
 
     @patch('subprocess.run')
     def test_recipe_raises_exception_upon_compilation_failure(self, subprocess_run):
         filesystem = MagicMock()
-        project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, -1)]
 
-        self.assertRaises(CompilationError, recipe.compile, project)
+        self.assertRaises(CompilationError, recipe.compile)
 
     @patch('subprocess.run')
     def test_recipe_runs_list_of_generated_executable_for_project_with_one_test(self, subprocess_run):
         filesystem = MagicMock()
-        project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         recipe.executables = ['test_suite']
         subprocess_run.return_value = CompletedProcess(None, 0)
 
-        recipe.run_tests(project)
+        recipe.run_tests()
 
         subprocess_run.assert_has_calls([
             call(
@@ -231,12 +227,11 @@ class TestTestRecipe(unittest.TestCase):
     @patch('subprocess.run')
     def test_recipe_runs_list_of_generated_executables_for_project_with_many_tests(self, subprocess_run):
         filesystem = MagicMock()
-        project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         recipe.executables = ['test_suite_1', 'test_suite_2']
         subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, 0)]
 
-        recipe.run_tests(project)
+        recipe.run_tests()
 
         subprocess_run.assert_has_calls([
             call(
@@ -252,22 +247,20 @@ class TestTestRecipe(unittest.TestCase):
     @patch('subprocess.run')
     def test_recipe_raises_exception_when_test_execution_fails_in_project_with_one_test(self, subprocess_run):
         filesystem = MagicMock()
-        project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         recipe.executables = ['test_suite']
         subprocess_run.return_value = CompletedProcess(None, -1)
 
-        self.assertRaises(TestsFailed, recipe.run_tests, project)
+        self.assertRaises(TestsFailed, recipe.run_tests)
 
     @patch('subprocess.run')
     def test_recipe_runs_all_tests_before_raising_exception_when_tests_fail(self, subprocess_run):
         filesystem = MagicMock()
-        project = self.xWingConsoleFrontendWithOneTest()
         recipe = TestRecipe(filesystem)
         recipe.executables = ['test_suite_1', 'test_suite_2']
         subprocess_run.side_effect = [CompletedProcess(None, -1), CompletedProcess(None, 0)]
 
-        self.assertRaises(TestsFailed, recipe.run_tests, project)
+        self.assertRaises(TestsFailed, recipe.run_tests)
 
         subprocess_run.assert_has_calls([
             call(
