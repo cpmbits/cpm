@@ -4,7 +4,7 @@ A modern project management tool for C/C++ projects.
 The [docs](https://github.com/jorsanpe/cpm/wiki) are currently maintained in the repository wiki.
 
 ## Installation
-`pip3 install cpm`
+`pip3 install cpm-cli`
 
 CPM depends on [CMake](https://cmake.org/) and [ninja](https://ninja-build.org/) for the build process.
 

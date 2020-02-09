@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="cpm-jorsanpe",
+    name="cpm-cli",
     version="0.1",
     scripts=['scripts/cpm'],
     author="Jordi Sánchez",
