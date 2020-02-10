@@ -58,6 +58,3 @@ class BuildRecipe(CompilationRecipe):
             cwd=BUILD_DIRECTORY
         )
 
-
-class MacOsBuildRecipe(BuildRecipe):
-    CMAKE_COMMAND = '/Applications/CMake.app/Contents/bin/cmake'
