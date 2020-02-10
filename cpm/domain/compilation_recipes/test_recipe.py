@@ -77,9 +77,5 @@ class TestRecipe(object):
         )
 
 
-class MacOsTestRecipe(TestRecipe):
-    CMAKE_COMMAND = '/Applications/CMake.app/Contents/bin/cmake'
-
-
 class TestsFailed(RuntimeError):
     pass

@@ -9,8 +9,8 @@ from cpm.api.clean import clean_project
 from cpm.api.test import run_tests
 from cpm.domain.build_service import BuildService
 from cpm.domain.clean_service import CleanService
-from cpm.domain.compilation_recipes.build import MacOsBuildRecipe
-from cpm.domain.compilation_recipes.test_recipe import MacOsTestRecipe
+from cpm.domain.compilation_recipes.build import BuildRecipe
+from cpm.domain.compilation_recipes.test_recipe import TestRecipe
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
 from cpm.domain.project_loader import ProjectLoader
@@ -54,7 +54,7 @@ def build():
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
     service = BuildService(loader)
-    recipe = MacOsBuildRecipe(filesystem)
+    recipe = BuildRecipe(filesystem)
 
     result = build_project(service, recipe)
 
@@ -107,7 +107,7 @@ def test():
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
     service = TestService(loader)
-    recipe = MacOsTestRecipe(filesystem)
+    recipe = TestRecipe(filesystem)
 
     result = run_tests(service, recipe, args.patterns)
 
