@@ -2,7 +2,6 @@ import unittest
 import mock
 
 from cpm.domain.compilation_recipes.build import BuildRecipe
-from cpm.domain.compilation_recipes.build import MacOsBuildRecipe
 from cpm.domain.plugin import Plugin
 from cpm.domain.project import Project, Package
 
@@ -156,7 +155,7 @@ class TestBuildRecipe(unittest.TestCase):
     def test_recipe_compiles_with_cmake_and_ninja(self, subprocess_run):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = self.deathStarBackend()
-        build_recipe = MacOsBuildRecipe(filesystem)
+        build_recipe = BuildRecipe(filesystem)
 
         build_recipe.compile(project)
 
