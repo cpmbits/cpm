@@ -1,4 +1,5 @@
 import subprocess
+import signal
 
 from cpm.domain.compilation_recipes import CompilationError
 from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
@@ -71,10 +72,13 @@ class TestRecipe(object):
             raise TestsFailed('tests failed')
 
     def run_test(self, executable):
-        return subprocess.run(
+        result = subprocess.run(
             [f'./{executable}'],
             cwd=TEST_DIRECTORY
         )
+        if result.returncode < 0:
+            print(f'{executable} failed with signal {result.returncode} ({signal.Signals(-result.returncode).name})')
+        return result
 
 
 class TestsFailed(RuntimeError):
