@@ -40,8 +40,10 @@ class BuildRecipe(CompilationRecipe):
         for package in project.packages:
             if package.cflags:
                 cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
-        cmake_builder.add_executable(project.name, project.sources) \
-            .add_custom_command(
+        cmake_builder.add_executable(project.name, project.sources)
+        if project.link_options.libraries:
+            cmake_builder.target_link_libraries(project.name, project.link_options.libraries)
+        cmake_builder.add_custom_command(
                     project.name,
                     'POST_BUILD',
                     f'${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:{project.name}> ${{PROJECT_SOURCE_DIR}}/../../{project.name}')

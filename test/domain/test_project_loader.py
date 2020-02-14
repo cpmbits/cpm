@@ -71,6 +71,22 @@ class TestProjectLoader(unittest.TestCase):
 
         assert Package(path='cpm-hub', cflags=['-std=c++11']) in project.packages
 
+    def test_loading_project_with_with_ldflags(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        filesystem.find.return_value = []
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'link_options': {
+                'libraries': ['pthread']
+            },
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        project = loader.load()
+
+        assert 'pthread' in project.link_options.libraries
+
     def test_loading_project_with_one_target(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
@@ -112,6 +128,31 @@ class TestProjectLoader(unittest.TestCase):
             'plugins/cest'
         ]
         plugin_loader.load.assert_called_once_with('cest', '2.3')
+
+    def test_loading_package_with_sources(self):
+        filesystem = mock.MagicMock()
+        filesystem.find.side_effect = [['package/file.cpp'], ['package/file.c']]
+        yaml_handler = mock.MagicMock()
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        package = loader.load_package('package', {})
+
+        assert package == Package(path='package', sources=['package/file.cpp', 'package/file.c'])
+        filesystem.find.assert_has_calls([
+            mock.call('package', '*.cpp'),
+            mock.call('package', '*.c'),
+        ])
+
+    def test_finding_project_test_suites(self):
+        filesystem = mock.MagicMock()
+        filesystem.find.return_value = ['tests/test_project.cpp']
+        yaml_handler = mock.MagicMock()
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        tests = loader.test_suites()
+
+        assert tests == ['tests/test_project.cpp']
+        filesystem.find.assert_called_once_with('tests', 'test_*.cpp')
 
     def test_saving_project_without_targets(self):
         yaml_handler = mock.MagicMock()
@@ -159,28 +200,3 @@ class TestProjectLoader(unittest.TestCase):
                 'plugins': {'cest': '1.2'}
             }
         )
-
-    def test_loading_package_with_sources(self):
-        filesystem = mock.MagicMock()
-        filesystem.find.side_effect = [['package/file.cpp'], ['package/file.c']]
-        yaml_handler = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-
-        package = loader.load_package('package', {})
-
-        assert package == Package(path='package', sources=['package/file.cpp', 'package/file.c'])
-        filesystem.find.assert_has_calls([
-            mock.call('package', '*.cpp'),
-            mock.call('package', '*.c'),
-        ])
-
-    def test_finding_project_test_suites(self):
-        filesystem = mock.MagicMock()
-        filesystem.find.return_value = ['tests/test_project.cpp']
-        yaml_handler = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-
-        tests = loader.test_suites()
-
-        assert tests == ['tests/test_project.cpp']
-        filesystem.find.assert_called_once_with('tests', 'test_*.cpp')
