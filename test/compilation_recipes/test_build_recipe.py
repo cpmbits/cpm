@@ -34,6 +34,32 @@ class TestBuildRecipe(unittest.TestCase):
             ')\n'
         )
 
+    def test_recipe_generation_with_target_link_libraries(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = self.deathStarBackend()
+        project.add_library('pthread')
+        project.add_library('rt')
+        build_recipe = BuildRecipe(filesystem)
+
+        build_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('recipes/build')
+        filesystem.symlink.assert_called_once_with('../../main.cpp', 'recipes/build/main.cpp')
+        filesystem.create_file.assert_called_once_with(
+            'recipes/build/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
+            'target_link_libraries(DeathStarBackend pthread rt)\n'
+            'add_custom_command(\n'
+            '    TARGET DeathStarBackend\n'
+            '    POST_BUILD\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            ')\n'
+        )
+
     def test_recipe_generation_with_one_package(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = self.deathStarBackend()

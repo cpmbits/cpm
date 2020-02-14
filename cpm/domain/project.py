@@ -17,6 +17,12 @@ class Package:
     cflags: list = field(default_factory=list)
 
 
+@dataclass
+class LinkOptions:
+    flags: list = field(default_factory=list)
+    libraries: list = field(default_factory=list)
+
+
 class Project(object):
     def __init__(self, name):
         self.name = name
@@ -25,6 +31,7 @@ class Project(object):
         self.sources = []
         self.packages = []
         self.include_directories = []
+        self.link_options = LinkOptions()
         self.targets = {}
 
     def add_target(self, target):
@@ -44,3 +51,6 @@ class Project(object):
 
     def add_include_directory(self, directory):
         self.include_directories.append(directory)
+
+    def add_library(self, library):
+        self.link_options.libraries.append(library)

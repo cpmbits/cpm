@@ -46,6 +46,33 @@ class TestTestRecipe(unittest.TestCase):
             call('../../tests', 'recipes/tests/tests'),
         ])
 
+    def test_recipe_generation_with_one_test_suite_with_target_link_libraries(self):
+        filesystem = MagicMock()
+        filesystem.directory_exists.return_value = False
+        project = self.xWingConsoleFrontendWithOneTest()
+        project.add_include_directory('plugins/cest')
+        project.add_library('pthread')
+        project.add_library('rt')
+        recipe = TestRecipe(filesystem)
+
+        recipe.generate(project)
+
+        filesystem.create_file.assert_called_once_with(
+            'recipes/tests/CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(xWingConsoleFrontend)\n'
+            'include_directories(plugins/cest)\n'
+            'add_library(xWingConsoleFrontend_object_library OBJECT )\n'
+            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:xWingConsoleFrontend_object_library>)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'target_link_libraries(test_suite pthread rt)\n'
+            'add_custom_target(unit\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+        )
+
     def test_recipe_generation_with_many_test_suites(self):
         filesystem = MagicMock()
         filesystem.directory_exists.return_value = False

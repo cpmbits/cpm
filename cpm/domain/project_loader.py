@@ -28,6 +28,8 @@ class ProjectLoader(object):
                 project.add_sources(plugin.sources)
                 for directory in plugin.include_directories:
                     project.add_include_directory(directory)
+            for library in self.link_libraries(description):
+                project.add_library(library)
             return project
         except FileNotFoundError:
             raise NotAChromosProject()
@@ -71,6 +73,10 @@ class ProjectLoader(object):
                 plugin.name: plugin.version for plugin in project.plugins
             }
         self.yaml_handler.dump(PROJECT_ROOT_FILE, project_description)
+
+    def link_libraries(self, description):
+        link_options = description.get('link_options', {})
+        return link_options.get('libraries', [])
 
 
 class NotAChromosProject(RuntimeError):

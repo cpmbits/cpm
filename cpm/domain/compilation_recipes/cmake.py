@@ -33,6 +33,10 @@ class CMakeBuilder(object):
         self.contents += f'set_target_properties({target} PROPERTIES {property} {" ".join(values)})\n'
         return self
 
+    def target_link_libraries(self, target, libraries):
+        self.contents += f'target_link_libraries({target} {" ".join(libraries)})\n'
+        return self
+
     def add_custom_target(self, target, command, depends):
         self.contents += f'add_custom_target({target}\n' \
                          f'    COMMAND {command}"\n' \
