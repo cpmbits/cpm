@@ -1,5 +1,6 @@
 import os
 import shutil
+from distutils.dir_util import copy_tree
 from pathlib import Path
 
 
@@ -10,6 +11,12 @@ class Filesystem:
     def create_file(self, name, contents=''):
         with open(name, 'w') as f:
             f.write(contents)
+
+    def copy_file(self, origin, destination):
+        shutil.copy2(origin, destination)
+
+    def copy_directory(self, origin, destination):
+        copy_tree(origin, destination)
 
     def directory_exists(self, name):
         return os.path.exists(name) and os.path.isdir(name)

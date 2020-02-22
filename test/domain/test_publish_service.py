@@ -4,7 +4,7 @@ from mock import MagicMock
 from cpm.domain.project import Project
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.publish_service import PublishService
-from cpm.domain.plugin_packager import PackagingError
+from cpm.domain.plugin_packager import NoPackagesInProject
 from cpm.domain.plugin_uploader import AuthenticationFailure
 
 
@@ -23,11 +23,11 @@ class TestPublishService(unittest.TestCase):
         project_loader = MagicMock()
         project_loader.load.return_value = project
         plugin_packager = MagicMock()
-        plugin_packager.pack.side_effect = PackagingError
+        plugin_packager.pack.side_effect = NoPackagesInProject
         plugin_uploader = MagicMock()
         service = PublishService(project_loader, plugin_packager, plugin_uploader)
 
-        self.assertRaises(PackagingError, service.publish)
+        self.assertRaises(NoPackagesInProject, service.publish)
 
         plugin_packager.pack.assert_called_once_with(project, 'dist')
 
