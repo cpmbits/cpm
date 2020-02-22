@@ -91,7 +91,7 @@ class TestBuildRecipe(unittest.TestCase):
     def test_recipe_generation_with_one_package_with_cflags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = self.deathStarBackend()
-        project.add_package(Package('package', cflags=['-std=c++11'], sources=['package.cpp']))
+        project.add_package(Package('package', cflags=['-std=c++11', '-DMACRO'], sources=['package.cpp']))
         project.add_include_directory('package')
         project.add_sources(['package.cpp'])
         build_recipe = BuildRecipe(filesystem)
@@ -104,7 +104,7 @@ class TestBuildRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'project(DeathStarBackend)\n'
             'include_directories(package)\n'
-            'set_source_files_properties(package.cpp PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_source_files_properties(package.cpp PROPERTIES COMPILE_FLAGS "-std=c++11 -DMACRO")\n'
             'add_executable(DeathStarBackend main.cpp package.cpp)\n'
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
@@ -131,8 +131,8 @@ class TestBuildRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'project(DeathStarBackend)\n'
             'include_directories(package)\n'
-            'set_source_files_properties(package1.cpp PROPERTIES COMPILE_FLAGS -std=c++11)\n'
-            'set_source_files_properties(package2.cpp PROPERTIES COMPILE_FLAGS -Wall)\n'
+            'set_source_files_properties(package1.cpp PROPERTIES COMPILE_FLAGS "-std=c++11")\n'
+            'set_source_files_properties(package2.cpp PROPERTIES COMPILE_FLAGS "-Wall")\n'
             'add_executable(DeathStarBackend main.cpp package1.cpp package2.cpp)\n'
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
