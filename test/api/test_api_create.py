@@ -5,7 +5,7 @@ from cpm.api.create import new_project
 from cpm.domain.creation_service import CreationOptions
 
 
-class TestInitApi(unittest.TestCase):
+class TestApiCreate(unittest.TestCase):
     def test_create_project_uses_creation_service_for_initializing_project(self):
         project_constructor = mock.MagicMock()
         project_constructor.exists.return_value = False

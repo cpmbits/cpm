@@ -7,13 +7,17 @@ from cpm.api.target import add_target
 from cpm.api.build import build_project
 from cpm.api.clean import clean_project
 from cpm.api.test import run_tests
+from cpm.api.publish import publish_project
 from cpm.domain.build_service import BuildService
 from cpm.domain.clean_service import CleanService
 from cpm.domain.compilation_recipes.build import BuildRecipe
 from cpm.domain.compilation_recipes.test_recipe import TestRecipe
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
+from cpm.domain.plugin_packager import PluginPackager
+from cpm.domain.plugin_uploader import PluginUploader
 from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.publish_service import PublishService
 from cpm.domain.target_service import TargetService
 from cpm.domain.test_service import TestService
 from cpm.infrastructure.filesystem import Filesystem
@@ -27,6 +31,7 @@ def main():
         'clean': clean,
         'target': target,
         'test': test,
+        'publish': publish,
     }
 
     action_parser = argparse.ArgumentParser(description='Chromos Package Manager')
@@ -110,6 +115,19 @@ def test():
     recipe = TestRecipe(filesystem)
 
     result = run_tests(service, recipe, args.patterns)
+
+    finish(result)
+
+
+def publish():
+    filesystem = Filesystem()
+    yaml_handler = YamlHandler(filesystem)
+    loader = ProjectLoader(yaml_handler, filesystem)
+    packager = PluginPackager(filesystem)
+    uploader = PluginUploader()
+    service = PublishService(loader, packager, uploader)
+
+    result = publish_project(service)
 
     finish(result)
 

@@ -8,7 +8,7 @@ from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.test_service import NoTestsFound
 
 
-class TestApiBuild(unittest.TestCase):
+class TestApiTest(unittest.TestCase):
     def test_run_tests_fails_when_current_directory_is_not_a_chromos_project(self):
         recipe = mock.MagicMock()
         test_service = mock.MagicMock()
