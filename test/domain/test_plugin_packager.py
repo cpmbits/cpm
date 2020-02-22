@@ -39,6 +39,8 @@ class TestPluginPackager(unittest.TestCase):
             call('api', 'dist/api'),
             call('domain', 'dist/domain'),
         ])
+        filesystem.zip.assert_called_once_with('dist', 'cest')
+        filesystem.remove_directory.assert_called_once_with('dist')
 
 
 

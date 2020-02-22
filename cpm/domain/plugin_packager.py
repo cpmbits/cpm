@@ -16,6 +16,10 @@ class PluginPackager(object):
         self.filesystem.copy_file(PROJECT_ROOT_FILE, f'{build_directory}/plugin.yaml')
         for package in project.packages:
             self.filesystem.copy_directory(package.path, f'{build_directory}/{package.path}')
+        self.filesystem.zip(build_directory, f'{project.name}')
+        self.filesystem.remove_directory(build_directory)
+
+        return f'{project.name}.zip'
 
 
 class PackagingFailure(RuntimeError):

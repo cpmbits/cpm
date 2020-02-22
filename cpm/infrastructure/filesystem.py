@@ -33,6 +33,9 @@ class Filesystem:
     def find(self, path, pattern):
         return [str(filename) for filename in Path(path).rglob(pattern)]
 
+    def zip(self, directory, output_filename):
+        shutil.make_archive(output_filename, 'zip', directory)
+
     def symlink(self, source, destination):
         if Path(destination).is_symlink():
             return

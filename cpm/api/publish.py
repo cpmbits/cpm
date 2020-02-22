@@ -13,4 +13,4 @@ def publish_project(publish_service):
     except PackagingFailure as error:
         return Result(FAIL, f'error: {error.cause}')
 
-    return Result(OK, f'Build finished')
+    return Result(OK, f'Project published')
