@@ -10,7 +10,7 @@ class CpmHubConnectorV1(object):
         self.repository_url = repository_url
 
     def publish_plugin(self, project, file_name):
-        payload = base64.b64encode(self.filesystem.read_file(file_name, 'rb'))
+        payload = base64.b64encode(self.filesystem.read_file(file_name, 'rb')).decode('utf-8')
         body = {
             'plugin_name': project.name,
             'file_name': file_name,

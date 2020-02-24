@@ -124,7 +124,7 @@ def publish():
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
     packager = PluginPackager(filesystem)
-    cpm_hub_connector = CpmHubConnectorV1()
+    cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url='http://localhost:8000/plugins')
     service = PublishService(loader, packager, cpm_hub_connector)
 
     result = publish_project(service)

@@ -13,7 +13,9 @@ class TestCpmHubConnectorV1(unittest.TestCase):
         filesystem = MagicMock()
         connector = CpmHubConnectorV1(filesystem, repository_url='my.url.com')
         project = Project('cest')
-        base64.b64encode.return_value = 'ABCDE'
+        binary_encoded = MagicMock()
+        binary_encoded.decode.return_value = 'ABCDE'
+        base64.b64encode.return_value = binary_encoded
         filesystem.read_file.return_value = 'fafa'
 
         connector.publish_plugin(project, 'cest.zip')
