@@ -15,7 +15,7 @@ from cpm.domain.compilation_recipes.test_recipe import TestRecipe
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
 from cpm.domain.plugin_packager import PluginPackager
-from cpm.domain.plugin_uploader import PluginUploader
+from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.domain.project_loader import ProjectLoader
 from cpm.domain.publish_service import PublishService
 from cpm.domain.target_service import TargetService
@@ -124,8 +124,8 @@ def publish():
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
     packager = PluginPackager(filesystem)
-    uploader = PluginUploader()
-    service = PublishService(loader, packager, uploader)
+    cpm_hub_connector = CpmHubConnectorV1()
+    service = PublishService(loader, packager, cpm_hub_connector)
 
     result = publish_project(service)
 

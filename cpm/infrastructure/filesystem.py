@@ -12,6 +12,10 @@ class Filesystem:
         with open(name, 'w') as f:
             f.write(contents)
 
+    def read_file(self, file_name, mode='r'):
+        with open(file_name, mode) as file_stream:
+            return file_stream.read()
+
     def copy_file(self, origin, destination):
         shutil.copy2(origin, destination)
 
