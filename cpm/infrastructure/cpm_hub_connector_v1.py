@@ -13,11 +13,11 @@ class CpmHubConnectorV1(object):
         payload = base64.b64encode(self.filesystem.read_file(file_name, 'rb')).decode('utf-8')
         body = {
             'plugin_name': project.name,
-            'file_name': file_name,
+            'version': project.version,
             'payload': payload
         }
 
-        http_client.put(self.repository_url, data=json.dumps(body))
+        http_client.post(self.repository_url, data=json.dumps(body))
 
 
 class AuthenticationFailure(RuntimeError):
