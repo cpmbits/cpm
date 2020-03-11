@@ -2,7 +2,7 @@ import json
 import unittest
 from mock import patch, MagicMock
 
-from cpm import CpmHubConnectorV1
+from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.domain.project import Project
 
 
