@@ -26,6 +26,7 @@ class LinkOptions:
 class Project(object):
     def __init__(self, name):
         self.name = name
+        self.version = "0.1"
         self.tests = []
         self.plugins = []
         self.sources = []

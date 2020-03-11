@@ -1,135 +1,29 @@
 #!/usr/bin/env python3.7
 import argparse
+import importlib
 import sys
+import pkgutil
 
-from cpm.api.create import new_project
-from cpm.api.target import add_target
-from cpm.api.build import build_project
-from cpm.api.clean import clean_project
-from cpm.api.test import run_tests
-from cpm.api.publish import publish_project
-from cpm.domain.build_service import BuildService
-from cpm.domain.clean_service import CleanService
-from cpm.domain.compilation_recipes.build import BuildRecipe
-from cpm.domain.compilation_recipes.test_recipe import TestRecipe
-from cpm.domain.creation_service import CreationService
-from cpm.domain.creation_service import CreationOptions
-from cpm.domain.plugin_packager import PluginPackager
-from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
-from cpm.domain.project_loader import ProjectLoader
-from cpm.domain.publish_service import PublishService
-from cpm.domain.target_service import TargetService
-from cpm.domain.test_service import TestService
-from cpm.infrastructure.filesystem import Filesystem
-from cpm.infrastructure.yaml_handler import YamlHandler
+import cpm.api
 
 
 def main():
-    action = {
-        'create': create,
-        'build': build,
-        'clean': clean,
-        'target': target,
-        'test': test,
-        'publish': publish,
-    }
+    action = {}
+    for api_action in api_actions():
+        module = importlib.import_module(api_action.name)
+        action[api_action.name.split('.')[-1]] = module
 
     action_parser = argparse.ArgumentParser(description='Chromos Package Manager')
     action_parser.add_argument('action', choices=action.keys())
     args = action_parser.parse_args(sys.argv[1:2])
 
-    action[args.action]()
-
-
-def create():
-    create_parser = argparse.ArgumentParser(prog='cpm create', description='Chromos Package Manager', add_help=False)
-    create_parser.add_argument('project_name')
-    create_parser.add_argument('-s', '--no-sample-code', required=False, action='store_true', default=False)
-    args = create_parser.parse_args(sys.argv[2:])
-
-    service = CreationService(Filesystem())
-    options = CreationOptions(generate_sample_code=not args.no_sample_code)
-    result = new_project(service, args.project_name, options)
+    result = action[args.action].execute(sys.argv[2:])
 
     finish(result)
 
 
-def build():
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    service = BuildService(loader)
-    recipe = BuildRecipe(filesystem)
-
-    result = build_project(service, recipe)
-
-    finish(result)
-
-
-def clean():
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    service = CleanService(filesystem, loader)
-
-    result = clean_project(service)
-
-    finish(result)
-
-
-def target():
-    target_action = {
-        'add': target_add,
-    }
-    target_parser = argparse.ArgumentParser(prog='cpm target', description='Chromos Package Manager', add_help=False)
-    target_parser.add_argument('target_action', choices=target_action.keys())
-    args = target_parser.parse_args(sys.argv[2:3])
-
-    target_action[args.target_action]()
-
-
-def target_add():
-    add_target_parser = argparse.ArgumentParser(prog='cpm target add', description='Chromos Package Manager', add_help=False)
-    add_target_parser.add_argument('target_name')
-    args = add_target_parser.parse_args(sys.argv[3:])
-
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    service = TargetService(loader)
-
-    result = add_target(service, args.target_name)
-
-    finish(result)
-
-
-def test():
-    add_target_parser = argparse.ArgumentParser(prog='cpm test', description='Chromos Package Manager', add_help=False)
-    add_target_parser.add_argument('patterns', nargs=argparse.REMAINDER)
-    args = add_target_parser.parse_args(sys.argv[2:])
-
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    service = TestService(loader)
-    recipe = TestRecipe(filesystem)
-
-    result = run_tests(service, recipe, args.patterns)
-
-    finish(result)
-
-
-def publish():
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    packager = PluginPackager(filesystem)
-    cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url='http://localhost:8000/plugins')
-    service = PublishService(loader, packager, cpm_hub_connector)
-
-    result = publish_project(service)
-
-    finish(result)
+def api_actions():
+    return list(pkgutil.iter_modules(cpm.api.__path__, cpm.api.__name__+'.'))
 
 
 def finish(result):
