@@ -13,16 +13,6 @@ Create-Project
     ${result}=    Run Process    ${CPM}    create    ${PROJECT_NAME}
     Should Be Equal 	${result.rc} 	${0}
 
-Target-Add-Fails-When-Directory-Does-Not-Contain-A-CPM-Project
-    ${result}=    Run Process    ${CPM}    target    add    ${PROJECT_NAME}
-    Should Be Equal 	${result.rc} 	${1}
-
-Target-Add
-    Run Process    ${CPM}    create    ${PROJECT_NAME}
-    Run Process    ${CPM}    target    add    ubuntu    cwd=${PROJECT_NAME}    alias=add_target
-    ${result}=    Get Process Result    add_target
-    Should Be Equal 	${result.rc} 	${0}
-
 Build-With-Sample-Code
     Run Process    ${CPM}    create    -s    ${PROJECT_NAME}
     Run Process    ${CPM}    build    cwd=${PROJECT_NAME}    alias=build
