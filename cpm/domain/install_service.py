@@ -1,0 +1,2 @@
+class PluginNotFound(RuntimeError):
+    pass

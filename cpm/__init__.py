@@ -11,7 +11,7 @@ def main():
     action = {}
     for api_action in api_actions():
         module = importlib.import_module(api_action.name)
-        action[api_action.name.split('.')[-1]] = module
+        action[module_name(api_action)] = module
 
     action_parser = argparse.ArgumentParser(description='Chromos Package Manager')
     action_parser.add_argument('action', choices=action.keys())
@@ -20,6 +20,10 @@ def main():
     result = action[args.action].execute(sys.argv[2:])
 
     finish(result)
+
+
+def module_name(api_action):
+    return api_action.name.split('.')[-1]
 
 
 def api_actions():
