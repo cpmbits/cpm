@@ -1,5 +1,8 @@
-class PluginDownload(object):
-    def __init__(self, name, version):
-        self.version = version
-        self.name = name
+from dataclasses import dataclass
 
+
+@dataclass
+class PluginDownload:
+    plugin_name: str
+    version: str
+    payload: str

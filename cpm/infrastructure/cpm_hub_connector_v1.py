@@ -1,6 +1,7 @@
 import json
 import base64
 
+from cpm.domain.plugin_download import PluginDownload
 from cpm.infrastructure import http_client
 
 
@@ -18,6 +19,10 @@ class CpmHubConnectorV1(object):
         }
 
         http_client.post(self.repository_url, data=json.dumps(body))
+
+    def download_plugin(self, plugin_name):
+        response = json.loads(http_client.get(f'{self.repository_url}/{plugin_name}'))
+        return PluginDownload(response['plugin_name'], response['version'], response['payload'])
 
 
 class AuthenticationFailure(RuntimeError):
