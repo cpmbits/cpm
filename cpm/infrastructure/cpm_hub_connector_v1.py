@@ -1,6 +1,8 @@
 import json
 import base64
+from http import HTTPStatus
 
+from cpm.domain.install_service import PluginNotFound
 from cpm.domain.plugin_download import PluginDownload
 from cpm.infrastructure import http_client
 
@@ -21,8 +23,12 @@ class CpmHubConnectorV1(object):
         http_client.post(self.repository_url, data=json.dumps(body))
 
     def download_plugin(self, plugin_name):
-        response = json.loads(http_client.get(f'{self.repository_url}/{plugin_name}'))
-        return PluginDownload(response['plugin_name'], response['version'], response['payload'])
+        response = http_client.get(f'{self.repository_url}/{plugin_name}')
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            raise PluginNotFound
+
+        data = json.loads(response.body)
+        return PluginDownload(data['plugin_name'], data['version'], data['payload'])
 
 
 class AuthenticationFailure(RuntimeError):
