@@ -7,8 +7,8 @@ class InstallService(object):
     def install(self, plugin_name):
         project = self.project_loader.load()
         plugin_download = self.cpm_hub_connector.download_plugin(plugin_name)
-        self.plugin_installer.install(plugin_download)
-        project.add_plugin(plugin_download.plugin)
+        plugin = self.plugin_installer.install(plugin_download)
+        project.add_plugin(plugin)
         self.project_loader.save(project)
 
 
