@@ -5,7 +5,6 @@ from mock import MagicMock
 from cpm.domain.install_service import InstallService
 from cpm.domain.install_service import PluginNotFound
 from cpm.domain.plugin import Plugin
-from cpm.domain.plugin_download import PluginDownload
 from cpm.domain.project import Project
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure

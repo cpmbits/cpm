@@ -9,7 +9,10 @@ class HttpResponse:
 
 
 def post(url, data=None, headers=None, files=None):
-    requests.post(url, files=files, data=data, headers=headers)
+    try:
+        requests.post(url, files=files, data=data, headers=headers)
+    except requests.exceptions.ConnectionError:
+        raise HttpConnectionError()
 
 
 def put(url, data=None, headers=None, files=None):
@@ -17,5 +20,12 @@ def put(url, data=None, headers=None, files=None):
 
 
 def get(url, data=None, headers=None, files=None):
-    response = requests.get(url, files=files, data=data, headers=headers)
-    return HttpResponse(response.status_code, response.text)
+    try:
+        response = requests.get(url, files=files, data=data, headers=headers)
+        return HttpResponse(response.status_code, response.text)
+    except requests.exceptions.ConnectionError:
+        raise HttpConnectionError()
+
+
+class HttpConnectionError(RuntimeError):
+    pass

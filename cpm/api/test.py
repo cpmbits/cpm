@@ -18,9 +18,9 @@ def run_tests(test_service, recipe, patterns=[]):
     try:
         test_service.run_tests(recipe, patterns)
     except NotAChromosProject:
-        return Result(FAIL, 'not a Chromos project')
+        return Result(FAIL, 'error: not a Chromos project')
     except CompilationError as e:
-        return Result(FAIL, f'{str(e)}')
+        return Result(FAIL, f'error: {str(e)}')
     except TestsFailed:
         return Result(FAIL, '✖ FAIL')
     except NoTestsFound:
