@@ -1,5 +1,7 @@
 import os
 import shutil
+import zipfile
+import io
 from distutils.dir_util import copy_tree
 from pathlib import Path
 
@@ -39,6 +41,11 @@ class Filesystem:
 
     def zip(self, directory, output_filename):
         shutil.make_archive(output_filename, 'zip', directory)
+
+    def unzips(self, payload, directory):
+        zip = zipfile.ZipFile(io.BytesIO(payload))
+        zip.extractall(path=directory)
+        zip.close()
 
     def symlink(self, source, destination):
         if Path(destination).is_symlink():
