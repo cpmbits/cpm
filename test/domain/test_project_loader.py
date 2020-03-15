@@ -187,9 +187,9 @@ class TestProjectLoader(unittest.TestCase):
     def test_saving_project_with_one_plugin(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
+        loader = ProjectLoader(yaml_handler, filesystem)
         test_project = Project('Project')
         test_project.add_plugin(Plugin('cest', '1.2'))
-        loader = ProjectLoader(yaml_handler, filesystem)
 
         loader.save(test_project)
 
@@ -200,3 +200,74 @@ class TestProjectLoader(unittest.TestCase):
                 'plugins': {'cest': '1.2'}
             }
         )
+
+    def test_adding_a_plugin_to_project_without_plugins(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        loader = ProjectLoader(yaml_handler, filesystem)
+        new_plugin = Plugin('cest', '1.2')
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'packages': {'cpm-hub': None},
+        }
+
+        loader.add_plugin(new_plugin)
+
+        yaml_handler.dump.assert_called_once_with(
+            PROJECT_ROOT_FILE,
+            {
+                'project_name': 'Project',
+                'packages': {'cpm-hub': None},
+                'plugins': {'cest': '1.2'}
+            }
+        )
+
+    def test_adding_a_plugin_to_project_with_plugins(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        loader = ProjectLoader(yaml_handler, filesystem)
+        new_plugin = Plugin('fakeit', '3.2')
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'packages': {'cpm-hub': None},
+            'plugins': {'cest': '1.2'}
+        }
+
+        loader.add_plugin(new_plugin)
+
+        yaml_handler.dump.assert_called_once_with(
+            PROJECT_ROOT_FILE,
+            {
+                'project_name': 'Project',
+                'packages': {'cpm-hub': None},
+                'plugins': {
+                    'cest': '1.2',
+                    'fakeit': '3.2',
+                }
+            }
+        )
+
+    def test_adding_a_plugin_to_project_with_previous_version_of_the_plugin(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        loader = ProjectLoader(yaml_handler, filesystem)
+        new_plugin = Plugin('cest', '1.3')
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'packages': {'cpm-hub': None},
+            'plugins': {'cest': '1.2'}
+        }
+
+        loader.add_plugin(new_plugin)
+
+        yaml_handler.dump.assert_called_once_with(
+            PROJECT_ROOT_FILE,
+            {
+                'project_name': 'Project',
+                'packages': {'cpm-hub': None},
+                'plugins': {
+                    'cest': '1.3',
+                }
+            }
+        )
+
