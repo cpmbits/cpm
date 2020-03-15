@@ -63,20 +63,29 @@ class ProjectLoader(object):
         return self.filesystem.find(path, '*.cpp') + self.filesystem.find(path, '*.c')
 
     def save(self, project):
-        project_description = {
+        description = {
             'project_name': project.name
         }
         if project.targets:
-            project_description['targets'] = {target: {} for target in project.targets}
+            description['targets'] = {target: {} for target in project.targets}
         if project.plugins:
-            project_description['plugins'] = {
+            description['plugins'] = {
                 plugin.name: plugin.version for plugin in project.plugins
             }
-        self.yaml_handler.dump(PROJECT_ROOT_FILE, project_description)
+        self.yaml_handler.dump(PROJECT_ROOT_FILE, description)
 
     def link_libraries(self, description):
         link_options = description.get('link_options', {})
         return link_options.get('libraries', [])
+
+    def add_plugin(self, new_plugin):
+        description = self.yaml_handler.load(PROJECT_ROOT_FILE)
+        if 'plugins' not in description:
+            description['plugins'] = {new_plugin.name: new_plugin.version}
+        else:
+            description['plugins'][new_plugin.name] = new_plugin.version
+
+        self.yaml_handler.dump(PROJECT_ROOT_FILE, description)
 
 
 class NotAChromosProject(RuntimeError):

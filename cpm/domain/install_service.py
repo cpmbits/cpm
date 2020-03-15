@@ -5,11 +5,10 @@ class InstallService(object):
         self.plugin_installer = plugin_installer
 
     def install(self, plugin_name):
-        project = self.project_loader.load()
+        self.project_loader.load()
         plugin_download = self.cpm_hub_connector.download_plugin(plugin_name)
         plugin = self.plugin_installer.install(plugin_download)
-        project.add_plugin(plugin)
-        self.project_loader.save(project)
+        self.project_loader.add_plugin(plugin)
 
 
 class PluginNotFound(RuntimeError):
