@@ -1,6 +1,7 @@
 import argparse
 
 from cpm.api.result import Result
+from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.install_service import PluginNotFound, InstallService
 from cpm.domain.plugin_installer import PluginInstaller
@@ -22,6 +23,8 @@ def install_plugin(install_service, plugin):
         return Result(FAIL, f'error: plugin {plugin} not found in CPM Hub')
     except HttpConnectionError:
         return Result(FAIL, f'error: failed to connect to CPM Hub')
+
+    return Result(OK, f'Installed plugin "{plugin}"')
 
 
 def execute(argv):
