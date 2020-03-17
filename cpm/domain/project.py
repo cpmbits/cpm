@@ -23,6 +23,12 @@ class LinkOptions:
     libraries: list = field(default_factory=list)
 
 
+@dataclass
+class ProjectAction(object):
+    name: str
+    command: str
+
+
 class Project(object):
     def __init__(self, name):
         self.name = name
@@ -33,6 +39,7 @@ class Project(object):
         self.packages = []
         self.include_directories = []
         self.link_options = LinkOptions()
+        self.actions = []
         self.targets = {}
 
     def add_target(self, target):
@@ -55,3 +62,6 @@ class Project(object):
 
     def add_library(self, library):
         self.link_options.libraries.append(library)
+
+    def add_action(self, project_action):
+        self.actions.append(project_action)
