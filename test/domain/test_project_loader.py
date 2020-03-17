@@ -3,7 +3,7 @@ import mock
 
 from cpm.domain.project_loader import ProjectLoader
 from cpm.domain.project_loader import NotAChromosProject
-from cpm.domain.project import Project, Package
+from cpm.domain.project import Project, Package, ProjectAction
 from cpm.domain.plugin import Plugin
 from cpm.domain.project import PROJECT_ROOT_FILE
 from cpm.domain.target import Target
@@ -23,7 +23,7 @@ class TestProjectLoader(unittest.TestCase):
 
         self.assertRaises(NotAChromosProject, loader.load)
 
-    def test_loading_project_without_targets(self):
+    def test_loading_project(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         yaml_handler.load.return_value = {
@@ -270,4 +270,21 @@ class TestProjectLoader(unittest.TestCase):
                 }
             }
         )
+
+    def test_loading_project_with_one_action(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        yaml_handler.load.return_value = {
+            'project_name': 'Project',
+            'actions': {
+                'deploy': 'sudo make me a sandwich'
+            }
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        loaded_project = loader.load()
+
+        yaml_handler.load.assert_called_once_with(PROJECT_ROOT_FILE)
+        assert loaded_project.name == 'Project'
+        assert loaded_project.actions == [ProjectAction('deploy', 'sudo make me a sandwich')]
 

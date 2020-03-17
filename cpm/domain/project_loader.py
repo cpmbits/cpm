@@ -1,5 +1,5 @@
 from cpm.domain.plugin_loader import PluginLoader
-from cpm.domain.project import PROJECT_ROOT_FILE
+from cpm.domain.project import PROJECT_ROOT_FILE, ProjectAction
 from cpm.domain.project import Package
 from cpm.domain.project import Project
 from cpm.domain.project import Target
@@ -30,6 +30,8 @@ class ProjectLoader(object):
                     project.add_include_directory(directory)
             for library in self.link_libraries(description):
                 project.add_library(library)
+            for action in self.project_actions(description):
+                project.add_action(action)
             return project
         except FileNotFoundError:
             raise NotAChromosProject()
@@ -86,6 +88,10 @@ class ProjectLoader(object):
             description['plugins'][new_plugin.name] = new_plugin.version
 
         self.yaml_handler.dump(PROJECT_ROOT_FILE, description)
+
+    def project_actions(self, description):
+        for action in description.get('actions', []):
+            yield ProjectAction(action, description['actions'][action])
 
 
 class NotAChromosProject(RuntimeError):
