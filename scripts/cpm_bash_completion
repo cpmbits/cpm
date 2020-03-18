@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+_cpm_completions()
+{
+  ACTIONS=$(cpm list-actions)
+  COMPREPLY=($(compgen -W "$ACTIONS" "${COMP_WORDS[1]}"))
+}
+
+complete -F _cpm_completions cpm

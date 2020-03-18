@@ -21,8 +21,12 @@ def main():
         actions[project_action.name] = ProjectActionRunner(project_action.name, project_action.command)
 
     action_parser = argparse.ArgumentParser(description='Chromos Package Manager')
-    action_parser.add_argument('action', choices=actions.keys())
+    action_parser.add_argument('action', choices=list(actions.keys()) + ['list-actions'])
     args = action_parser.parse_args(sys.argv[1:2])
+
+    if args.action == 'list-actions':
+        print(' '.join(actions.keys()))
+        sys.exit(0)
 
     result = actions[args.action].execute(sys.argv[2:])
 
