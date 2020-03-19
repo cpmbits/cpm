@@ -7,7 +7,7 @@ class TestService(object):
         if not project.tests:
             raise NoTestsFound()
         recipe.generate(project)
-        recipe.compile()
+        recipe.build_tests()
         if not patterns:
             recipe.run_tests()
         else:

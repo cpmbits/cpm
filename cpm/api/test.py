@@ -5,9 +5,9 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.project_loader import ProjectLoader
 from cpm.domain.test_service import TestService
-from cpm.domain.compilation_recipes.test_recipe import TestRecipe
-from cpm.domain.compilation_recipes.test_recipe import TestsFailed
-from cpm.domain.compilation_recipes import CompilationError
+from cpm.domain.cmake_recipe import CMakeRecipe
+from cpm.domain.cmake_recipe import TestsFailed
+from cpm.domain.cmake_recipe import CompilationError
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.test_service import NoTestsFound
 from cpm.infrastructure.filesystem import Filesystem
@@ -38,7 +38,7 @@ def execute(argv):
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
     service = TestService(loader)
-    recipe = TestRecipe(filesystem)
+    recipe = CMakeRecipe(filesystem)
 
     result = run_tests(service, recipe, args.patterns)
 

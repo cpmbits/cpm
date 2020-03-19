@@ -1,4 +1,4 @@
-from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
+from cpm.domain.cmake_recipe import BUILD_DIRECTORY
 
 
 class CleanService(object):
@@ -8,6 +8,6 @@ class CleanService(object):
 
     def clean(self):
         self.project_loader.load()
-        if not self.filesystem.directory_exists(RECIPES_DIRECTORY):
+        if not self.filesystem.directory_exists(BUILD_DIRECTORY):
             return
-        self.filesystem.remove_directory(RECIPES_DIRECTORY)
+        self.filesystem.remove_directory(BUILD_DIRECTORY)

@@ -32,7 +32,7 @@ class TestTestService(unittest.TestCase):
 
         project_loader.load.assert_called_once()
         test_recipe.generate.assert_not_called()
-        test_recipe.compile.assert_not_called()
+        test_recipe.build_tests.assert_not_called()
         test_recipe.run_tests.assert_not_called()
 
     def test_service_generates_the_recipe_then_compiles_and_runs_the_tests(self):
@@ -47,7 +47,7 @@ class TestTestService(unittest.TestCase):
 
         project_loader.load.assert_called_once()
         test_recipe.generate.assert_called_once_with(project)
-        test_recipe.compile.assert_called_once()
+        test_recipe.build_tests.assert_called_once()
         test_recipe.run_tests.assert_called_once()
 
     def test_service_runs_one_test_when_one_executable_matches_one_pattern(self):

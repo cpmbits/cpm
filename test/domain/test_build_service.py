@@ -19,8 +19,8 @@ class TestBuildService(unittest.TestCase):
         service = BuildService(project_loader)
 
         self.assertRaises(NotAChromosProject, service.build, compilation_recipe)
-
-        project_loader.load.assert_called_once()
+        self.assertRaises(NotAChromosProject, service.update, compilation_recipe)
+        project_loader.load.assert_called()
 
     def test_build_service_generates_compilation_recipe_from_project_sources_and_compiles_project(self):
         compilation_recipe = mock.MagicMock()
@@ -33,4 +33,16 @@ class TestBuildService(unittest.TestCase):
 
         project_loader.load.assert_called_once()
         compilation_recipe.generate.assert_called_once_with(project)
-        compilation_recipe.compile.assert_called_once_with(project)
+        compilation_recipe.build.assert_called_once_with(project)
+
+    def test_build_service_only_generates_compilation_recipe_when_updating(self):
+        compilation_recipe = mock.MagicMock()
+        project_loader = mock.MagicMock()
+        project = Project('ProjectName')
+        project_loader.load.return_value = project
+        service = BuildService(project_loader)
+
+        service.update(compilation_recipe)
+
+        project_loader.load.assert_called_once()
+        compilation_recipe.generate.assert_called_once_with(project)

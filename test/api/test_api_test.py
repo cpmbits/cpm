@@ -2,8 +2,8 @@ import unittest
 import mock
 
 from cpm.api.test import run_tests
-from cpm.domain.compilation_recipes import CompilationError
-from cpm.domain.compilation_recipes.test_recipe import TestsFailed
+from cpm.domain.cmake_recipe import CompilationError
+from cpm.domain.cmake_recipe import TestsFailed
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.test_service import NoTestsFound
 
