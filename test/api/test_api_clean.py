@@ -1,5 +1,5 @@
 import unittest
-import mock
+from mock import MagicMock
 
 from cpm.api.clean import clean_project
 from cpm.domain.project_loader import NotAChromosProject
@@ -7,18 +7,20 @@ from cpm.domain.project_loader import NotAChromosProject
 
 class TestApiClean(unittest.TestCase):
     def test_clean_fails_when_current_directory_is_not_a_chromos_project(self):
-        clean_service = mock.MagicMock()
-        clean_service.clean.side_effect = NotAChromosProject()
+        cmake_recipe = MagicMock()
+        build_service = MagicMock()
+        build_service.clean.side_effect = NotAChromosProject()
 
-        result = clean_project(clean_service)
+        result = clean_project(build_service, cmake_recipe)
 
         assert result.status_code == 1
-        clean_service.clean.assert_called_once()
+        build_service.clean.assert_called_once_with(cmake_recipe)
 
     def test_clean_project(self):
-        clean_service = mock.MagicMock()
+        cmake_recipe = MagicMock()
+        build_service = MagicMock()
 
-        result = clean_project(clean_service)
+        result = clean_project(build_service, cmake_recipe)
 
         assert result.status_code == 0
-        clean_service.clean.assert_called_once()
+        build_service.clean.assert_called_once_with(cmake_recipe)
