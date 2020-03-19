@@ -2,7 +2,7 @@ from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.build_service import BuildService
-from cpm.domain.compilation_recipes.cmake_recipe import CMakeRecipe
+from cpm.domain.cmake_recipe import CMakeRecipe
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.project_loader import ProjectLoader
 from cpm.infrastructure.filesystem import Filesystem

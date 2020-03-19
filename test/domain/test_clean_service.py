@@ -2,7 +2,7 @@ import unittest
 import mock
 
 from cpm.domain.clean_service import CleanService
-from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
+from cpm.domain.cmake_recipe import BUILD_DIRECTORY
 from cpm.domain.project_loader import NotAChromosProject
 
 
@@ -31,7 +31,7 @@ class TestCleanService(unittest.TestCase):
         service.clean()
 
         project_loader.load.assert_called_once()
-        filesystem.remove_directory.assert_called_once_with(RECIPES_DIRECTORY)
+        filesystem.remove_directory.assert_called_once_with(BUILD_DIRECTORY)
 
     def test_clean_service_skips_when_recipes_directory_does_not_exist(self):
         filesystem = mock.MagicMock()
