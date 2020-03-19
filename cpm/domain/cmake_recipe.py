@@ -3,6 +3,7 @@ import signal
 
 from cpm.domain import cmake
 
+CMAKELISTS = 'CMakeLists.txt'
 BUILD_DIRECTORY = f'build'
 
 
@@ -21,7 +22,7 @@ class CMakeRecipe(object):
         self.test_executables = [test_file.split('/')[-1].split('.')[0] for test_file in project.tests]
 
         self.filesystem.create_file(
-            'CMakeLists.txt',
+            CMAKELISTS,
             self.build_cmakelists(project)
         )
 
@@ -43,7 +44,7 @@ class CMakeRecipe(object):
         cmake_builder.add_custom_command(
                     project.name,
                     'POST_BUILD',
-                    f'${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:{project.name}> ${{PROJECT_SOURCE_DIR}}/../../{project.name}')
+                    f'${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:{project.name}> ${{PROJECT_SOURCE_DIR}}/{project.name}')
 
         if self.test_executables:
             project_object_library = project.name + '_object_library'
@@ -93,6 +94,16 @@ class CMakeRecipe(object):
         if result.returncode < 0:
             print(f'{executable} failed with signal {result.returncode} ({signal.Signals(-result.returncode).name})')
         return result
+
+    def clean(self):
+        if not self.filesystem.directory_exists(BUILD_DIRECTORY):
+            return
+        subprocess.run(
+            ['ninja', 'clean'],
+            cwd=BUILD_DIRECTORY
+        )
+        self.filesystem.delete_file(CMAKELISTS)
+        self.filesystem.remove_directory(BUILD_DIRECTORY)
 
 
 class TestsFailed(RuntimeError):

@@ -10,8 +10,8 @@ class Filesystem:
     def create_directory(self, path):
         os.makedirs(path)
 
-    def create_file(self, name, contents=''):
-        with open(name, 'w') as f:
+    def create_file(self, file_name, contents=''):
+        with open(file_name, 'w') as f:
             f.write(contents)
 
     def read_file(self, file_name, mode='r'):
@@ -20,6 +20,9 @@ class Filesystem:
 
     def copy_file(self, origin, destination):
         shutil.copy2(origin, destination)
+
+    def delete_file(self, file_name):
+        os.remove(file_name)
 
     def copy_directory(self, origin, destination):
         copy_tree(origin, destination)
