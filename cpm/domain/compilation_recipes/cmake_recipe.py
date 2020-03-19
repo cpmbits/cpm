@@ -7,7 +7,7 @@ from cpm.domain.compilation_recipes import RECIPES_DIRECTORY
 BUILD_DIRECTORY = f'{RECIPES_DIRECTORY}/build'
 
 
-class BuildRecipe(CompilationRecipe):
+class CMakeRecipe(CompilationRecipe):
     CMAKE_COMMAND = 'cmake'
 
     def __init__(self, filesystem):
