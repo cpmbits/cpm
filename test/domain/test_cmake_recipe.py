@@ -5,7 +5,7 @@ from mock import call
 from mock import patch
 
 from subprocess import CompletedProcess
-from cpm.domain.cmake_recipe import CMakeRecipe, TestsFailed
+from cpm.domain.cmake_recipe import CMakeRecipe, TestsFailed, BUILD_DIRECTORY, CMAKELISTS
 from cpm.domain.plugin import Plugin
 from cpm.domain.project import Project, Package
 
@@ -33,7 +33,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
         )
 
@@ -58,7 +58,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
         )
 
@@ -82,7 +82,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
         )
 
@@ -107,7 +107,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
         )
 
@@ -135,7 +135,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
         )
 
@@ -157,7 +157,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
         )
 
@@ -180,7 +180,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
             'add_library(DeathStarBackend_object_library OBJECT )\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
@@ -210,7 +210,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
             'add_library(DeathStarBackend_object_library OBJECT )\n'
             'add_executable(test_suite_1 tests/test_suite_1.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
@@ -245,7 +245,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_custom_command(\n'
             '    TARGET DeathStarBackend\n'
             '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/../../DeathStarBackend\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
             ')\n'
             'add_library(DeathStarBackend_object_library OBJECT )\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
@@ -369,6 +369,33 @@ class TestCMakeRecipe(unittest.TestCase):
                 cwd='build'
             )
         ])
+
+    @patch('subprocess.run')
+    def test_recipe_cleans_project_then_removes_build_directory(self, subprocess_run):
+        filesystem = MagicMock()
+        recipe = CMakeRecipe(filesystem)
+        filesystem.directory_exists.return_value = True
+
+        recipe.clean()
+
+        subprocess_run.assert_has_calls([
+            call(
+                ['ninja', 'clean'],
+                cwd='build'
+            )
+        ])
+        filesystem.remove_directory.assert_called_once_with(BUILD_DIRECTORY)
+        filesystem.delete_file.assert_called_once_with(CMAKELISTS)
+
+    @patch('subprocess.run')
+    def test_clean_is_not_run_if_build_directory_does_not_exist(self, subprocess_run):
+        filesystem = MagicMock()
+        recipe = CMakeRecipe(filesystem)
+        filesystem.directory_exists.return_value = False
+
+        recipe.clean()
+
+        subprocess_run.assert_not_called()
 
     def deathStarBackend(self):
         project = Project('DeathStarBackend')

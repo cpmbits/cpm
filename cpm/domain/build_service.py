@@ -10,3 +10,8 @@ class BuildService(object):
     def update(self, cmake_recipe):
         project = self.project_loader.load()
         cmake_recipe.generate(project)
+
+    def clean(self, cmake_recipe):
+        self.project_loader.load()
+        cmake_recipe.clean()
+

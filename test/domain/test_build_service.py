@@ -13,36 +13,57 @@ class TestBuildService(unittest.TestCase):
         BuildService(project_loader)
 
     def test_build_service_fails_when_project_loader_fails_to_load_project(self):
-        compilation_recipe = mock.MagicMock()
+        cmake_recipe = mock.MagicMock()
         project_loader = mock.MagicMock()
         project_loader.load.side_effect = NotAChromosProject
         service = BuildService(project_loader)
 
-        self.assertRaises(NotAChromosProject, service.build, compilation_recipe)
-        self.assertRaises(NotAChromosProject, service.update, compilation_recipe)
+        self.assertRaises(NotAChromosProject, service.build, cmake_recipe)
+        self.assertRaises(NotAChromosProject, service.update, cmake_recipe)
         project_loader.load.assert_called()
 
     def test_build_service_generates_compilation_recipe_from_project_sources_and_compiles_project(self):
-        compilation_recipe = mock.MagicMock()
+        cmake_recipe = mock.MagicMock()
         project_loader = mock.MagicMock()
+        service = BuildService(project_loader)
         project = Project('ProjectName')
         project_loader.load.return_value = project
-        service = BuildService(project_loader)
 
-        service.build(compilation_recipe)
+        service.build(cmake_recipe)
 
         project_loader.load.assert_called_once()
-        compilation_recipe.generate.assert_called_once_with(project)
-        compilation_recipe.build.assert_called_once_with(project)
+        cmake_recipe.generate.assert_called_once_with(project)
+        cmake_recipe.build.assert_called_once_with(project)
 
     def test_build_service_only_generates_compilation_recipe_when_updating(self):
-        compilation_recipe = mock.MagicMock()
+        cmake_recipe = mock.MagicMock()
         project_loader = mock.MagicMock()
         project = Project('ProjectName')
         project_loader.load.return_value = project
         service = BuildService(project_loader)
 
-        service.update(compilation_recipe)
+        service.update(cmake_recipe)
 
         project_loader.load.assert_called_once()
-        compilation_recipe.generate.assert_called_once_with(project)
+        cmake_recipe.generate.assert_called_once_with(project)
+
+    def test_clean_fails_when_project_loader_fails_to_load_project(self):
+        cmake_recipe = mock.MagicMock()
+        project_loader = mock.MagicMock()
+        project_loader.load.side_effect = NotAChromosProject
+        service = BuildService(project_loader)
+
+        self.assertRaises(NotAChromosProject, service.clean, cmake_recipe)
+
+        project_loader.load.assert_called_once()
+
+    def test_clean_uses_cmake_recipe_to_clean_project(self):
+        cmake_recipe = mock.MagicMock()
+        project_loader = mock.MagicMock()
+        service = BuildService(project_loader)
+
+        service.clean(cmake_recipe)
+
+        project_loader.load.assert_called_once()
+        cmake_recipe.clean.assert_called_once()
+
