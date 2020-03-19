@@ -6,3 +6,7 @@ class BuildService(object):
         project = self.project_loader.load()
         cmake_recipe.generate(project)
         cmake_recipe.build(project)
+
+    def update(self, cmake_recipe):
+        project = self.project_loader.load()
+        cmake_recipe.generate(project)

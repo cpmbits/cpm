@@ -5,7 +5,7 @@ from cpm.api.clean import clean_project
 from cpm.domain.project_loader import NotAChromosProject
 
 
-class TestApiBuild(unittest.TestCase):
+class TestApiClean(unittest.TestCase):
     def test_clean_fails_when_current_directory_is_not_a_chromos_project(self):
         clean_service = mock.MagicMock()
         clean_service.clean.side_effect = NotAChromosProject()

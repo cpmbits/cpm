@@ -14,7 +14,7 @@ class CMakeRecipe(object):
         self.test_executables = []
 
     def generate(self, project):
-        self.create_symlinks_to_sources(project)
+        self.create_build_directory(project)
         self.generate_cmakelists(project)
 
     def generate_cmakelists(self, project):
@@ -25,7 +25,7 @@ class CMakeRecipe(object):
             self.build_cmakelists(project)
         )
 
-    def create_symlinks_to_sources(self, project):
+    def create_build_directory(self, project):
         if not self.filesystem.directory_exists(BUILD_DIRECTORY):
             self.filesystem.create_directory(BUILD_DIRECTORY)
 
