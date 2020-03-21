@@ -66,4 +66,3 @@ class TestInstallService(unittest.TestCase):
 
         cpm_hub_connector.download_plugin.assert_called_once_with("cest")
         plugin_installer.install.assert_called_once_with(plugin_download)
-        project_loader.add_plugin.assert_called_once_with(plugin)

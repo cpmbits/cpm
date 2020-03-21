@@ -8,7 +8,6 @@ class InstallService(object):
         self.project_loader.load()
         plugin_download = self.cpm_hub_connector.download_plugin(plugin_name)
         plugin = self.plugin_installer.install(plugin_download)
-        self.project_loader.add_plugin(plugin)
 
 
 class PluginNotFound(RuntimeError):
