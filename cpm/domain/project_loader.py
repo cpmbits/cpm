@@ -14,7 +14,7 @@ class ProjectLoader(object):
     def load(self):
         try:
             description = self.yaml_handler.load(PROJECT_ROOT_FILE)
-            project = Project(description['project_name'])
+            project = Project(description['name'])
             project.add_sources(['main.cpp'])
             for package in self.project_packages(description):
                 project.add_package(package)
@@ -66,7 +66,7 @@ class ProjectLoader(object):
 
     def save(self, project):
         description = {
-            'project_name': project.name
+            'name': project.name
         }
         if project.targets:
             description['targets'] = {target: {} for target in project.targets}
