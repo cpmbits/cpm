@@ -39,6 +39,11 @@ class Filesystem:
     def remove_directory(self, path):
         shutil.rmtree(path)
 
+    def list_directories(self, path):
+        if self.directory_exists(path):
+            return next(os.walk(path))[1]
+        return []
+
     def find(self, path, pattern):
         return [str(filename) for filename in Path(path).rglob(pattern)]
 
