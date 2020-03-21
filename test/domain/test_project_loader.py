@@ -106,28 +106,22 @@ class TestProjectLoader(unittest.TestCase):
     @mock.patch('cpm.domain.project_loader.PluginLoader')
     def test_loading_project_with_one_plugin(self, PluginLoader):
         filesystem = mock.MagicMock()
-        plugin = Plugin('cest', '2.3')
-        plugin.add_include_directory('plugins/cest')
         plugin_loader = mock.MagicMock()
-        plugin_loader.load.return_value = plugin
         PluginLoader.return_value = plugin_loader
         yaml_handler = mock.MagicMock()
-        yaml_handler.load.return_value = {
-            'name': 'Project',
-            'plugins': {'cest': '2.3'}
-        }
+        yaml_handler.load.return_value = {'name': 'Project'}
         loader = ProjectLoader(yaml_handler, filesystem)
+
+        filesystem.list_directories.return_value = ['cest']
+        plugin = Plugin('cest')
+        plugin.add_include_directory('plugins/cest')
+        plugin_loader.load_from.return_value = plugin
 
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
-        assert loaded_project.plugins == [
-            Plugin('cest', '2.3')
-        ]
-        assert loaded_project.include_directories == [
-            'plugins/cest'
-        ]
-        plugin_loader.load.assert_called_once_with('cest', '2.3')
+        assert loaded_project.plugins == [Plugin('cest')]
+        assert loaded_project.include_directories == ['plugins/cest']
 
     def test_loading_package_with_sources(self):
         filesystem = mock.MagicMock()
@@ -154,122 +148,53 @@ class TestProjectLoader(unittest.TestCase):
         assert tests == ['tests/test_project.cpp']
         filesystem.find.assert_called_once_with('tests', 'test_*.cpp')
 
-    def test_saving_project_without_targets(self):
-        yaml_handler = mock.MagicMock()
+    def test_loading_local_plugins_when_plugins_directory_is_empty(self):
         filesystem = mock.MagicMock()
-        test_project = Project('Project')
+        yaml_handler = mock.MagicMock()
+        loader = ProjectLoader(yaml_handler, filesystem)
+        filesystem.list_directories.return_value = []
+
+        plugins = loader.load_local_plugins()
+
+        assert plugins == []
+        filesystem.list_directories.assert_called_once_with('plugins')
+
+    @mock.patch('cpm.domain.project_loader.PluginLoader')
+    def test_loading_local_plugins_when_plugins_directory_contains_one_plugin(self, PluginLoader):
+        filesystem = mock.MagicMock()
+        yaml_handler = mock.MagicMock()
+        plugin_loader = mock.MagicMock()
+        PluginLoader.return_value = plugin_loader
         loader = ProjectLoader(yaml_handler, filesystem)
 
-        loader.save(test_project)
+        filesystem.list_directories.return_value = ['cest']
+        plugin_loader.load_from.return_value = Plugin('cest')
 
-        yaml_handler.dump.assert_called_once_with(
-            PROJECT_ROOT_FILE,
-            {'name': 'Project'}
-        )
+        plugins = loader.load_local_plugins()
 
-    def test_saving_project_with_one_target(self):
-        yaml_handler = mock.MagicMock()
+        assert plugins == [Plugin('cest')]
+        filesystem.list_directories.assert_called_once_with('plugins')
+        plugin_loader.load_from.assert_called_once_with('plugins/cest')
+
+    @mock.patch('cpm.domain.project_loader.PluginLoader')
+    def test_loading_local_plugins_when_plugins_directory_contains_many_plugins(self, PluginLoader):
         filesystem = mock.MagicMock()
-        test_project = Project('Project')
-        test_project.add_target(Target('ubuntu'))
+        yaml_handler = mock.MagicMock()
+        plugin_loader = mock.MagicMock()
+        PluginLoader.return_value = plugin_loader
         loader = ProjectLoader(yaml_handler, filesystem)
 
-        loader.save(test_project)
+        filesystem.list_directories.return_value = ['cest', 'base64']
+        plugin_loader.load_from.side_effect = [Plugin('cest'), Plugin('base64')]
 
-        yaml_handler.dump.assert_called_once_with(
-            PROJECT_ROOT_FILE,
-            {
-                'name': 'Project',
-                'targets': {'ubuntu': {}}
-            }
-        )
+        plugins = loader.load_local_plugins()
 
-    def test_saving_project_with_one_plugin(self):
-        yaml_handler = mock.MagicMock()
-        filesystem = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-        test_project = Project('Project')
-        test_project.add_plugin(Plugin('cest', '1.2'))
-
-        loader.save(test_project)
-
-        yaml_handler.dump.assert_called_once_with(
-            PROJECT_ROOT_FILE,
-            {
-                'name': 'Project',
-                'plugins': {'cest': '1.2'}
-            }
-        )
-
-    def test_adding_a_plugin_to_project_without_plugins(self):
-        yaml_handler = mock.MagicMock()
-        filesystem = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-        new_plugin = Plugin('cest', '1.2')
-        yaml_handler.load.return_value = {
-            'name': 'Project',
-            'packages': {'cpm-hub': None},
-        }
-
-        loader.add_plugin(new_plugin)
-
-        yaml_handler.dump.assert_called_once_with(
-            PROJECT_ROOT_FILE,
-            {
-                'name': 'Project',
-                'packages': {'cpm-hub': None},
-                'plugins': {'cest': '1.2'}
-            }
-        )
-
-    def test_adding_a_plugin_to_project_with_plugins(self):
-        yaml_handler = mock.MagicMock()
-        filesystem = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-        new_plugin = Plugin('fakeit', '3.2')
-        yaml_handler.load.return_value = {
-            'name': 'Project',
-            'packages': {'cpm-hub': None},
-            'plugins': {'cest': '1.2'}
-        }
-
-        loader.add_plugin(new_plugin)
-
-        yaml_handler.dump.assert_called_once_with(
-            PROJECT_ROOT_FILE,
-            {
-                'name': 'Project',
-                'packages': {'cpm-hub': None},
-                'plugins': {
-                    'cest': '1.2',
-                    'fakeit': '3.2',
-                }
-            }
-        )
-
-    def test_adding_a_plugin_to_project_with_previous_version_of_the_plugin(self):
-        yaml_handler = mock.MagicMock()
-        filesystem = mock.MagicMock()
-        loader = ProjectLoader(yaml_handler, filesystem)
-        new_plugin = Plugin('cest', '1.3')
-        yaml_handler.load.return_value = {
-            'name': 'Project',
-            'packages': {'cpm-hub': None},
-            'plugins': {'cest': '1.2'}
-        }
-
-        loader.add_plugin(new_plugin)
-
-        yaml_handler.dump.assert_called_once_with(
-            PROJECT_ROOT_FILE,
-            {
-                'name': 'Project',
-                'packages': {'cpm-hub': None},
-                'plugins': {
-                    'cest': '1.3',
-                }
-            }
-        )
+        assert plugins == [Plugin('cest'), Plugin('base64')]
+        filesystem.list_directories.assert_called_once_with('plugins')
+        plugin_loader.load_from.assert_has_calls([
+            mock.call('plugins/cest'),
+            mock.call('plugins/base64')
+        ])
 
     def test_loading_project_with_one_action(self):
         yaml_handler = mock.MagicMock()

@@ -16,11 +16,25 @@ class TestPluginLoader(unittest.TestCase):
         filesystem = MagicMock()
         yaml_handler = MagicMock()
         yaml_handler.load.return_value = {
-            'plugin_name': 'cest'
+            'name': 'cest'
         }
         loader = PluginLoader(yaml_handler, filesystem)
 
-        plugin = loader.load('cest', '1.0')
+        plugin = loader.load('cest')
+
+        yaml_handler.load.assert_called_once_with('plugins/cest/plugin.yaml')
+        assert plugin.name == 'cest'
+        assert plugin.include_directories == []
+
+    def test_loading_plugin_from_directory(self):
+        filesystem = MagicMock()
+        yaml_handler = MagicMock()
+        yaml_handler.load.return_value = {
+            'name': 'cest'
+        }
+        loader = PluginLoader(yaml_handler, filesystem)
+
+        plugin = loader.load_from('plugins/cest')
 
         yaml_handler.load.assert_called_once_with('plugins/cest/plugin.yaml')
         assert plugin.name == 'cest'
@@ -32,12 +46,12 @@ class TestPluginLoader(unittest.TestCase):
         filesystem.parent_directory.return_value = 'plugins/cest'
         filesystem.find.side_effect = [['plugins/cest/plugin.cpp'], ['plugins/cest/plugin.c']]
         yaml_handler.load.return_value = {
-            'plugin_name': 'cest',
+            'name': 'cest',
             'packages': {'cest': None},
         }
         loader = PluginLoader(yaml_handler, filesystem)
 
-        plugin = loader.load('cest', '1.0')
+        plugin = loader.load('cest')
 
         assert plugin.name == 'cest'
         assert Package(path='plugins/cest/cest') in plugin.packages
@@ -50,7 +64,7 @@ class TestPluginLoader(unittest.TestCase):
         filesystem.parent_directory.return_value = 'plugins/cest'
         filesystem.find.side_effect = [['plugins/cest/plugin.cpp'], ['plugins/cest/plugin.c']]
         yaml_handler.load.return_value = {
-            'plugin_name': 'cest',
+            'name': 'cest',
             'packages': {
                 'cest': {
                     'cflags': ['-std=c++11']
@@ -59,7 +73,7 @@ class TestPluginLoader(unittest.TestCase):
         }
         loader = PluginLoader(yaml_handler, filesystem)
 
-        plugin = loader.load('cest', '1.0')
+        plugin = loader.load('cest')
 
         assert plugin.name == 'cest'
         assert Package(path='plugins/cest/cest', cflags=['-std=c++11']) in plugin.packages

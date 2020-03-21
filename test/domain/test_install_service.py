@@ -55,7 +55,7 @@ class TestInstallService(unittest.TestCase):
         cpm_hub_connector = MagicMock()
         plugin_installer = MagicMock()
         plugin_download = MagicMock()
-        plugin = Plugin("cest", "1.0")
+        plugin = Plugin("cest")
         plugin_installer.install.return_value = plugin
         project = Project("Project")
         project_loader.load.return_value = project
@@ -66,4 +66,3 @@ class TestInstallService(unittest.TestCase):
 
         cpm_hub_connector.download_plugin.assert_called_once_with("cest")
         plugin_installer.install.assert_called_once_with(plugin_download)
-        project_loader.add_plugin.assert_called_once_with(plugin)

@@ -13,5 +13,5 @@ class PluginInstaller(object):
         self.filesystem.create_directory(plugin_directory)
         self.filesystem.unzips(base64.b64decode(plugin_download.payload), plugin_directory)
 
-        return self.plugin_loader.load(plugin_download.plugin_name, plugin_download.version)
+        return self.plugin_loader.load(plugin_download.plugin_name)
 

@@ -23,7 +23,7 @@ class ProjectLoader(object):
             project.add_tests(self.test_suites())
             for target in self.described_targets(description):
                 project.add_target(target)
-            for plugin in self.load_plugins(description):
+            for plugin in self.load_local_plugins():
                 project.add_plugin(plugin)
                 project.add_sources(plugin.sources)
                 for directory in plugin.include_directories:
@@ -42,10 +42,14 @@ class ProjectLoader(object):
                 yield Target(target, description['targets'][target])
         return []
 
+    def load_local_plugins(self):
+        plugin_directories = self.filesystem.list_directories('plugins')
+        return [self.plugin_loader.load_from(f'plugins/{directory}') for directory in plugin_directories]
+
     def load_plugins(self, description):
         if 'plugins' in description:
             for plugin in description['plugins']:
-                yield self.plugin_loader.load(plugin, description['plugins'][plugin])
+                yield self.plugin_loader.load(plugin)
         return []
 
     def project_packages(self, description):
@@ -64,30 +68,9 @@ class ProjectLoader(object):
     def all_sources(self, path):
         return self.filesystem.find(path, '*.cpp') + self.filesystem.find(path, '*.c')
 
-    def save(self, project):
-        description = {
-            'name': project.name
-        }
-        if project.targets:
-            description['targets'] = {target: {} for target in project.targets}
-        if project.plugins:
-            description['plugins'] = {
-                plugin.name: plugin.version for plugin in project.plugins
-            }
-        self.yaml_handler.dump(PROJECT_ROOT_FILE, description)
-
     def link_libraries(self, description):
         link_options = description.get('link_options', {})
         return link_options.get('libraries', [])
-
-    def add_plugin(self, new_plugin):
-        description = self.yaml_handler.load(PROJECT_ROOT_FILE)
-        if 'plugins' not in description:
-            description['plugins'] = {new_plugin.name: new_plugin.version}
-        else:
-            description['plugins'][new_plugin.name] = new_plugin.version
-
-        self.yaml_handler.dump(PROJECT_ROOT_FILE, description)
 
     def project_actions(self, description):
         for action in description.get('actions', []):

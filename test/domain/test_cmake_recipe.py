@@ -448,7 +448,7 @@ def _project_without_sources(name):
 def _project_with_one_plugin(name):
     project = Project(name)
     project.sources = ['main.cpp']
-    project.add_plugin(Plugin('cest', '1.0'))
+    project.add_plugin(Plugin('cest'))
     return project
 
 

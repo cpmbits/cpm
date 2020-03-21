@@ -7,9 +7,6 @@ from pathlib import Path
 
 
 class Filesystem:
-    def create_directory(self, path):
-        os.makedirs(path)
-
     def create_file(self, file_name, contents=''):
         with open(file_name, 'w') as f:
             f.write(contents)
@@ -18,11 +15,17 @@ class Filesystem:
         with open(file_name, mode) as file_stream:
             return file_stream.read()
 
+    def file_exists(self, name):
+        return os.path.exists(name) and os.path.isfile(name)
+
     def copy_file(self, origin, destination):
         shutil.copy2(origin, destination)
 
     def delete_file(self, file_name):
         os.remove(file_name)
+
+    def create_directory(self, path):
+        os.makedirs(path)
 
     def copy_directory(self, origin, destination):
         copy_tree(origin, destination)
@@ -36,8 +39,10 @@ class Filesystem:
     def remove_directory(self, path):
         shutil.rmtree(path)
 
-    def file_exists(self, name):
-        return os.path.exists(name) and os.path.isfile(name)
+    def list_directories(self, path):
+        if self.directory_exists(path):
+            return next(os.walk(path))[1]
+        return []
 
     def find(self, path, pattern):
         return [str(filename) for filename in Path(path).rglob(pattern)]
