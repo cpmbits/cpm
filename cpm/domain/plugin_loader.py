@@ -7,11 +7,13 @@ class PluginLoader(object):
         self.filesystem = filesystem
         self.yaml_handler = yaml_handler
 
-    def load(self, name, version):
-        plugin_path = f'plugins/{name}'
-        description = self.yaml_handler.load(f'{plugin_path}/plugin.yaml')
-        plugin = Plugin(name, version)
-        for package in self.plugin_packages(description, plugin_path):
+    def load(self, name):
+        return self.load_from(f'plugins/{name}')
+
+    def load_from(self, directory):
+        description = self.yaml_handler.load(f'{directory}/plugin.yaml')
+        plugin = Plugin(description['name'])
+        for package in self.plugin_packages(description, directory):
             plugin.add_package(package)
             plugin.add_include_directory(self.filesystem.parent_directory(package.path))
         plugin.add_sources(self.plugin_sources(plugin.packages))

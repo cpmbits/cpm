@@ -1,7 +1,7 @@
 class Plugin(object):
-    def __init__(self, name, version):
+    def __init__(self, name):
         self.name = name
-        self.version = version
+        self.version = ""
         self.sources = []
         self.packages = []
         self.include_directories = []

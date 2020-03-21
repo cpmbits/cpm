@@ -23,7 +23,7 @@ class ProjectLoader(object):
             project.add_tests(self.test_suites())
             for target in self.described_targets(description):
                 project.add_target(target)
-            for plugin in self.load_plugins(description):
+            for plugin in self.load_local_plugins():
                 project.add_plugin(plugin)
                 project.add_sources(plugin.sources)
                 for directory in plugin.include_directories:
@@ -42,10 +42,14 @@ class ProjectLoader(object):
                 yield Target(target, description['targets'][target])
         return []
 
+    def load_local_plugins(self):
+        plugin_directories = self.filesystem.list_directories('plugins')
+        return [self.plugin_loader.load_from(f'plugins/{directory}') for directory in plugin_directories]
+
     def load_plugins(self, description):
         if 'plugins' in description:
             for plugin in description['plugins']:
-                yield self.plugin_loader.load(plugin, description['plugins'][plugin])
+                yield self.plugin_loader.load(plugin)
         return []
 
     def project_packages(self, description):
