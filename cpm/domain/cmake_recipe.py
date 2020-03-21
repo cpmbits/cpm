@@ -19,8 +19,6 @@ class CMakeRecipe(object):
         self.generate_cmakelists(project)
 
     def generate_cmakelists(self, project):
-        self.test_executables = [test_file.split('/')[-1].split('.')[0] for test_file in project.tests]
-
         self.filesystem.create_file(
             CMAKELISTS,
             self.build_cmakelists(project)
@@ -35,6 +33,32 @@ class CMakeRecipe(object):
             .minimum_required('3.7') \
             .project(project.name) \
             .include(project.include_directories)
+
+        self.__generate_build_rules(cmake_builder, project)
+
+        self.__generate_test_rules(cmake_builder, project)
+
+        return cmake_builder.contents
+
+    def __generate_test_rules(self, cmake_builder, project):
+        self.test_executables = [test_file.split('/')[-1].split('.')[0] for test_file in project.tests]
+
+        if self.test_executables:
+            sources_without_main = self._sources_without_main(project)
+            if sources_without_main:
+                project_object_library = project.name + '_object_library'
+                cmake_builder.add_object_library(project_object_library, sources_without_main)
+                object_libraries = [project_object_library]
+            else:
+                object_libraries = []
+            for executable, test_file in zip(self.test_executables, project.tests):
+                cmake_builder.add_executable(executable, [test_file], object_libraries) \
+                    .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11'])
+                if project.link_options.libraries:
+                    cmake_builder.target_link_libraries(executable, project.link_options.libraries)
+            cmake_builder.add_custom_target('test', 'echo "> Done', self.test_executables)
+
+    def __generate_build_rules(self, cmake_builder, project):
         for package in project.packages:
             if package.cflags:
                 cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
@@ -42,24 +66,12 @@ class CMakeRecipe(object):
         if project.link_options.libraries:
             cmake_builder.target_link_libraries(project.name, project.link_options.libraries)
         cmake_builder.add_custom_command(
-                    project.name,
-                    'POST_BUILD',
-                    f'${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:{project.name}> ${{PROJECT_SOURCE_DIR}}/{project.name}')
-
-        if self.test_executables:
-            project_object_library = project.name + '_object_library'
-            cmake_builder.add_object_library(project_object_library, self._sources_without_main(project))
-            for executable, test_file in zip(self.test_executables, project.tests):
-                cmake_builder.add_executable(executable, [test_file], [project_object_library]) \
-                    .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11'])
-                if project.link_options.libraries:
-                    cmake_builder.target_link_libraries(executable, project.link_options.libraries)
-            cmake_builder.add_custom_target('test', 'echo "> Done', self.test_executables)
-
-        return cmake_builder.contents
+            project.name,
+            'POST_BUILD',
+            f'${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:{project.name}> ${{PROJECT_SOURCE_DIR}}/{project.name}')
 
     def _sources_without_main(self, project):
-        return filter(lambda x: x != "main.cpp", project.sources)
+        return list(filter(lambda x: x != "main.cpp", project.sources))
 
     def build(self, project):
         subprocess.run(
