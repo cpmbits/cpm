@@ -27,7 +27,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         yaml_handler.load.return_value = {
-            'project_name': 'Project'
+            'name': 'Project'
         }
         loader = ProjectLoader(yaml_handler, filesystem)
 
@@ -42,7 +42,7 @@ class TestProjectLoader(unittest.TestCase):
         filesystem.find.return_value = []
         filesystem.parent_directory.return_value = '.'
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'packages': {'cpm-hub': None},
         }
         loader = ProjectLoader(yaml_handler, filesystem)
@@ -58,7 +58,7 @@ class TestProjectLoader(unittest.TestCase):
         filesystem = mock.MagicMock()
         filesystem.find.return_value = []
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'packages': {
                 'cpm-hub': {
                     'cflags': ['-std=c++11']
@@ -76,7 +76,7 @@ class TestProjectLoader(unittest.TestCase):
         filesystem = mock.MagicMock()
         filesystem.find.return_value = []
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'link_options': {
                 'libraries': ['pthread']
             },
@@ -91,7 +91,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'targets': {
                 'ubuntu': {},
             }
@@ -113,7 +113,7 @@ class TestProjectLoader(unittest.TestCase):
         PluginLoader.return_value = plugin_loader
         yaml_handler = mock.MagicMock()
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'plugins': {'cest': '2.3'}
         }
         loader = ProjectLoader(yaml_handler, filesystem)
@@ -164,7 +164,7 @@ class TestProjectLoader(unittest.TestCase):
 
         yaml_handler.dump.assert_called_once_with(
             PROJECT_ROOT_FILE,
-            {'project_name': 'Project'}
+            {'name': 'Project'}
         )
 
     def test_saving_project_with_one_target(self):
@@ -179,7 +179,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.dump.assert_called_once_with(
             PROJECT_ROOT_FILE,
             {
-                'project_name': 'Project',
+                'name': 'Project',
                 'targets': {'ubuntu': {}}
             }
         )
@@ -196,7 +196,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.dump.assert_called_once_with(
             PROJECT_ROOT_FILE,
             {
-                'project_name': 'Project',
+                'name': 'Project',
                 'plugins': {'cest': '1.2'}
             }
         )
@@ -207,7 +207,7 @@ class TestProjectLoader(unittest.TestCase):
         loader = ProjectLoader(yaml_handler, filesystem)
         new_plugin = Plugin('cest', '1.2')
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'packages': {'cpm-hub': None},
         }
 
@@ -216,7 +216,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.dump.assert_called_once_with(
             PROJECT_ROOT_FILE,
             {
-                'project_name': 'Project',
+                'name': 'Project',
                 'packages': {'cpm-hub': None},
                 'plugins': {'cest': '1.2'}
             }
@@ -228,7 +228,7 @@ class TestProjectLoader(unittest.TestCase):
         loader = ProjectLoader(yaml_handler, filesystem)
         new_plugin = Plugin('fakeit', '3.2')
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'packages': {'cpm-hub': None},
             'plugins': {'cest': '1.2'}
         }
@@ -238,7 +238,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.dump.assert_called_once_with(
             PROJECT_ROOT_FILE,
             {
-                'project_name': 'Project',
+                'name': 'Project',
                 'packages': {'cpm-hub': None},
                 'plugins': {
                     'cest': '1.2',
@@ -253,7 +253,7 @@ class TestProjectLoader(unittest.TestCase):
         loader = ProjectLoader(yaml_handler, filesystem)
         new_plugin = Plugin('cest', '1.3')
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'packages': {'cpm-hub': None},
             'plugins': {'cest': '1.2'}
         }
@@ -263,7 +263,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.dump.assert_called_once_with(
             PROJECT_ROOT_FILE,
             {
-                'project_name': 'Project',
+                'name': 'Project',
                 'packages': {'cpm-hub': None},
                 'plugins': {
                     'cest': '1.3',
@@ -275,7 +275,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         yaml_handler.load.return_value = {
-            'project_name': 'Project',
+            'name': 'Project',
             'actions': {
                 'deploy': 'sudo make me a sandwich'
             }

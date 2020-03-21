@@ -19,7 +19,7 @@ def new_project(project_constructor, project_name, options=CreationOptions()):
 
 def execute(argv):
     create_parser = argparse.ArgumentParser(prog='cpm create', description='Chromos Package Manager', add_help=False)
-    create_parser.add_argument('project_name')
+    create_parser.add_argument('name')
     create_parser.add_argument('-s', '--no-sample-code', required=False, action='store_true', default=False)
     args = create_parser.parse_args(argv)
 
