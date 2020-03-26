@@ -27,7 +27,7 @@ class TestCreationService(unittest.TestCase):
         filesystem.create_directory.assert_called_once_with('AwesomeProject')
         filesystem.create_file.assert_called_once_with(
             'AwesomeProject/project.yaml',
-            'project_name: AwesomeProject\n'
+            'name: AwesomeProject\n'
         )
         
     def test_creation_service_generates_default_sample_code_when_selected(self):

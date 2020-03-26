@@ -36,7 +36,7 @@ class CreationService:
     def create_project_descriptor_file(self, project_name):
         self.filesystem.create_file(
             f'{project_name}/project.yaml',
-            f'project_name: {project_name}\n'
+            f'name: {project_name}\n'
         )
 
     def create_project_directory(self, project_name):

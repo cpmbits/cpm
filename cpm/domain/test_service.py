@@ -16,7 +16,7 @@ class TestService(object):
     def run_matching_tests(self, recipe, patterns):
         tests = filter(
             lambda exe: any(pattern in exe for pattern in patterns),
-            recipe.executables
+            recipe.test_executables
         )
         for test in tests:
             recipe.run_test(test)
