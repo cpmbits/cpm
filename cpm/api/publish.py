@@ -1,3 +1,5 @@
+import argparse
+
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
@@ -26,11 +28,15 @@ def publish_project(publish_service):
 
 
 def execute(argv):
+    publish_parser = argparse.ArgumentParser(prog='cpm publish', description='Chromos Package Manager', add_help=False)
+    publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='http://localhost:8000/plugins')
+    args = publish_parser.parse_args(argv)
+
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
     packager = PluginPackager(filesystem)
-    cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url='http://localhost:8000/plugins')
+    cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url=args.repository_url)
     service = PublishService(loader, packager, cpm_hub_connector)
 
     result = publish_project(service)
