@@ -52,7 +52,7 @@ class TestTestService(unittest.TestCase):
 
     def test_service_runs_one_test_when_one_executable_matches_one_pattern(self):
         test_recipe = mock.MagicMock()
-        test_recipe.executables = ['test_one']
+        test_recipe.test_executables = ['test_one']
         project_loader = mock.MagicMock()
         project = Project('ProjectName')
         project.tests = ['test']
@@ -66,7 +66,7 @@ class TestTestService(unittest.TestCase):
 
     def test_service_runs_no_tests_when_one_executable_doesnt_match_one_pattern(self):
         test_recipe = mock.MagicMock()
-        test_recipe.executables = ['test']
+        test_recipe.test_executables = ['test']
         project_loader = mock.MagicMock()
         project = Project('ProjectName')
         project.tests = ['test']
@@ -80,7 +80,7 @@ class TestTestService(unittest.TestCase):
 
     def test_service_runs_many_tests_when_many_executables_matches_one_pattern(self):
         test_recipe = mock.MagicMock()
-        test_recipe.executables = ['test_api_one', 'test_api_two']
+        test_recipe.test_executables = ['test_api_one', 'test_api_two']
         project_loader = mock.MagicMock()
         project = Project('ProjectName')
         project.tests = ['test_api_one', 'test_api_two']
@@ -97,7 +97,7 @@ class TestTestService(unittest.TestCase):
 
     def test_service_runs_many_tests_when_many_executables_matches_many_patterns(self):
         test_recipe = mock.MagicMock()
-        test_recipe.executables = ['test_api_one', 'test_api_two']
+        test_recipe.test_executables = ['test_api_one', 'test_api_two']
         project_loader = mock.MagicMock()
         project = Project('ProjectName')
         project.tests = ['test_api_one', 'test_api_two']
