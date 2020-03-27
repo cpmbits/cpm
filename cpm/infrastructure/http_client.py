@@ -24,7 +24,7 @@ def get(url, data=None, headers=None, files=None):
         response = requests.get(url, files=files, data=data, headers=headers)
         return HttpResponse(response.status_code, response.text)
     except requests.exceptions.ConnectionError:
-        raise HttpConnectionError()
+        raise HttpConnectionError(url)
 
 
 class HttpConnectionError(RuntimeError):

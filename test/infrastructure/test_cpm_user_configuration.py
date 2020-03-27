@@ -15,7 +15,7 @@ class TestCpmUserConfiguration(unittest.TestCase):
 
         cpm_user_configuration.load()
 
-        assert cpm_user_configuration['cpm-hub-url'] == 'http://localhost:8000'
+        assert cpm_user_configuration['cpm_hub_url'] == 'http://localhost:8000'
         yaml_handler.load.assert_not_called()
         filesystem.file_exists.assert_called_once_with(f'/home/cpmuser/{GLOBAL_CONFIGURATION_FILENAME}')
 
@@ -29,17 +29,17 @@ class TestCpmUserConfiguration(unittest.TestCase):
 
         cpm_user_configuration.load()
 
-        assert cpm_user_configuration['cpm-hub-url'] == 'http://localhost:8000'
+        assert cpm_user_configuration['cpm_hub_url'] == 'http://localhost:8000'
         yaml_handler.load.assert_called_once_with(f'/home/cpmuser/{GLOBAL_CONFIGURATION_FILENAME}')
 
     def test_loading_configuration_updates_defaults_with_global_configuration_values(self):
         filesystem = MagicMock()
         yaml_handler = MagicMock()
         filesystem.file_exists.return_value = True
-        yaml_handler.load.return_value = {'cpm-hub-url': 'http://otherserver.com:8000'}
+        yaml_handler.load.return_value = {'cpm_hub_url': 'http://otherserver.com:8000'}
         cpm_user_configuration = CpmUserConfiguration(yaml_handler, filesystem)
 
         cpm_user_configuration.load()
 
-        assert cpm_user_configuration['cpm-hub-url'] == 'http://otherserver.com:8000'
+        assert cpm_user_configuration['cpm_hub_url'] == 'http://otherserver.com:8000'
 

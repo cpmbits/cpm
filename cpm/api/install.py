@@ -9,6 +9,7 @@ from cpm.domain.plugin_loader import PluginLoader
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.project_loader import ProjectLoader
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
+from cpm.infrastructure.cpm_user_configuration import CpmUserConfiguration
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.http_client import HttpConnectionError
 from cpm.infrastructure.yaml_handler import YamlHandler
@@ -21,8 +22,8 @@ def install_plugin(install_service, plugin):
         return Result(FAIL, 'error: not a Chromos project')
     except PluginNotFound:
         return Result(FAIL, f'error: plugin {plugin} not found in CPM Hub')
-    except HttpConnectionError:
-        return Result(FAIL, f'error: failed to connect to CPM Hub')
+    except HttpConnectionError as e:
+        return Result(FAIL, f'error: failed to connect to CPM Hub at {e}')
 
     return Result(OK, f'Installed plugin "{plugin}"')
 
@@ -34,10 +35,12 @@ def execute(argv):
 
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
+    user_configuration = CpmUserConfiguration(yaml_handler, filesystem)
+    user_configuration.load()
     project_loader = ProjectLoader(yaml_handler, filesystem)
     plugin_loader = PluginLoader(yaml_handler, filesystem)
     plugin_installer = PluginInstaller(filesystem, plugin_loader)
-    cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url='http://localhost:8000/plugins')
+    cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url=f'{user_configuration["cpm_hub_url"]}/plugins')
     service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
 
     result = install_plugin(service, args.plugin_name)
