@@ -44,6 +44,9 @@ class Filesystem:
             return next(os.walk(path))[1]
         return []
 
+    def home_directory(self):
+        return str(Path.home())
+
     def find(self, path, pattern):
         return [str(filename) for filename in Path(path).rglob(pattern)]
 
