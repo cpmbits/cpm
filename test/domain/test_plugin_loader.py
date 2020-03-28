@@ -54,7 +54,7 @@ class TestPluginLoader(unittest.TestCase):
         plugin = loader.load('cest')
 
         assert plugin.name == 'cest'
-        assert Package(path='plugins/cest/cest') in plugin.packages
+        assert Package(path='plugins/cest/cest', sources=['plugins/cest/plugin.cpp', 'plugins/cest/plugin.c']) in plugin.packages
         assert plugin.include_directories == ['plugins/cest']
         assert plugin.sources == ['plugins/cest/plugin.cpp', 'plugins/cest/plugin.c']
 
@@ -76,7 +76,7 @@ class TestPluginLoader(unittest.TestCase):
         plugin = loader.load('cest')
 
         assert plugin.name == 'cest'
-        assert Package(path='plugins/cest/cest', cflags=['-std=c++11']) in plugin.packages
+        assert Package(path='plugins/cest/cest', sources=['plugins/cest/plugin.cpp', 'plugins/cest/plugin.c'], cflags=['-std=c++11']) in plugin.packages
 
     def test_finding_plugin_sources(self):
         filesystem = MagicMock()

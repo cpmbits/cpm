@@ -16,7 +16,7 @@ class PluginLoader(object):
         for package in self.plugin_packages(description, directory):
             plugin.add_package(package)
             plugin.add_include_directory(self.filesystem.parent_directory(package.path))
-        plugin.add_sources(self.plugin_sources(plugin.packages))
+            plugin.add_sources(package.sources)
         return plugin
 
     def plugin_packages(self, description, plugin_path):
@@ -25,10 +25,10 @@ class PluginLoader(object):
         return []
 
     def _load_package(self, package, package_description, plugin_path):
-        if package_description is None:
-            return Package(f'{plugin_path}/{package}')
-        cflags = package_description.get('cflags', [])
-        return Package(f'{plugin_path}/{package}', cflags=cflags)
+        cflags = package_description.get('cflags', []) if package_description is not None else []
+        package_path = f'{plugin_path}/{package}'
+        sources = self.all_sources(package_path)
+        return Package(package_path, sources=sources, cflags=cflags)
 
     def plugin_sources(self, packages):
         return [source for package in packages for source in self.all_sources(package.path)]

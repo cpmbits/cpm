@@ -161,6 +161,29 @@ class TestCMakeRecipe(unittest.TestCase):
             ')\n'
         )
 
+    def test_recipe_generation_with_one_plugin_with_a_package_with_cflags(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_with_one_plugin('DeathStarBackend', sources=['plugins.cpp'], cflags=['-DDEFINE'])
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('build')
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'set_source_files_properties(plugins.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
+            'add_custom_command(\n'
+            '    TARGET DeathStarBackend\n'
+            '    POST_BUILD\n'
+            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
+            ')\n'
+        )
+
     def test_recipe_generation_with_one_test_suite(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_sources('DeathStarBackend', ['source.cpp'])
@@ -184,7 +207,7 @@ class TestCMakeRecipe(unittest.TestCase):
             ')\n'
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
-            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'add_custom_target(test\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'
@@ -214,9 +237,9 @@ class TestCMakeRecipe(unittest.TestCase):
             ')\n'
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite_1 tests/test_suite_1.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
-            'set_target_properties(test_suite_1 PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_target_properties(test_suite_1 PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'add_executable(test_suite_2 tests/test_suite_2.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
-            'set_target_properties(test_suite_2 PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_target_properties(test_suite_2 PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'add_custom_target(test\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite_1 test_suite_2\n'
@@ -249,7 +272,7 @@ class TestCMakeRecipe(unittest.TestCase):
             ')\n'
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
-            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'target_link_libraries(test_suite pthread rt)\n'
             'add_custom_target(test\n'
             '    COMMAND echo "> Done"\n'
@@ -279,7 +302,7 @@ class TestCMakeRecipe(unittest.TestCase):
             '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Cest> ${PROJECT_SOURCE_DIR}/Cest\n'
             ')\n'
             'add_executable(test_cest tests/test_cest.cpp)\n'
-            'set_target_properties(test_cest PROPERTIES COMPILE_FLAGS -std=c++11)\n'
+            'set_target_properties(test_cest PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'add_custom_target(test\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_cest\n'
@@ -445,10 +468,14 @@ def _project_without_sources(name):
     return project
 
 
-def _project_with_one_plugin(name):
+def _project_with_one_plugin(name, sources=[], cflags=[]):
     project = Project(name)
     project.sources = ['main.cpp']
+    plugin = Plugin('cest')
+    plugin.add_package(Package('plugins/cest', sources=sources, cflags=cflags))
     project.add_plugin(Plugin('cest'))
+    for package in plugin.packages:
+        project.add_package(package)
     return project
 
 

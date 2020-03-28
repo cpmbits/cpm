@@ -53,7 +53,7 @@ class CMakeRecipe(object):
                 object_libraries = []
             for executable, test_file in zip(self.test_executables, project.tests):
                 cmake_builder.add_executable(executable, [test_file], object_libraries) \
-                    .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11'])
+                    .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11', '-g'])
                 if project.link_options.libraries:
                     cmake_builder.target_link_libraries(executable, project.link_options.libraries)
             cmake_builder.add_custom_target('test', 'echo "> Done', self.test_executables)

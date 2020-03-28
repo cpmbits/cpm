@@ -30,7 +30,7 @@ class CMakeBuilder(object):
         return self
 
     def set_target_properties(self, target, property, values):
-        self.contents += f'set_target_properties({target} PROPERTIES {property} {" ".join(values)})\n'
+        self.contents += f'set_target_properties({target} PROPERTIES {property} "{" ".join(values)}")\n'
         return self
 
     def target_link_libraries(self, target, libraries):
