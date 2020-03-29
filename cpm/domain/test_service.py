@@ -9,17 +9,16 @@ class TestService(object):
         recipe.generate(project)
         recipe.build_tests()
         if not patterns:
-            recipe.run_tests()
+            recipe.run_all_tests()
         else:
             self.run_matching_tests(recipe, patterns)
 
     def run_matching_tests(self, recipe, patterns):
-        tests = filter(
+        tests = list(filter(
             lambda exe: any(pattern in exe for pattern in patterns),
             recipe.test_executables
-        )
-        for test in tests:
-            recipe.run_test(test)
+        ))
+        recipe.run_tests(tests)
 
 
 class NoTestsFound(RuntimeError):
