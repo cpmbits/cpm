@@ -83,14 +83,8 @@ class CMakeRecipe(object):
             raise CompilationError()
 
     def build_tests(self):
-        subprocess.run(
-            [self.CMAKE_COMMAND, '-G', 'Ninja', '..'],
-            cwd=BUILD_DIRECTORY
-        )
-        subprocess.run(
-            ['ninja', 'test'],
-            cwd=BUILD_DIRECTORY
-        )
+        self.run_compile_command(self.CMAKE_COMMAND, '-G', 'Ninja', '..')
+        self.run_compile_command('ninja', 'test')
 
     def run_tests(self):
         test_results = [self.run_test(executable) for executable in self.test_executables]
