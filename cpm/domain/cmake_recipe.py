@@ -74,14 +74,13 @@ class CMakeRecipe(object):
         return list(filter(lambda x: x != "main.cpp", project.sources))
 
     def build(self, project):
-        subprocess.run(
-            [self.CMAKE_COMMAND, '-G', 'Ninja', '..'],
-            cwd=BUILD_DIRECTORY
-        )
-        subprocess.run(
-            ['ninja', project.name],
-            cwd=BUILD_DIRECTORY
-        )
+        self.run_compile_command(self.CMAKE_COMMAND, '-G', 'Ninja', '..')
+        self.run_compile_command('ninja', project.name)
+
+    def run_compile_command(self, *args):
+        result = subprocess.run([*args], cwd=BUILD_DIRECTORY)
+        if result.returncode != 0:
+            raise CompilationError()
 
     def build_tests(self):
         subprocess.run(
