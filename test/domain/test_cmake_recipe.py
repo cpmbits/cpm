@@ -5,7 +5,7 @@ from mock import call
 from mock import patch
 
 from subprocess import CompletedProcess
-from cpm.domain.cmake_recipe import CMakeRecipe, TestsFailed, BUILD_DIRECTORY, CMAKELISTS
+from cpm.domain.cmake_recipe import CMakeRecipe, TestsFailed, BUILD_DIRECTORY, CMAKELISTS, CompilationError
 from cpm.domain.plugin import Plugin
 from cpm.domain.project import Project, Package
 
@@ -324,6 +324,7 @@ class TestCMakeRecipe(unittest.TestCase):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
         cmake_recipe = CMakeRecipe(filesystem)
+        subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, 0)]
 
         cmake_recipe.build(project)
 
@@ -339,10 +340,28 @@ class TestCMakeRecipe(unittest.TestCase):
         ])
 
     @patch('subprocess.run')
-    def test_recipe_builds_tests_with_cmake_and_ninja(self, subprocess_run):
+    def test_build_raises_an_exception_when_cmake_command_fails(self, subprocess_run):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
         cmake_recipe = CMakeRecipe(filesystem)
+        subprocess_run.return_value = CompletedProcess(None, -1)
+
+        self.assertRaises(CompilationError, cmake_recipe.build, project)
+
+    @patch('subprocess.run')
+    def test_build_raises_an_exception_when_ninja_command_fails(self, subprocess_run):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_without_sources('DeathStarBackend')
+        cmake_recipe = CMakeRecipe(filesystem)
+        subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, -1)]
+
+        self.assertRaises(CompilationError, cmake_recipe.build, project)
+
+    @patch('subprocess.run')
+    def test_recipe_builds_tests_with_cmake_and_ninja(self, subprocess_run):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        cmake_recipe = CMakeRecipe(filesystem)
+        subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, 0)]
 
         cmake_recipe.build_tests()
 
@@ -356,6 +375,22 @@ class TestCMakeRecipe(unittest.TestCase):
                 cwd='build'
             )
         ])
+
+    @patch('subprocess.run')
+    def test_build_tests_raises_exception_when_cmake_command_fails(self, subprocess_run):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        cmake_recipe = CMakeRecipe(filesystem)
+        subprocess_run.return_value = CompletedProcess(None, -1)
+
+        self.assertRaises(CompilationError, cmake_recipe.build_tests)
+
+    @patch('subprocess.run')
+    def test_build_tests_raises_exception_when_ninja_command_fails(self, subprocess_run):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        cmake_recipe = CMakeRecipe(filesystem)
+        subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, -1)]
+
+        self.assertRaises(CompilationError, cmake_recipe.build_tests)
 
     @patch('subprocess.run')
     def test_recipe_runs_list_of_generated_executable_for_project_with_one_test(self, subprocess_run):

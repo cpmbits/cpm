@@ -2,6 +2,7 @@ import unittest
 import mock
 
 from cpm.api.build import build_project
+from cpm.domain.cmake_recipe import CompilationError
 from cpm.domain.project_loader import NotAChromosProject
 
 
@@ -10,6 +11,16 @@ class TestApiBuild(unittest.TestCase):
         recipe = mock.MagicMock()
         build_service = mock.MagicMock()
         build_service.build.side_effect = NotAChromosProject()
+
+        result = build_project(build_service, recipe)
+
+        assert result.status_code == 1
+        build_service.build.assert_called_once_with(recipe)
+
+    def test_run_tests_fails_when_compilation_fails(self):
+        recipe = mock.MagicMock()
+        build_service = mock.MagicMock()
+        build_service.build.side_effect = CompilationError()
 
         result = build_project(build_service, recipe)
 
