@@ -86,8 +86,11 @@ class CMakeRecipe(object):
         self.run_compile_command(self.CMAKE_COMMAND, '-G', 'Ninja', '..')
         self.run_compile_command('ninja', 'test')
 
-    def run_tests(self):
-        test_results = [self.run_test(executable) for executable in self.test_executables]
+    def run_all_tests(self):
+        self.run_tests(self.test_executables)
+
+    def run_tests(self, executables):
+        test_results = [self.run_test(executable) for executable in executables]
         if any(result.returncode != 0 for result in test_results):
             raise TestsFailed('tests failed')
 
@@ -97,7 +100,7 @@ class CMakeRecipe(object):
             cwd=BUILD_DIRECTORY
         )
         if result.returncode < 0:
-            print(f'{executable} failed with signal {result.returncode} ({signal.Signals(-result.returncode).name})')
+            print(f'{executable} failed with {result.returncode} ({signal.Signals(-result.returncode).name})')
         return result
 
     def clean(self):

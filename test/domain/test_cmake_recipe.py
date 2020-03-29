@@ -399,7 +399,7 @@ class TestCMakeRecipe(unittest.TestCase):
         recipe.test_executables = ['test_suite']
         subprocess_run.return_value = CompletedProcess(None, 0)
 
-        recipe.run_tests()
+        recipe.run_all_tests()
 
         subprocess_run.assert_has_calls([
             call(
@@ -415,7 +415,7 @@ class TestCMakeRecipe(unittest.TestCase):
         recipe.test_executables = ['test_suite_1', 'test_suite_2']
         subprocess_run.side_effect = [CompletedProcess(None, 0), CompletedProcess(None, 0)]
 
-        recipe.run_tests()
+        recipe.run_all_tests()
 
         subprocess_run.assert_has_calls([
             call(
@@ -435,7 +435,7 @@ class TestCMakeRecipe(unittest.TestCase):
         recipe.test_executables = ['test_suite']
         subprocess_run.return_value = CompletedProcess(None, -1)
 
-        self.assertRaises(TestsFailed, recipe.run_tests)
+        self.assertRaises(TestsFailed, recipe.run_all_tests)
 
     @patch('subprocess.run')
     def test_recipe_runs_all_tests_before_raising_exception_when_tests_fail(self, subprocess_run):
@@ -444,7 +444,7 @@ class TestCMakeRecipe(unittest.TestCase):
         recipe.test_executables = ['test_suite_1', 'test_suite_2']
         subprocess_run.side_effect = [CompletedProcess(None, -1), CompletedProcess(None, 0)]
 
-        self.assertRaises(TestsFailed, recipe.run_tests)
+        self.assertRaises(TestsFailed, recipe.run_all_tests)
 
         subprocess_run.assert_has_calls([
             call(
