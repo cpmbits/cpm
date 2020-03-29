@@ -25,7 +25,7 @@ class TestApiBuild(unittest.TestCase):
         result = build_project(build_service, recipe)
 
         assert result.status_code == 1
-        build_service.build.assert_called_once_with(recipe, [])
+        build_service.build.assert_called_once_with(recipe)
 
     def test_build_project(self):
         build_service = mock.MagicMock()
