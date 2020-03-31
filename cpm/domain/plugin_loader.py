@@ -13,6 +13,7 @@ class PluginLoader(object):
     def load_from(self, directory):
         description = self.yaml_handler.load(f'{directory}/plugin.yaml')
         plugin = Plugin(description['name'])
+        plugin.version = description.get('version', "0.1")
         for package in self.plugin_packages(description, directory):
             plugin.add_package(package)
             plugin.add_include_directory(self.filesystem.parent_directory(package.path))
