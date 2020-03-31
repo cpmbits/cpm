@@ -15,6 +15,7 @@ class ProjectLoader(object):
         try:
             description = self.yaml_handler.load(PROJECT_ROOT_FILE)
             project = Project(description['name'])
+            project.version = description.get('version', "0.1")
             project.add_sources(['main.cpp'])
             for package in self.project_packages(description):
                 project.add_package(package)
