@@ -36,6 +36,21 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.load.assert_called_once_with(PROJECT_ROOT_FILE)
         assert loaded_project.name == 'Project'
 
+    def test_loading_project_with_specified_version(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        yaml_handler.load.return_value = {
+            'name': 'Project',
+            'version': '1.5'
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        loaded_project = loader.load()
+
+        yaml_handler.load.assert_called_once_with(PROJECT_ROOT_FILE)
+        assert loaded_project.name == 'Project'
+        assert loaded_project.version == '1.5'
+
     def test_loading_project_with_one_package(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()

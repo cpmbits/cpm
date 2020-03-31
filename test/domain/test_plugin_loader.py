@@ -26,6 +26,21 @@ class TestPluginLoader(unittest.TestCase):
         assert plugin.name == 'cest'
         assert plugin.include_directories == []
 
+    def test_loading_plugin_with_given_version(self):
+        filesystem = MagicMock()
+        yaml_handler = MagicMock()
+        yaml_handler.load.return_value = {
+            'name': 'cest',
+            'version': '4.7.5',
+        }
+        loader = PluginLoader(yaml_handler, filesystem)
+
+        plugin = loader.load('cest')
+
+        yaml_handler.load.assert_called_once_with('plugins/cest/plugin.yaml')
+        assert plugin.name == 'cest'
+        assert plugin.version == '4.7.5'
+
     def test_loading_plugin_from_directory(self):
         filesystem = MagicMock()
         yaml_handler = MagicMock()
