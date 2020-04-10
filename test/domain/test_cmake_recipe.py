@@ -30,11 +30,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'project(DeathStarBackend)\n'
             'include_directories()\n'
             'add_executable(DeathStarBackend main.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
         )
 
     def test_recipe_generation_with_target_link_libraries(self):
@@ -55,11 +50,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'include_directories()\n'
             'add_executable(DeathStarBackend main.cpp)\n'
             'target_link_libraries(DeathStarBackend pthread rt)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
         )
 
     def test_recipe_generation_with_one_package(self):
@@ -79,11 +69,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'project(DeathStarBackend)\n'
             'include_directories(package)\n'
             'add_executable(DeathStarBackend main.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
         )
 
     def test_recipe_generation_with_one_package_with_cflags(self):
@@ -104,11 +89,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'include_directories(package)\n'
             'set_source_files_properties(package.cpp PROPERTIES COMPILE_FLAGS "-std=c++11 -DMACRO")\n'
             'add_executable(DeathStarBackend main.cpp package.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
         )
 
     def test_recipe_generation_with_many_packages_with_cflags(self):
@@ -132,11 +112,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'set_source_files_properties(package1.cpp PROPERTIES COMPILE_FLAGS "-std=c++11")\n'
             'set_source_files_properties(package2.cpp PROPERTIES COMPILE_FLAGS "-Wall")\n'
             'add_executable(DeathStarBackend main.cpp package1.cpp package2.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
         )
 
     def test_recipe_generation_with_one_plugin(self):
@@ -154,11 +129,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'project(DeathStarBackend)\n'
             'include_directories()\n'
             'add_executable(DeathStarBackend main.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
         )
 
     def test_recipe_generation_with_one_plugin_with_a_package_with_cflags(self):
@@ -177,11 +147,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'include_directories()\n'
             'set_source_files_properties(plugins.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
             'add_executable(DeathStarBackend main.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
         )
 
     def test_recipe_generation_with_one_test_suite(self):
@@ -200,11 +165,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'project(DeathStarBackend)\n'
             'include_directories()\n'
             'add_executable(DeathStarBackend main.cpp source.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
@@ -230,11 +190,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'project(DeathStarBackend)\n'
             'include_directories()\n'
             'add_executable(DeathStarBackend main.cpp source.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite_1 tests/test_suite_1.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
             'set_target_properties(test_suite_1 PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
@@ -265,11 +220,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'include_directories()\n'
             'add_executable(DeathStarBackend main.cpp source.cpp)\n'
             'target_link_libraries(DeathStarBackend pthread rt)\n'
-            'add_custom_command(\n'
-            '    TARGET DeathStarBackend\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DeathStarBackend> ${PROJECT_SOURCE_DIR}/DeathStarBackend\n'
-            ')\n'
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
@@ -296,11 +246,6 @@ class TestCMakeRecipe(unittest.TestCase):
             'project(Cest)\n'
             'include_directories()\n'
             'add_executable(Cest main.cpp)\n'
-            'add_custom_command(\n'
-            '    TARGET Cest\n'
-            '    POST_BUILD\n'
-            '    COMMAND COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Cest> ${PROJECT_SOURCE_DIR}/Cest\n'
-            ')\n'
             'add_executable(test_cest tests/test_cest.cpp)\n'
             'set_target_properties(test_cest PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'add_custom_target(test\n'

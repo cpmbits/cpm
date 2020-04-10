@@ -65,10 +65,6 @@ class CMakeRecipe(object):
         cmake_builder.add_executable(project.name, project.sources)
         if project.link_options.libraries:
             cmake_builder.target_link_libraries(project.name, project.link_options.libraries)
-        cmake_builder.add_custom_command(
-            project.name,
-            'POST_BUILD',
-            f'${{CMAKE_COMMAND}} -E copy $<TARGET_FILE:{project.name}> ${{PROJECT_SOURCE_DIR}}/{project.name}')
 
     def _sources_without_main(self, project):
         return list(filter(lambda x: x != "main.cpp", project.sources))
