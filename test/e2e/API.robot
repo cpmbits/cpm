@@ -6,7 +6,7 @@ Test Teardown    Delete Project
 
 *** Variables ***
 ${PROJECT_NAME}     AwesomeProject
-${CPM}    ${EXECDIR}/scripts/cpm
+${CPM}    ${EXECDIR}/../../scripts/cpm
 
 *** Test Cases ***
 Create-Project

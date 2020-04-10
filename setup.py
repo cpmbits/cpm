@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cpm-cli",
-    version="0.3",
+    version="0.4",
     scripts=['scripts/cpm'],
     author="Jordi Sánchez",
     description="Chromos Package Manager",
