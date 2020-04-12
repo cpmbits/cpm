@@ -12,7 +12,6 @@ class CpmUserConfiguration(object):
         self.configuration = DEFAULT_CONFIGURATION.copy()
 
     def load(self):
-        print(f'loading cpm configuration from {self.global_configuration_file}')
         if self.filesystem.file_exists(self.global_configuration_file):
             configuration = self.yaml_handler.load(self.global_configuration_file)
             self.configuration.update(configuration)

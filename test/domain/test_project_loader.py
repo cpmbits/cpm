@@ -86,7 +86,7 @@ class TestProjectLoader(unittest.TestCase):
 
         assert Package(path='cpm-hub', cflags=['-std=c++11']) in project.packages
 
-    def test_loading_project_with_with_ldflags(self):
+    def test_loading_project_with_with_libraries_link_option(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         filesystem.find.return_value = []
@@ -101,6 +101,20 @@ class TestProjectLoader(unittest.TestCase):
         project = loader.load()
 
         assert 'pthread' in project.link_options.libraries
+
+    def test_loading_project_with_with_global_compile_flags(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        filesystem.find.return_value = []
+        yaml_handler.load.return_value = {
+            'name': 'Project',
+            'compile_flags': ['-g'],
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        project = loader.load()
+
+        assert '-g' in project.compile_flags
 
     def test_loading_project_with_one_target(self):
         yaml_handler = mock.MagicMock()

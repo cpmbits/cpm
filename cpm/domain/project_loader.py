@@ -29,10 +29,11 @@ class ProjectLoader(object):
                 project.add_sources(plugin.sources)
                 for directory in plugin.include_directories:
                     project.add_include_directory(directory)
-                for package in plugin.packages:
-                    project.add_package(package)
+                #for package in plugin.packages:
+                #    project.add_package(package)
             for library in self.link_libraries(description):
                 project.add_library(library)
+            project.add_compile_flags(self.compile_flags(description))
             for action in self.project_actions(description):
                 project.add_action(action)
             return project
@@ -78,6 +79,9 @@ class ProjectLoader(object):
     def project_actions(self, description):
         for action in description.get('actions', []):
             yield ProjectAction(action, description['actions'][action])
+
+    def compile_flags(self, description):
+        return description.get('compile_flags', [])
 
 
 class NotAChromosProject(RuntimeError):

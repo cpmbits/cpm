@@ -10,8 +10,9 @@ BUILD_DIRECTORY = f'build'
 class CMakeRecipe(object):
     CMAKE_COMMAND = 'cmake'
 
-    def __init__(self, filesystem):
+    def __init__(self, filesystem, compile_plugins_as_libraries=False):
         self.filesystem = filesystem
+        self.compile_plugins_as_libraries = compile_plugins_as_libraries
         self.test_executables = []
 
     def generate(self, project):
@@ -62,9 +63,15 @@ class CMakeRecipe(object):
         for package in project.packages:
             if package.cflags:
                 cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
+        for plugin in project.plugins:
+            cmake_builder.add_static_library(plugin.name, plugin.sources)
+            for package in plugin.packages:
+                if package.cflags:
+                    cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
         cmake_builder.add_executable(project.name, project.sources)
-        if project.link_options.libraries:
-            cmake_builder.target_link_libraries(project.name, project.link_options.libraries)
+        if project.link_options.libraries or project.plugins:
+            link_libraries = project.link_options.libraries + [plugin.name for plugin in project.plugins]
+            cmake_builder.target_link_libraries(project.name, link_libraries)
 
     def _sources_without_main(self, project):
         return list(filter(lambda x: x != "main.cpp", project.sources))

@@ -22,6 +22,10 @@ class CMakeBuilder(object):
         self.contents += f'add_library({name} OBJECT {" ".join(sources)})\n'
         return self
 
+    def add_static_library(self, name, sources):
+        self.contents += f'add_library({name} STATIC {" ".join(sources)})\n'
+        return self
+
     def add_executable(self, name, sources, object_libraries=[]):
         self.contents += f'add_executable({name} {" ".join(sources)}'
         for library in object_libraries:
