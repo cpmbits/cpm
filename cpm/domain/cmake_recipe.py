@@ -66,6 +66,8 @@ class CMakeRecipe(object):
         for plugin in project.plugins:
             self.__generate_plugin_build_rules(cmake_builder, plugin)
         cmake_builder.add_executable(project.name, project.sources)
+        if project.compile_flags:
+            cmake_builder.set_target_properties(project.name, 'COMPILE_FLAGS', project.compile_flags)
         self.__generate_link_libraries_rule(cmake_builder, project)
 
     def __generate_link_libraries_rule(self, cmake_builder, project):

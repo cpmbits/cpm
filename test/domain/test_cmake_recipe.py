@@ -71,6 +71,27 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(DeathStarBackend main.cpp)\n'
         )
 
+    def test_recipe_generation_with_one_package_with_global_compile_flags(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_without_sources('DeathStarBackend')
+        project.add_package(Package('package', sources=['package.cpp']))
+        project.add_include_directory('package')
+        project.add_sources(['package.cpp'])
+        project.compile_flags = ['-g']
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories(package)\n'
+            'add_executable(DeathStarBackend main.cpp package.cpp)\n'
+            'set_target_properties(DeathStarBackend PROPERTIES COMPILE_FLAGS "-g")\n'
+        )
+
     def test_recipe_generation_with_one_package_with_cflags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
