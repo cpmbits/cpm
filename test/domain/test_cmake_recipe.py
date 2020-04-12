@@ -71,6 +71,27 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(DeathStarBackend main.cpp)\n'
         )
 
+    def test_recipe_generation_with_one_package_with_global_compile_flags(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_without_sources('DeathStarBackend')
+        project.add_package(Package('package', sources=['package.cpp']))
+        project.add_include_directory('package')
+        project.add_sources(['package.cpp'])
+        project.compile_flags = ['-g']
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories(package)\n'
+            'add_executable(DeathStarBackend main.cpp package.cpp)\n'
+            'set_target_properties(DeathStarBackend PROPERTIES COMPILE_FLAGS "-g")\n'
+        )
+
     def test_recipe_generation_with_one_package_with_cflags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
@@ -116,6 +137,25 @@ class TestCMakeRecipe(unittest.TestCase):
 
     def test_recipe_generation_with_one_plugin(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_with_one_plugin('DeathStarBackend', sources=['plugin.cpp'])
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('build')
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'add_library(cest STATIC plugin.cpp)\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
+            'target_link_libraries(DeathStarBackend cest)\n'
+        )
+
+    def test_recipe_generation_with_one_plugin_without_sources(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_one_plugin('DeathStarBackend')
         cmake_recipe = CMakeRecipe(filesystem)
 
@@ -133,7 +173,7 @@ class TestCMakeRecipe(unittest.TestCase):
 
     def test_recipe_generation_with_one_plugin_with_a_package_with_cflags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
-        project = _project_with_one_plugin('DeathStarBackend', sources=['plugins.cpp'], cflags=['-DDEFINE'])
+        project = _project_with_one_plugin('DeathStarBackend', sources=['plugin.cpp'], cflags=['-DDEFINE'])
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -145,8 +185,10 @@ class TestCMakeRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'project(DeathStarBackend)\n'
             'include_directories()\n'
-            'set_source_files_properties(plugins.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
+            'add_library(cest STATIC plugin.cpp)\n'
+            'set_source_files_properties(plugin.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
             'add_executable(DeathStarBackend main.cpp)\n'
+            'target_link_libraries(DeathStarBackend cest)\n'
         )
 
     def test_recipe_generation_with_one_test_suite(self):
@@ -453,9 +495,8 @@ def _project_with_one_plugin(name, sources=[], cflags=[]):
     project.sources = ['main.cpp']
     plugin = Plugin('cest')
     plugin.add_package(Package('plugins/cest', sources=sources, cflags=cflags))
-    project.add_plugin(Plugin('cest'))
-    for package in plugin.packages:
-        project.add_package(package)
+    plugin.add_sources(sources)
+    project.add_plugin(plugin)
     return project
 
 

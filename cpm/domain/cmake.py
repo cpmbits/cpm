@@ -1,3 +1,6 @@
+from collections import OrderedDict
+
+
 class CMakeBuilder(object):
     def __init__(self):
         self.contents = ''
@@ -11,8 +14,11 @@ class CMakeBuilder(object):
         return self
 
     def include(self, directories):
-        self.contents += f'include_directories({" ".join(directories)})\n'
+        self.contents += f'include_directories({" ".join(self.no_duplicates(directories))})\n'
         return self
+
+    def no_duplicates(self, directories):
+        return list(OrderedDict.fromkeys(directories))
 
     def set_source_files_properties(self, sources, property, values):
         self.contents += f'set_source_files_properties({" ".join(sources)} PROPERTIES {property} "{" ".join(values)}")\n'
@@ -20,6 +26,10 @@ class CMakeBuilder(object):
 
     def add_object_library(self, name, sources):
         self.contents += f'add_library({name} OBJECT {" ".join(sources)})\n'
+        return self
+
+    def add_static_library(self, name, sources):
+        self.contents += f'add_library({name} STATIC {" ".join(sources)})\n'
         return self
 
     def add_executable(self, name, sources, object_libraries=[]):

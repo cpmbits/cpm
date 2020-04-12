@@ -37,6 +37,7 @@ class Project(object):
         self.plugins = []
         self.sources = []
         self.packages = []
+        self.compile_flags = []
         self.include_directories = []
         self.link_options = LinkOptions()
         self.actions = []
@@ -65,3 +66,6 @@ class Project(object):
 
     def add_action(self, project_action):
         self.actions.append(project_action)
+
+    def add_compile_flags(self, compile_flags):
+        self.compile_flags.extend(compile_flags)
