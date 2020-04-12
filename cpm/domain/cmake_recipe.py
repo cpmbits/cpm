@@ -64,14 +64,22 @@ class CMakeRecipe(object):
             if package.cflags:
                 cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
         for plugin in project.plugins:
-            cmake_builder.add_static_library(plugin.name, plugin.sources)
-            for package in plugin.packages:
-                if package.cflags:
-                    cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
+            self.__generate_plugin_build_rules(cmake_builder, plugin)
         cmake_builder.add_executable(project.name, project.sources)
-        if project.link_options.libraries or project.plugins:
-            link_libraries = project.link_options.libraries + [plugin.name for plugin in project.plugins]
+        self.__generate_link_libraries_rule(cmake_builder, project)
+
+    def __generate_link_libraries_rule(self, cmake_builder, project):
+        plugins_with_sources = list(filter(lambda p: p.sources, project.plugins))
+        if project.link_options.libraries or plugins_with_sources:
+            link_libraries = project.link_options.libraries + [plugin.name for plugin in plugins_with_sources]
             cmake_builder.target_link_libraries(project.name, link_libraries)
+
+    def __generate_plugin_build_rules(self, cmake_builder, plugin):
+        if plugin.sources:
+            cmake_builder.add_static_library(plugin.name, plugin.sources)
+        for package in plugin.packages:
+            if package.cflags:
+                cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
 
     def _sources_without_main(self, project):
         return list(filter(lambda x: x != "main.cpp", project.sources))

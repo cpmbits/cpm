@@ -29,8 +29,6 @@ class ProjectLoader(object):
                 project.add_sources(plugin.sources)
                 for directory in plugin.include_directories:
                     project.add_include_directory(directory)
-                #for package in plugin.packages:
-                #    project.add_package(package)
             for library in self.link_libraries(description):
                 project.add_library(library)
             project.add_compile_flags(self.compile_flags(description))
