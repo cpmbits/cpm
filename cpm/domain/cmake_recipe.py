@@ -55,8 +55,10 @@ class CMakeRecipe(object):
             for executable, test_file in zip(self.test_executables, project.tests):
                 cmake_builder.add_executable(executable, [test_file], object_libraries) \
                     .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11', '-g'])
+                plugins_with_sources = list(filter(lambda p: p.sources, project.plugins))
                 if project.link_options.libraries:
-                    cmake_builder.target_link_libraries(executable, project.link_options.libraries)
+                    link_libraries = [plugin.name for plugin in plugins_with_sources] + project.link_options.libraries
+                    cmake_builder.target_link_libraries(executable, link_libraries)
             cmake_builder.add_custom_target('test', 'echo "> Done', self.test_executables)
 
     def __generate_build_rules(self, cmake_builder, project):
@@ -73,7 +75,7 @@ class CMakeRecipe(object):
     def __generate_link_libraries_rule(self, cmake_builder, project):
         plugins_with_sources = list(filter(lambda p: p.sources, project.plugins))
         if project.link_options.libraries or plugins_with_sources:
-            link_libraries = project.link_options.libraries + [plugin.name for plugin in plugins_with_sources]
+            link_libraries = [plugin.name for plugin in plugins_with_sources] + project.link_options.libraries
             cmake_builder.target_link_libraries(project.name, link_libraries)
 
     def __generate_plugin_build_rules(self, cmake_builder, plugin):

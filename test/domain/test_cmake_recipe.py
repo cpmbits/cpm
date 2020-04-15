@@ -191,6 +191,27 @@ class TestCMakeRecipe(unittest.TestCase):
             'target_link_libraries(DeathStarBackend cest)\n'
         )
 
+    def test_recipe_generation_with_one_plugin_and_link_libraries(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_with_one_plugin('DeathStarBackend', sources=['plugin.cpp'], cflags=['-DDEFINE'])
+        project.add_library('boost')
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('build')
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'add_library(cest STATIC plugin.cpp)\n'
+            'set_source_files_properties(plugin.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
+            'target_link_libraries(DeathStarBackend cest boost)\n'
+        )
+
     def test_recipe_generation_with_one_test_suite(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_sources('DeathStarBackend', ['source.cpp'])
@@ -210,6 +231,34 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
+            'add_custom_target(test\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+        )
+
+    def test_recipe_generation_with_one_test_suite_and_one_plugin_and_link_libraries(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_with_one_plugin('DeathStarBackend', ['plugin.cpp'])
+        project.tests = ['tests/test_suite.cpp']
+        project.add_library('boost')
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('build')
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'add_library(cest STATIC plugin.cpp)\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
+            'target_link_libraries(DeathStarBackend cest boost)\n'
+            'add_executable(test_suite tests/test_suite.cpp)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
+            'target_link_libraries(test_suite cest boost)\n'
             'add_custom_target(test\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'

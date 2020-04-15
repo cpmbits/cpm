@@ -1,12 +1,12 @@
 import unittest
+
 import mock
 
-from cpm.domain.project_loader import ProjectLoader
-from cpm.domain.project_loader import NotAChromosProject
-from cpm.domain.project import Project, Package, ProjectAction
 from cpm.domain.plugin import Plugin
 from cpm.domain.project import PROJECT_ROOT_FILE
-from cpm.domain.target import Target
+from cpm.domain.project import Package, ProjectAction
+from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader import ProjectLoader
 
 
 class TestProjectLoader(unittest.TestCase):
