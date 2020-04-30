@@ -27,3 +27,14 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Build dist package
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      run: |
+        pip install pep517
+        python -m pep517.build --source --binary --out-dir dist/ .
+    - name: Publish package
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.pypi_token }}
