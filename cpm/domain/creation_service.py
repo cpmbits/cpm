@@ -6,12 +6,16 @@ from cpm.domain.sample_code import CPP_HELLO_WORLD
 
 @dataclass
 class CreationOptions:
+    name: str = 'MyProject'
+    directory: str = '.'
     generate_sample_code: bool = True
+    init_from_existing_sources: bool = False
 
 
 class CreationService:
-    def __init__(self, filesystem):
+    def __init__(self, filesystem, project_loader):
         self.filesystem = filesystem
+        self.project_loader = project_loader
 
     def exists(self, project_name):
         return self.filesystem.directory_exists(project_name)
