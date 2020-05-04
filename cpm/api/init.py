@@ -12,10 +12,11 @@ from cpm.infrastructure.yaml_handler import YamlHandler
 
 def init_project(creation_service, options=CreationOptions(init_from_existing_sources=True)):
     if creation_service.exists(options.directory):
-        return Result(FAIL, f'error: directory {options.directory} already contains a CPM project')
+        directory_print = 'current directory' if options.directory == '.' else f'directory {options.directory}'
+        return Result(FAIL, f'error: {directory_print} already contains a CPM project')
 
     creation_service.create(options)
-    return Result(OK, f'Created project {options.name}')
+    return Result(OK, f'Created project {options.project_name}')
 
 
 def execute(argv):
@@ -32,7 +33,7 @@ def execute(argv):
         init_from_existing_sources=True,
         generate_sample_code=False,
         directory='.',
-        name=args.name
+        project_name=args.project_name
     )
     result = init_project(service, options)
 

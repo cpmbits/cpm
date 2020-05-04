@@ -12,7 +12,7 @@ class TestApiInit(unittest.TestCase):
         options = CreationOptions(
             init_from_existing_sources=True,
             directory='.',
-            name='Awesome Project'
+            project_name='Awesome Project'
         )
 
         result = init_project(creation_service, options)

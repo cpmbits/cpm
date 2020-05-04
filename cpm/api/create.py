@@ -29,7 +29,11 @@ def execute(argv):
     project_loader = ProjectLoader(yaml_handler, filesystem)
     service = CreationService(filesystem, project_loader)
 
-    options = CreationOptions(generate_sample_code=not args.no_sample_code)
+    options = CreationOptions(
+        generate_sample_code=not args.no_sample_code,
+        project_name=args.project_name,
+        directory=args.project_name,
+    )
     result = new_project(service, args.project_name, options)
 
     return result

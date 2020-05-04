@@ -38,21 +38,48 @@ class TestCreationService(unittest.TestCase):
         filesystem = mock.MagicMock()
         project_loader = mock.MagicMock()
         creation_service = CreationService(filesystem, project_loader)
+        creation_options = CreationOptions(
+            generate_sample_code=False,
+            directory='AwesomeProject',
+            project_name='AwesomeProject'
+        )
 
-        creation_service.create('AwesomeProject', CreationOptions(generate_sample_code=False))
+        creation_service.create(creation_options)
 
         filesystem.create_directory.assert_called_once_with('AwesomeProject')
         filesystem.create_file.assert_called_once_with(
             'AwesomeProject/project.yaml',
             'name: AwesomeProject\n'
         )
-        
+
+    def test_it_only_creates_descriptor_file_when_creating_project_from_existing_sources(self):
+        filesystem = mock.MagicMock()
+        project_loader = mock.MagicMock()
+        creation_service = CreationService(filesystem, project_loader)
+        creation_options = CreationOptions(
+            generate_sample_code=False,
+            directory='.',
+            project_name='AwesomeProject',
+            init_from_existing_sources=True
+        )
+
+        creation_service.create(creation_options)
+
+        filesystem.create_directory.assert_not_called()
+        filesystem.create_file.assert_called_once_with(
+            './project.yaml',
+            'name: AwesomeProject\n'
+        )
     def test_creation_service_generates_default_sample_code_when_selected(self):
         filesystem = mock.MagicMock()
         project_loader = mock.MagicMock()
         creation_service = CreationService(filesystem, project_loader)
+        creation_options = CreationOptions(
+            directory='AwesomeProject',
+            project_name='AwesomeProject'
+        )
 
-        creation_service.create('AwesomeProject')
+        creation_service.create(creation_options)
 
         filesystem.create_file.assert_called_with(
             'AwesomeProject/main.cpp',
@@ -63,8 +90,11 @@ class TestCreationService(unittest.TestCase):
         filesystem = mock.MagicMock()
         project_loader = mock.MagicMock()
         creation_service = CreationService(filesystem, project_loader)
+        creation_options = CreationOptions(
+            project_name='AwesomeProject'
+        )
 
-        project = creation_service.create('AwesomeProject', CreationOptions(generate_sample_code=True))
+        project = creation_service.create(creation_options)
 
         assert project.name == 'AwesomeProject'
         assert project.sources == ['main.cpp']
