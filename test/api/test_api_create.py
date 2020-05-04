@@ -7,28 +7,37 @@ from cpm.domain.creation_service import CreationOptions
 
 class TestApiCreate(unittest.TestCase):
     def test_create_project_uses_creation_service_for_initializing_project(self):
-        project_constructor = mock.MagicMock()
-        project_constructor.exists.return_value = False
+        creation_service = mock.MagicMock()
+        creation_service.exists.return_value = False
+        options = CreationOptions(
+            project_name='Awesome Project'
+        )
 
-        result = new_project(project_constructor, 'Awesome Project')
+        result = new_project(creation_service, options)
 
         assert result.status_code == 0
-        project_constructor.create.assert_called_once_with('Awesome Project', CreationOptions())
+        creation_service.create.assert_called_once_with(options)
 
     def test_returns_error_code_when_project_already_exists(self):
-        project_constructor = mock.MagicMock()
-        project_constructor.exists.return_value = True
+        creation_service = mock.MagicMock()
+        creation_service.exists.return_value = True
+        options = CreationOptions(
+            project_name='Awesome Project'
+        )
 
-        result = new_project(project_constructor, 'Awesome Project')
+        result = new_project(creation_service, options)
 
         assert result.status_code == 1
 
     def test_create_project_accepts_options_from_api(self):
-        project_constructor = mock.MagicMock()
-        project_constructor.exists.return_value = False
-        options = CreationOptions(generate_sample_code=True)
+        creation_service = mock.MagicMock()
+        creation_service.exists.return_value = False
+        options = CreationOptions(
+            project_name='Awesome Project',
+            generate_sample_code=True
+        )
 
-        result = new_project(project_constructor, 'Awesome Project', options)
+        result = new_project(creation_service, options)
 
         assert result.status_code == 0
-        project_constructor.create.assert_called_once_with('Awesome Project', options)
+        creation_service.create.assert_called_once_with(options)

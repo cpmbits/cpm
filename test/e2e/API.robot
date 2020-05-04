@@ -13,8 +13,13 @@ Create-Project
     ${result}=    Run Process    ${CPM}    create    ${PROJECT_NAME}
     Should Be Equal 	${result.rc} 	${0}
 
+Create-New-Project-When-Directory-Exists
+    Run Process    ${CPM}    create    ${PROJECT_NAME}
+    ${result}=    Run Process    ${CPM}    create    ${PROJECT_NAME}
+    Should Be Equal 	${result.rc} 	${1}
+
 Build-With-Sample-Code
-    Run Process    ${CPM}    create    -s    ${PROJECT_NAME}
+    Run Process    ${CPM}    create    ${PROJECT_NAME}
     Run Process    ${CPM}    build    cwd=${PROJECT_NAME}    alias=build
     ${result}=    Get Process Result    build
     Should Be Equal 	${result.rc} 	${0}
