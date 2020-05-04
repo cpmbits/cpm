@@ -13,9 +13,9 @@ class ProjectLoader(object):
         self.yaml_handler = yaml_handler
         self.plugin_loader = PluginLoader(yaml_handler, filesystem)
 
-    def load(self):
+    def load(self, directory='.'):
         try:
-            description = self.yaml_handler.load(PROJECT_DESCRIPTOR_FILE)
+            description = self.yaml_handler.load(f'{directory}/{PROJECT_DESCRIPTOR_FILE}')
             project = Project(description['name'])
             project.version = description.get('version', "0.1")
             project.add_sources(['main.cpp'])

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from cpm.domain.project import Project
+from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 
 
@@ -17,8 +18,12 @@ class CreationService:
         self.filesystem = filesystem
         self.project_loader = project_loader
 
-    def exists(self, project_name):
-        return self.filesystem.directory_exists(project_name)
+    def exists(self, directory):
+        try:
+            self.project_loader.load(directory)
+            return True
+        except NotAChromosProject:
+            return False
 
     def create(self, project_name, options=CreationOptions()):
         project = Project(project_name)

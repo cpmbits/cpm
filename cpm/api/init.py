@@ -11,7 +11,7 @@ from cpm.infrastructure.yaml_handler import YamlHandler
 
 
 def init_project(creation_service, options=CreationOptions(init_from_existing_sources=True)):
-    if creation_service.exists(options):
+    if creation_service.exists(options.directory):
         return Result(FAIL, f'error: directory {options.directory} already contains a CPM project')
 
     creation_service.create(options)
@@ -27,6 +27,13 @@ def execute(argv):
     yaml_handler = YamlHandler(filesystem)
     project_loader = ProjectLoader(yaml_handler, filesystem)
     service = CreationService(filesystem, project_loader)
-    result = init_project(service, args.project_name)
+
+    options = CreationOptions(
+        init_from_existing_sources=True,
+        generate_sample_code=False,
+        directory='.',
+        name=args.name
+    )
+    result = init_project(service, options)
 
     return result
