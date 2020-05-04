@@ -3,9 +3,9 @@ import unittest
 import mock
 
 from cpm.domain.plugin import Plugin
-from cpm.domain.project import PROJECT_ROOT_FILE
 from cpm.domain.project import Package, ProjectAction
 from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader import PROJECT_DESCRIPTOR_FILE
 from cpm.domain.project_loader import ProjectLoader
 
 
@@ -33,7 +33,20 @@ class TestProjectLoader(unittest.TestCase):
 
         loaded_project = loader.load()
 
-        yaml_handler.load.assert_called_once_with(PROJECT_ROOT_FILE)
+        yaml_handler.load.assert_called_once_with(f'./{PROJECT_DESCRIPTOR_FILE}')
+        assert loaded_project.name == 'Project'
+
+    def test_loading_project_from_a_different_directory(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        yaml_handler.load.return_value = {
+            'name': 'Project'
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        loaded_project = loader.load(directory='Project')
+
+        yaml_handler.load.assert_called_once_with(f'Project/{PROJECT_DESCRIPTOR_FILE}')
         assert loaded_project.name == 'Project'
 
     def test_loading_project_with_specified_version(self):
@@ -47,7 +60,6 @@ class TestProjectLoader(unittest.TestCase):
 
         loaded_project = loader.load()
 
-        yaml_handler.load.assert_called_once_with(PROJECT_ROOT_FILE)
         assert loaded_project.name == 'Project'
         assert loaded_project.version == '1.5'
 
@@ -238,7 +250,6 @@ class TestProjectLoader(unittest.TestCase):
 
         loaded_project = loader.load()
 
-        yaml_handler.load.assert_called_once_with(PROJECT_ROOT_FILE)
         assert loaded_project.name == 'Project'
         assert loaded_project.actions == [ProjectAction('deploy', 'sudo make me a sandwich')]
 

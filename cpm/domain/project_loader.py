@@ -1,8 +1,10 @@
 from cpm.domain.plugin_loader import PluginLoader
-from cpm.domain.project import PROJECT_ROOT_FILE, ProjectAction
+from cpm.domain.project import ProjectAction
 from cpm.domain.project import Package
 from cpm.domain.project import Project
 from cpm.domain.project import Target
+
+PROJECT_DESCRIPTOR_FILE = 'project.yaml'
 
 
 class ProjectLoader(object):
@@ -11,9 +13,9 @@ class ProjectLoader(object):
         self.yaml_handler = yaml_handler
         self.plugin_loader = PluginLoader(yaml_handler, filesystem)
 
-    def load(self):
+    def load(self, directory='.'):
         try:
-            description = self.yaml_handler.load(PROJECT_ROOT_FILE)
+            description = self.yaml_handler.load(f'{directory}/{PROJECT_DESCRIPTOR_FILE}')
             project = Project(description['name'])
             project.version = description.get('version', "0.1")
             project.add_sources(['main.cpp'])
