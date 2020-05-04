@@ -1,4 +1,4 @@
-from cpm.domain.project import PROJECT_ROOT_FILE
+from cpm.domain.project_loader import PROJECT_DESCRIPTOR_FILE
 
 
 class PluginPackager(object):
@@ -13,7 +13,7 @@ class PluginPackager(object):
             raise PackagingFailure(cause='build directory exists')
 
         self.filesystem.create_directory(build_directory)
-        self.filesystem.copy_file(PROJECT_ROOT_FILE, f'{build_directory}/plugin.yaml')
+        self.filesystem.copy_file(PROJECT_DESCRIPTOR_FILE, f'{build_directory}/plugin.yaml')
         for package in project.packages:
             self.filesystem.copy_directory(package.path, f'{build_directory}/{package.path}')
         self.filesystem.zip(build_directory, f'{project.name}')

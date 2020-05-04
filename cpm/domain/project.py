@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
 
-PROJECT_ROOT_FILE = 'project.yaml'
-
 
 @dataclass
 class Target:
