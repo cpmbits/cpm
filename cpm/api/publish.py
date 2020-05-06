@@ -23,6 +23,8 @@ def publish_project(publish_service):
         return Result(FAIL, f'error: {error.cause}')
     except HttpConnectionError:
         return Result(FAIL, f'error: failed to connect to CPM Hub')
+    except KeyboardInterrupt:
+        return Result(FAIL, f'interrupted')
 
     return Result(OK, f'Project published')
 
