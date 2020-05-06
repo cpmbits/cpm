@@ -1,5 +1,6 @@
 import json
 import base64
+from getpass import getpass
 from http import HTTPStatus
 
 from cpm.domain.install_service import PluginNotFound
@@ -14,10 +15,14 @@ class CpmHubConnectorV1(object):
 
     def publish_plugin(self, project, file_name):
         payload = base64.b64encode(self.filesystem.read_file(file_name, 'rb')).decode('utf-8')
+        username = input('username: ')
+        password = getpass(prompt='password: ', stream=None)
         body = {
             'plugin_name': project.name,
             'version': project.version,
-            'payload': payload
+            'payload': payload,
+            'username': username,
+            'password': password,
         }
 
         http_client.post(self.repository_url, data=json.dumps(body))

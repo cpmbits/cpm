@@ -13,17 +13,21 @@ from cpm.infrastructure.http_client import HttpResponse
 
 class TestCpmHubConnectorV1(unittest.TestCase):
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
-    def test_publish_plugin_posts_plugin_with_base64_encoded_payload(self, http_client):
+    @patch('builtins.input')
+    @patch('cpm.infrastructure.cpm_hub_connector_v1.getpass')
+    def test_publish_plugin_posts_plugin_with_base64_encoded_payload_and_user_credentials(self, getpass, input, http_client):
         filesystem = MagicMock()
         project = Project('cpm-hub')
         connector = CpmHubConnectorV1(filesystem)
         filesystem.read_file.return_value = b'plugin payload'
+        getpass.return_value = 'password'
+        input.return_value = 'username'
 
         connector.publish_plugin(project, 'cpm-hub.zip')
 
         http_client.post.assert_called_once_with(
             connector.repository_url,
-            data='{"plugin_name": "cpm-hub", "version": "0.1", "payload": "cGx1Z2luIHBheWxvYWQ="}'
+            data='{"plugin_name": "cpm-hub", "version": "0.1", "payload": "cGx1Z2luIHBheWxvYWQ=", "username": "username", "password": "password"}'
         )
 
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
