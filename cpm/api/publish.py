@@ -9,6 +9,9 @@ from cpm.domain.publish_service import PublishService
 from cpm.domain.plugin_packager import PackagingFailure
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
+from cpm.infrastructure.cpm_hub_connector_v1 import InvalidCpmHubUrl
+from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
+from cpm.infrastructure.cpm_hub_connector_v1 import PublicationFailure
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.http_client import HttpConnectionError
 from cpm.infrastructure.yaml_handler import YamlHandler
@@ -23,6 +26,12 @@ def publish_project(publish_service):
         return Result(FAIL, f'error: {error.cause}')
     except HttpConnectionError:
         return Result(FAIL, f'error: failed to connect to CPM Hub')
+    except InvalidCpmHubUrl:
+        return Result(FAIL, f'error: invalid CPM Hub URL')
+    except AuthenticationFailure:
+        return Result(FAIL, f'error: invalid credentials')
+    except PublicationFailure:
+        return Result(FAIL, f'error: publish failed')
     except KeyboardInterrupt:
         return Result(FAIL, f'interrupted')
 
