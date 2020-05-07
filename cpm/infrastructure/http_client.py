@@ -13,7 +13,8 @@ class HttpResponse:
 
 def post(url, data=None, headers=None, files=None):
     try:
-        requests.post(url, files=files, data=data, headers=headers, verify=False)
+        response = requests.post(url, files=files, data=data, headers=headers, verify=False)
+        return HttpResponse(response.status_code, response.text)
     except requests.exceptions.ConnectionError as e:
         raise HttpConnectionError()
 
