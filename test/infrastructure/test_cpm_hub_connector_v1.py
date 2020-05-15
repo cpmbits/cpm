@@ -80,10 +80,21 @@ class TestCpmHubConnectorV1(unittest.TestCase):
         connector = CpmHubConnectorV1(filesystem)
         http_client.get.return_value = HttpResponse(HTTPStatus.OK, '{"plugin_name": "cpm-hub", "version": "0.1", "payload": "cGx1Z2luIHBheWxvYWQ="}')
 
-        plugin_download = connector.download_plugin('cest')
+        plugin_download = connector.download_plugin('cest', 'latest')
 
-        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest')
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest/latest')
         assert plugin_download == PluginDownload("cpm-hub", "0.1", "cGx1Z2luIHBheWxvYWQ=")
+
+    @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
+    def test_download_plugin_gets_plugin_with_specific_version(self, http_client):
+        filesystem = MagicMock()
+        connector = CpmHubConnectorV1(filesystem)
+        http_client.get.return_value = HttpResponse(HTTPStatus.OK, '{"plugin_name": "cpm-hub", "version": "1.0", "payload": "cGx1Z2luIHBheWxvYWQ="}')
+
+        plugin_download = connector.download_plugin('cest', '1.0')
+
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest/1.0')
+        assert plugin_download == PluginDownload("cpm-hub", "1.0", "cGx1Z2luIHBheWxvYWQ=")
 
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
     def test_download_plugin_raises_exception_when_plugin_is_not_found(self, http_client):
@@ -91,6 +102,6 @@ class TestCpmHubConnectorV1(unittest.TestCase):
         connector = CpmHubConnectorV1(filesystem)
         http_client.get.return_value = HttpResponse(HTTPStatus.NOT_FOUND, '')
 
-        self.assertRaises(PluginNotFound, connector.download_plugin, 'cest')
+        self.assertRaises(PluginNotFound, connector.download_plugin, 'cest', 'latest')
 
-        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest')
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest/latest')

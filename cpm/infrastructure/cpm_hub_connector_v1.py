@@ -34,8 +34,8 @@ class CpmHubConnectorV1(object):
         if response.status_code != HTTPStatus.OK:
             raise PublicationFailure()
 
-    def download_plugin(self, plugin_name):
-        response = http_client.get(f'{self.repository_url}/{plugin_name}')
+    def download_plugin(self, name, version):
+        response = http_client.get(f'{self.repository_url}/{name}/{version}')
         if response.status_code == HTTPStatus.NOT_FOUND:
             raise PluginNotFound
 

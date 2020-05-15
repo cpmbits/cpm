@@ -12,35 +12,43 @@ class TestApiInstall(unittest.TestCase):
         install_service = mock.MagicMock()
         install_service.install.side_effect = NotAChromosProject
 
-        result = install_plugin(install_service, "cest")
+        result = install_plugin(install_service, 'cest')
 
         assert result.status_code == 1
-        install_service.install.assert_called_once_with("cest")
+        install_service.install.assert_called_once_with('cest', 'latest')
 
     def test_plugin_install_fails_when_http_connection_fails(self):
         install_service = mock.MagicMock()
         install_service.install.side_effect = HttpConnectionError
 
-        result = install_plugin(install_service, "cest")
+        result = install_plugin(install_service, 'cest')
 
         assert result.status_code == 1
-        install_service.install.assert_called_once_with("cest")
+        install_service.install.assert_called_once_with('cest', 'latest')
 
     def test_plugin_install_fails_when_plugin_is_not_found(self):
         install_service = mock.MagicMock()
         install_service.install.side_effect = PluginNotFound
 
-        result = install_plugin(install_service, "cest")
+        result = install_plugin(install_service, 'cest')
 
         assert result.status_code == 1
-        install_service.install.assert_called_once_with("cest")
+        install_service.install.assert_called_once_with('cest', 'latest')
 
     def test_plugin_install(self):
         install_service = mock.MagicMock()
 
-        result = install_plugin(install_service, "cest")
+        result = install_plugin(install_service, 'cest')
 
         assert result.status_code == 0
-        install_service.install.assert_called_once_with("cest")
+        install_service.install.assert_called_once_with('cest', 'latest')
+
+    def test_plugin_install_of_specific_version(self):
+        install_service = mock.MagicMock()
+
+        result = install_plugin(install_service, 'cest', '1.1')
+
+        assert result.status_code == 0
+        install_service.install.assert_called_once_with('cest', '1.1')
 
 

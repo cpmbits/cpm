@@ -15,31 +15,31 @@ from cpm.infrastructure.http_client import HttpConnectionError
 from cpm.infrastructure.yaml_handler import YamlHandler
 
 
-def install_plugin(install_service, plugin):
+def install_plugin(install_service, name, version='latest'):
     try:
-        install_service.install(plugin)
+        install_service.install(name, version)
     except NotAChromosProject:
         return Result(FAIL, 'error: not a Chromos project')
     except PluginNotFound:
-        return Result(FAIL, f'error: plugin {plugin} not found in CPM Hub')
+        return Result(FAIL, f'error: plugin {name} not found in CPM Hub')
     except HttpConnectionError as e:
         return Result(FAIL, f'error: failed to connect to CPM Hub at {e}')
 
-    return Result(OK, f'Installed plugin "{plugin}"')
+    return Result(OK, f'Installed plugin "{name}"')
 
 
 def execute(argv):
     create_parser = argparse.ArgumentParser(prog='cpm install', description='Chromos Package Manager', add_help=False)
-    create_parser.add_argument('plugin_name')
+    create_parser.add_argument('plugin_name', nargs='?')
     args = create_parser.parse_args(argv)
 
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
-    user_configuration = CpmUserConfiguration(yaml_handler, filesystem)
-    user_configuration.load()
     project_loader = ProjectLoader(yaml_handler, filesystem)
     plugin_loader = PluginLoader(yaml_handler, filesystem)
     plugin_installer = PluginInstaller(filesystem, plugin_loader)
+    user_configuration = CpmUserConfiguration(yaml_handler, filesystem)
+    user_configuration.load()
     cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url=f'{user_configuration["cpm_hub_url"]}/plugins')
     service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
 
