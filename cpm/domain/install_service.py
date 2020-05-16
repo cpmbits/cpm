@@ -6,8 +6,14 @@ class InstallService(object):
 
     def install(self, name, version):
         self.project_loader.load()
+        print(f'installing {name}:{version}')
         plugin_download = self.cpm_hub_connector.download_plugin(name, version)
         return self.plugin_installer.install(plugin_download)
+
+    def install_project_plugins(self):
+        project = self.project_loader.load()
+        for plugin_name, version in project.declared_plugins.items():
+            self.install(plugin_name, version)
 
 
 class PluginNotFound(RuntimeError):

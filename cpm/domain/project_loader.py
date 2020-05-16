@@ -19,6 +19,7 @@ class ProjectLoader(object):
             project = Project(description['name'])
             project.version = description.get('version', "0.1")
             project.add_sources(['main.cpp'])
+            project.declared_plugins = description.get('plugins', {})
             for package in self.project_packages(description):
                 project.add_package(package)
                 project.add_include_directory(self.filesystem.parent_directory(package.path))

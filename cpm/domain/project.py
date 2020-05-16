@@ -32,6 +32,7 @@ class Project(object):
         self.name = name
         self.version = "0.1"
         self.tests = []
+        self.declared_plugins = {}
         self.plugins = []
         self.sources = []
         self.packages = []

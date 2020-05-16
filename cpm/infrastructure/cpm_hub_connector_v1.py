@@ -36,7 +36,7 @@ class CpmHubConnectorV1(object):
     def download_plugin(self, name, version):
         response = http_client.get(self.__plugin_url(name, version))
         if response.status_code == HTTPStatus.NOT_FOUND:
-            raise PluginNotFound()
+            raise PluginNotFound(f'{name}:{version}')
 
         data = json.loads(response.body)
         return PluginDownload(data['plugin_name'], data['version'], data['payload'])
