@@ -6,7 +6,6 @@ from http import HTTPStatus
 from cpm.domain.install_service import PluginNotFound
 from cpm.domain.plugin_download import PluginDownload
 from cpm.infrastructure import http_client
-from cpm.infrastructure.http_client import HttpConnectionError
 
 
 class CpmHubConnectorV1(object):
@@ -34,13 +33,16 @@ class CpmHubConnectorV1(object):
         if response.status_code != HTTPStatus.OK:
             raise PublicationFailure()
 
-    def download_plugin(self, plugin_name):
-        response = http_client.get(f'{self.repository_url}/{plugin_name}')
+    def download_plugin(self, name, version):
+        response = http_client.get(self.__plugin_url(name, version))
         if response.status_code == HTTPStatus.NOT_FOUND:
-            raise PluginNotFound
+            raise PluginNotFound()
 
         data = json.loads(response.body)
         return PluginDownload(data['plugin_name'], data['version'], data['payload'])
+
+    def __plugin_url(self, name, version):
+        return f'{self.repository_url}/{name}' if version == "latest" else f'{self.repository_url}/{name}/{version}'
 
 
 class AuthenticationFailure(RuntimeError):

@@ -24,7 +24,7 @@ class TestInstallService(unittest.TestCase):
         project_loader.load.side_effect = NotAChromosProject
         service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
 
-        self.assertRaises(NotAChromosProject, service.install, "cest")
+        self.assertRaises(NotAChromosProject, service.install, 'cest', 'latest')
 
         project_loader.load.assert_called_once()
 
@@ -35,9 +35,9 @@ class TestInstallService(unittest.TestCase):
         cpm_hub_connector.download_plugin.side_effect = AuthenticationFailure
         service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
 
-        self.assertRaises(AuthenticationFailure, service.install, "cest")
+        self.assertRaises(AuthenticationFailure, service.install, 'cest', 'latest')
 
-        cpm_hub_connector.download_plugin.assert_called_once_with("cest")
+        cpm_hub_connector.download_plugin.assert_called_once_with('cest', 'latest')
 
     def test_install_service_fails_when_plugin_is_not_found_in_cpm_hub(self):
         project_loader = MagicMock()
@@ -46,23 +46,38 @@ class TestInstallService(unittest.TestCase):
         cpm_hub_connector.download_plugin.side_effect = PluginNotFound
         service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
 
-        self.assertRaises(PluginNotFound, service.install, "cest")
+        self.assertRaises(PluginNotFound, service.install, 'cest', 'latest')
 
-        cpm_hub_connector.download_plugin.assert_called_once_with("cest")
+        cpm_hub_connector.download_plugin.assert_called_once_with('cest', 'latest')
 
     def test_install_service_downloads_plugin_then_installs_it_and_updates_the_project(self):
         project_loader = MagicMock()
         cpm_hub_connector = MagicMock()
         plugin_installer = MagicMock()
         plugin_download = MagicMock()
-        plugin = Plugin("cest")
-        plugin_installer.install.return_value = plugin
+        plugin_installer.install.return_value = Plugin("cest")
         project = Project("Project")
         project_loader.load.return_value = project
         cpm_hub_connector.download_plugin.return_value = plugin_download
         service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
 
-        service.install("cest")
+        service.install('cest', 'latest')
 
-        cpm_hub_connector.download_plugin.assert_called_once_with("cest")
+        cpm_hub_connector.download_plugin.assert_called_once_with('cest', 'latest')
+        plugin_installer.install.assert_called_once_with(plugin_download)
+
+    def test_it_installs_given_plugin_version(self):
+        project_loader = MagicMock()
+        cpm_hub_connector = MagicMock()
+        plugin_installer = MagicMock()
+        plugin_download = MagicMock()
+        plugin_installer.install.return_value = Plugin("cest")
+        project = Project("Project")
+        project_loader.load.return_value = project
+        cpm_hub_connector.download_plugin.return_value = plugin_download
+        service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
+
+        service.install('cest', '1.0')
+
+        cpm_hub_connector.download_plugin.assert_called_once_with('cest', '1.0')
         plugin_installer.install.assert_called_once_with(plugin_download)
