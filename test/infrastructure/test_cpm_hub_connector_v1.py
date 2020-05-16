@@ -82,7 +82,7 @@ class TestCpmHubConnectorV1(unittest.TestCase):
 
         plugin_download = connector.download_plugin('cest', 'latest')
 
-        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest/latest')
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest')
         assert plugin_download == PluginDownload("cpm-hub", "0.1", "cGx1Z2luIHBheWxvYWQ=")
 
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
@@ -104,4 +104,4 @@ class TestCpmHubConnectorV1(unittest.TestCase):
 
         self.assertRaises(PluginNotFound, connector.download_plugin, 'cest', 'latest')
 
-        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest/latest')
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest')
