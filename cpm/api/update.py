@@ -21,8 +21,8 @@ def update_project(build_service, recipe):
 def execute(argv):
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    service = BuildService(loader)
+    project_loader = ProjectLoader(yaml_handler, filesystem)
+    service = BuildService(project_loader)
     recipe = CMakeRecipe(filesystem)
 
     result = update_project(service, recipe)

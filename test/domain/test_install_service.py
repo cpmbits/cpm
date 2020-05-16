@@ -1,6 +1,7 @@
 import unittest
 
 from mock import MagicMock
+from mock import call
 
 from cpm.domain.install_service import InstallService
 from cpm.domain.install_service import PluginNotFound
@@ -55,8 +56,8 @@ class TestInstallService(unittest.TestCase):
         cpm_hub_connector = MagicMock()
         plugin_installer = MagicMock()
         plugin_download = MagicMock()
-        plugin_installer.install.return_value = Plugin("cest")
-        project = Project("Project")
+        plugin_installer.install.return_value = Plugin('cest')
+        project = Project('Project')
         project_loader.load.return_value = project
         cpm_hub_connector.download_plugin.return_value = plugin_download
         service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
@@ -71,8 +72,8 @@ class TestInstallService(unittest.TestCase):
         cpm_hub_connector = MagicMock()
         plugin_installer = MagicMock()
         plugin_download = MagicMock()
-        plugin_installer.install.return_value = Plugin("cest")
-        project = Project("Project")
+        plugin_installer.install.return_value = Plugin('cest')
+        project = Project('Project')
         project_loader.load.return_value = project
         cpm_hub_connector.download_plugin.return_value = plugin_download
         service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
@@ -81,3 +82,28 @@ class TestInstallService(unittest.TestCase):
 
         cpm_hub_connector.download_plugin.assert_called_once_with('cest', '1.0')
         plugin_installer.install.assert_called_once_with(plugin_download)
+
+    def test_it_installs_all_plugins_declared_in_project(self):
+        project_loader = MagicMock()
+        cpm_hub_connector = MagicMock()
+        plugin_installer = MagicMock()
+        plugin_download = MagicMock()
+        project = Project('Project')
+        project.declared_plugins = {
+            'cest': '1.0',
+            'fakeit': '1.0',
+        }
+        project_loader.load.return_value = project
+        cpm_hub_connector.download_plugin.return_value = plugin_download
+        service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
+
+        service.install_project_plugins()
+
+        cpm_hub_connector.download_plugin.assert_has_calls([
+            call('cest', '1.0'),
+            call('fakeit', '1.0'),
+        ])
+        plugin_installer.install.assert_has_calls([
+            call(plugin_download),
+            call(plugin_download)
+        ])

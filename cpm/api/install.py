@@ -22,16 +22,29 @@ def install_plugin(install_service, name, version='latest'):
         return Result(FAIL, 'error: not a Chromos project')
     except PluginNotFound:
         return Result(FAIL, f'error: plugin {name} not found in CPM Hub')
-    except HttpConnectionError as e:
-        return Result(FAIL, f'error: failed to connect to CPM Hub at {e}')
+    except HttpConnectionError as error:
+        return Result(FAIL, f'error: failed to connect to CPM Hub at {error}')
 
     return Result(OK, f'Installed plugin "{name}"')
 
 
+def install_project_plugins(install_service):
+    try:
+        install_service.install_project_plugins()
+    except NotAChromosProject:
+        return Result(FAIL, 'error: not a Chromos project')
+    except PluginNotFound as e:
+        return Result(FAIL, f'error: plugin {e} not found in CPM Hub')
+    except HttpConnectionError as error:
+        return Result(FAIL, f'error: failed to connect to CPM Hub at {error}')
+
+    return Result(OK, f'Installed plugins')
+
+
 def execute(argv):
-    create_parser = argparse.ArgumentParser(prog='cpm install', description='Chromos Package Manager', add_help=False)
-    create_parser.add_argument('plugin_name', nargs='?')
-    args = create_parser.parse_args(argv)
+    install_plugin_arg_parser = argparse.ArgumentParser(prog='cpm install', description='Chromos Package Manager', add_help=False)
+    install_plugin_arg_parser.add_argument('plugin_name', nargs='?')
+    args = install_plugin_arg_parser.parse_args(argv)
 
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
@@ -43,6 +56,9 @@ def execute(argv):
     cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url=f'{user_configuration["cpm_hub_url"]}/plugins')
     service = InstallService(project_loader, plugin_installer, cpm_hub_connector)
 
-    result = install_plugin(service, args.plugin_name)
+    if not args.plugin_name:
+        result = install_project_plugins(service)
+    else:
+        result = install_plugin(service, args.plugin_name)
 
     return result
