@@ -6,7 +6,7 @@ from mock import patch
 
 from subprocess import CompletedProcess
 from cpm.domain.cmake_recipe import CMakeRecipe, TestsFailed, BUILD_DIRECTORY, CMAKELISTS, CompilationError
-from cpm.domain.plugin import Plugin
+from cpm.domain.bit import Bit
 from cpm.domain.project import Project, Package
 
 
@@ -15,7 +15,7 @@ class TestCMakeRecipe(unittest.TestCase):
         filesystem = MagicMock()
         CMakeRecipe(filesystem)
 
-    def test_recipe_generation_without_plugins_or_packages(self):
+    def test_recipe_generation_without_bits_or_packages(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
         cmake_recipe = CMakeRecipe(filesystem)
@@ -135,9 +135,9 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(DeathStarBackend main.cpp package1.cpp package2.cpp)\n'
         )
 
-    def test_recipe_generation_with_one_plugin(self):
+    def test_recipe_generation_with_one_bit(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
-        project = _project_with_one_plugin('DeathStarBackend', sources=['plugin.cpp'])
+        project = _project_with_one_bit('DeathStarBackend', sources=['bit.cpp'])
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -149,14 +149,14 @@ class TestCMakeRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'project(DeathStarBackend)\n'
             'include_directories()\n'
-            'add_library(cest STATIC plugin.cpp)\n'
+            'add_library(cest STATIC bit.cpp)\n'
             'add_executable(DeathStarBackend main.cpp)\n'
             'target_link_libraries(DeathStarBackend cest)\n'
         )
 
-    def test_recipe_generation_with_one_plugin_without_sources(self):
+    def test_recipe_generation_with_one_bit_without_sources(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
-        project = _project_with_one_plugin('DeathStarBackend')
+        project = _project_with_one_bit('DeathStarBackend')
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -171,9 +171,9 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(DeathStarBackend main.cpp)\n'
         )
 
-    def test_recipe_generation_with_one_plugin_with_a_package_with_cflags(self):
+    def test_recipe_generation_with_one_bit_with_a_package_with_cflags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
-        project = _project_with_one_plugin('DeathStarBackend', sources=['plugin.cpp'], cflags=['-DDEFINE'])
+        project = _project_with_one_bit('DeathStarBackend', sources=['bit.cpp'], cflags=['-DDEFINE'])
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -185,15 +185,15 @@ class TestCMakeRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'project(DeathStarBackend)\n'
             'include_directories()\n'
-            'add_library(cest STATIC plugin.cpp)\n'
-            'set_source_files_properties(plugin.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
+            'add_library(cest STATIC bit.cpp)\n'
+            'set_source_files_properties(bit.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
             'add_executable(DeathStarBackend main.cpp)\n'
             'target_link_libraries(DeathStarBackend cest)\n'
         )
 
-    def test_recipe_generation_with_one_plugin_and_link_libraries(self):
+    def test_recipe_generation_with_one_bit_and_link_libraries(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
-        project = _project_with_one_plugin('DeathStarBackend', sources=['plugin.cpp'], cflags=['-DDEFINE'])
+        project = _project_with_one_bit('DeathStarBackend', sources=['bit.cpp'], cflags=['-DDEFINE'])
         project.add_library('boost')
         cmake_recipe = CMakeRecipe(filesystem)
 
@@ -206,8 +206,8 @@ class TestCMakeRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'project(DeathStarBackend)\n'
             'include_directories()\n'
-            'add_library(cest STATIC plugin.cpp)\n'
-            'set_source_files_properties(plugin.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
+            'add_library(cest STATIC bit.cpp)\n'
+            'set_source_files_properties(bit.cpp PROPERTIES COMPILE_FLAGS "-DDEFINE")\n'
             'add_executable(DeathStarBackend main.cpp)\n'
             'target_link_libraries(DeathStarBackend cest boost)\n'
         )
@@ -237,9 +237,9 @@ class TestCMakeRecipe(unittest.TestCase):
             ')\n'
         )
 
-    def test_recipe_generation_with_one_test_suite_and_one_plugin_and_link_libraries(self):
+    def test_recipe_generation_with_one_test_suite_and_one_bit_and_link_libraries(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
-        project = _project_with_one_plugin('DeathStarBackend', ['plugin.cpp'])
+        project = _project_with_one_bit('DeathStarBackend', ['bit.cpp'])
         project.tests = ['tests/test_suite.cpp']
         project.add_library('boost')
         cmake_recipe = CMakeRecipe(filesystem)
@@ -253,7 +253,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'cmake_minimum_required (VERSION 3.7)\n'
             'project(DeathStarBackend)\n'
             'include_directories()\n'
-            'add_library(cest STATIC plugin.cpp)\n'
+            'add_library(cest STATIC bit.cpp)\n'
             'add_executable(DeathStarBackend main.cpp)\n'
             'target_link_libraries(DeathStarBackend cest boost)\n'
             'add_executable(test_suite tests/test_suite.cpp)\n'
@@ -539,13 +539,13 @@ def _project_without_sources(name):
     return project
 
 
-def _project_with_one_plugin(name, sources=[], cflags=[]):
+def _project_with_one_bit(name, sources=[], cflags=[]):
     project = Project(name)
     project.sources = ['main.cpp']
-    plugin = Plugin('cest')
-    plugin.add_package(Package('plugins/cest', sources=sources, cflags=cflags))
-    plugin.add_sources(sources)
-    project.add_plugin(plugin)
+    bit = Bit('cest')
+    bit.add_package(Package('bits/cest', sources=sources, cflags=cflags))
+    bit.add_sources(sources)
+    project.add_bit(bit)
     return project
 
 

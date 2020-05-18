@@ -32,8 +32,8 @@ class Project(object):
         self.name = name
         self.version = "0.1"
         self.tests = []
-        self.declared_plugins = {}
-        self.plugins = []
+        self.declared_bits = {}
+        self.bits = []
         self.sources = []
         self.packages = []
         self.compile_flags = []
@@ -45,8 +45,8 @@ class Project(object):
     def add_target(self, target):
         self.targets[target.name] = target
 
-    def add_plugin(self, plugin):
-        self.plugins.append(plugin)
+    def add_bit(self, bit):
+        self.bits.append(bit)
 
     def add_sources(self, sources):
         self.sources.extend(sources)

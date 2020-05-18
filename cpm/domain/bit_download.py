@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class PluginDownload:
-    plugin_name: str
+class BitDownload:
+    bit_name: str
     version: str
     payload: str

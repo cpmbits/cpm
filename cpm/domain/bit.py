@@ -1,4 +1,4 @@
-class Plugin(object):
+class Bit(object):
     def __init__(self, name):
         self.name = name
         self.version = ""

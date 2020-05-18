@@ -10,9 +10,9 @@ BUILD_DIRECTORY = f'build'
 class CMakeRecipe(object):
     CMAKE_COMMAND = 'cmake'
 
-    def __init__(self, filesystem, compile_plugins_as_libraries=False):
+    def __init__(self, filesystem, compile_bits_as_libraries=False):
         self.filesystem = filesystem
-        self.compile_plugins_as_libraries = compile_plugins_as_libraries
+        self.compile_bits_as_libraries = compile_bits_as_libraries
         self.test_executables = []
 
     def generate(self, project):
@@ -55,9 +55,9 @@ class CMakeRecipe(object):
             for executable, test_file in zip(self.test_executables, project.tests):
                 cmake_builder.add_executable(executable, [test_file], object_libraries) \
                     .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11', '-g'])
-                plugins_with_sources = list(filter(lambda p: p.sources, project.plugins))
+                bits_with_sources = list(filter(lambda p: p.sources, project.bits))
                 if project.link_options.libraries:
-                    link_libraries = [plugin.name for plugin in plugins_with_sources] + project.link_options.libraries
+                    link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
                     cmake_builder.target_link_libraries(executable, link_libraries)
             cmake_builder.add_custom_target('test', 'echo "> Done', self.test_executables)
 
@@ -65,23 +65,23 @@ class CMakeRecipe(object):
         for package in project.packages:
             if package.cflags:
                 cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
-        for plugin in project.plugins:
-            self.__generate_plugin_build_rules(cmake_builder, plugin)
+        for bit in project.bits:
+            self.__generate_bit_build_rules(cmake_builder, bit)
         cmake_builder.add_executable(project.name, project.sources)
         if project.compile_flags:
             cmake_builder.set_target_properties(project.name, 'COMPILE_FLAGS', project.compile_flags)
         self.__generate_link_libraries_rule(cmake_builder, project)
 
     def __generate_link_libraries_rule(self, cmake_builder, project):
-        plugins_with_sources = list(filter(lambda p: p.sources, project.plugins))
-        if project.link_options.libraries or plugins_with_sources:
-            link_libraries = [plugin.name for plugin in plugins_with_sources] + project.link_options.libraries
+        bits_with_sources = list(filter(lambda p: p.sources, project.bits))
+        if project.link_options.libraries or bits_with_sources:
+            link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
             cmake_builder.target_link_libraries(project.name, link_libraries)
 
-    def __generate_plugin_build_rules(self, cmake_builder, plugin):
-        if plugin.sources:
-            cmake_builder.add_static_library(plugin.name, plugin.sources)
-        for package in plugin.packages:
+    def __generate_bit_build_rules(self, cmake_builder, bit):
+        if bit.sources:
+            cmake_builder.add_static_library(bit.name, bit.sources)
+        for package in bit.packages:
             if package.cflags:
                 cmake_builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
 

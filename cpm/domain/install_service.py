@@ -1,20 +1,20 @@
 class InstallService(object):
-    def __init__(self, project_loader, plugin_installer, cpm_hub_connector):
+    def __init__(self, project_loader, bit_installer, cpm_hub_connector):
         self.cpm_hub_connector = cpm_hub_connector
         self.project_loader = project_loader
-        self.plugin_installer = plugin_installer
+        self.bit_installer = bit_installer
 
     def install(self, name, version):
         self.project_loader.load()
         print(f'installing {name}:{version}')
-        plugin_download = self.cpm_hub_connector.download_plugin(name, version)
-        return self.plugin_installer.install(plugin_download)
+        bit_download = self.cpm_hub_connector.download_bit(name, version)
+        return self.bit_installer.install(bit_download)
 
-    def install_project_plugins(self):
+    def install_project_bits(self):
         project = self.project_loader.load()
-        for plugin_name, version in project.declared_plugins.items():
-            self.install(plugin_name, version)
+        for bit_name, version in project.declared_bits.items():
+            self.install(bit_name, version)
 
 
-class PluginNotFound(RuntimeError):
+class BitNotFound(RuntimeError):
     pass
