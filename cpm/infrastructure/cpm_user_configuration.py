@@ -1,6 +1,6 @@
 GLOBAL_CONFIGURATION_FILENAME = '.cpm.yaml'
 DEFAULT_CONFIGURATION = {
-    'cpm_hub_url': 'http://localhost:8000',
+    'cpm_hub_url': 'https://repo.cpmbits.com:8000',
 }
 
 
