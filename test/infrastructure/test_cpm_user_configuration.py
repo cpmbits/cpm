@@ -15,7 +15,7 @@ class TestCpmUserConfiguration(unittest.TestCase):
 
         cpm_user_configuration.load()
 
-        assert cpm_user_configuration['cpm_hub_url'] == 'http://localhost:8000'
+        assert cpm_user_configuration['cpm_hub_url'] == 'https://repo.cpmbits.com:8000'
         yaml_handler.load.assert_not_called()
         filesystem.file_exists.assert_called_once_with(f'/home/cpmuser/{GLOBAL_CONFIGURATION_FILENAME}')
 
@@ -29,7 +29,7 @@ class TestCpmUserConfiguration(unittest.TestCase):
 
         cpm_user_configuration.load()
 
-        assert cpm_user_configuration['cpm_hub_url'] == 'http://localhost:8000'
+        assert cpm_user_configuration['cpm_hub_url'] == 'https://repo.cpmbits.com:8000'
         yaml_handler.load.assert_called_once_with(f'/home/cpmuser/{GLOBAL_CONFIGURATION_FILENAME}')
 
     def test_loading_configuration_updates_defaults_with_global_configuration_values(self):
