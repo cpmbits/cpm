@@ -4,9 +4,9 @@ from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.project_loader import ProjectLoader
-from cpm.domain.plugin_packager import PluginPackager
+from cpm.domain.bit_packager import BitPackager
 from cpm.domain.publish_service import PublishService
-from cpm.domain.plugin_packager import PackagingFailure
+from cpm.domain.bit_packager import PackagingFailure
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_hub_connector_v1 import InvalidCpmHubUrl
@@ -40,13 +40,13 @@ def publish_project(publish_service):
 
 def execute(argv):
     publish_parser = argparse.ArgumentParser(prog='cpm publish', description='Chromos Package Manager', add_help=False)
-    publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='http://localhost:8000/plugins')
+    publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='http://localhost:8000/bits')
     args = publish_parser.parse_args(argv)
 
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
     loader = ProjectLoader(yaml_handler, filesystem)
-    packager = PluginPackager(filesystem)
+    packager = BitPackager(filesystem)
     cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url=args.repository_url)
     service = PublishService(loader, packager, cpm_hub_connector)
 

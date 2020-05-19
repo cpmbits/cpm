@@ -2,7 +2,7 @@ import unittest
 
 import mock
 
-from cpm.domain.plugin import Plugin
+from cpm.domain.bit import Bit
 from cpm.domain.project import Package, ProjectAction
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.project_loader import PROJECT_DESCRIPTOR_FILE
@@ -63,12 +63,12 @@ class TestProjectLoader(unittest.TestCase):
         assert loaded_project.name == 'Project'
         assert loaded_project.version == '1.5'
 
-    def test_loading_project_with_one_declared_plugin(self):
+    def test_loading_project_with_one_declared_bit(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         yaml_handler.load.return_value = {
             'name': 'Project',
-            'plugins': {
+            'bits': {
                 'cest': '1.0'
             }
         }
@@ -77,7 +77,7 @@ class TestProjectLoader(unittest.TestCase):
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
-        assert loaded_project.declared_plugins == {
+        assert loaded_project.declared_bits == {
             'cest': '1.0'
         }
 
@@ -162,25 +162,25 @@ class TestProjectLoader(unittest.TestCase):
         assert loaded_project.name == 'Project'
         assert 'ubuntu' in loaded_project.targets
 
-    @mock.patch('cpm.domain.project_loader.PluginLoader')
-    def test_loading_project_with_one_plugin(self, PluginLoader):
+    @mock.patch('cpm.domain.project_loader.BitLoader')
+    def test_loading_project_with_one_bit(self, BitLoader):
         filesystem = mock.MagicMock()
-        plugin_loader = mock.MagicMock()
-        PluginLoader.return_value = plugin_loader
+        bit_loader = mock.MagicMock()
+        BitLoader.return_value = bit_loader
         yaml_handler = mock.MagicMock()
         yaml_handler.load.return_value = {'name': 'Project'}
         loader = ProjectLoader(yaml_handler, filesystem)
 
         filesystem.list_directories.return_value = ['cest']
-        plugin = Plugin('cest')
-        plugin.add_include_directory('plugins/cest')
-        plugin_loader.load_from.return_value = plugin
+        bit = Bit('cest')
+        bit.add_include_directory('bits/cest')
+        bit_loader.load_from.return_value = bit
 
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
-        assert loaded_project.plugins == [Plugin('cest')]
-        assert loaded_project.include_directories == ['plugins/cest']
+        assert loaded_project.bits == [Bit('cest')]
+        assert loaded_project.include_directories == ['bits/cest']
 
     def test_loading_package_with_sources(self):
         filesystem = mock.MagicMock()
@@ -207,52 +207,52 @@ class TestProjectLoader(unittest.TestCase):
         assert tests == ['tests/test_project.cpp']
         filesystem.find.assert_called_once_with('tests', 'test_*.cpp')
 
-    def test_loading_local_plugins_when_plugins_directory_is_empty(self):
+    def test_loading_local_bits_when_bits_directory_is_empty(self):
         filesystem = mock.MagicMock()
         yaml_handler = mock.MagicMock()
         loader = ProjectLoader(yaml_handler, filesystem)
         filesystem.list_directories.return_value = []
 
-        plugins = loader.load_local_plugins()
+        bits = loader.load_local_bits()
 
-        assert plugins == []
-        filesystem.list_directories.assert_called_once_with('plugins')
+        assert bits == []
+        filesystem.list_directories.assert_called_once_with('bits')
 
-    @mock.patch('cpm.domain.project_loader.PluginLoader')
-    def test_loading_local_plugins_when_plugins_directory_contains_one_plugin(self, PluginLoader):
+    @mock.patch('cpm.domain.project_loader.BitLoader')
+    def test_loading_local_bits_when_bits_directory_contains_one_bit(self, BitLoader):
         filesystem = mock.MagicMock()
         yaml_handler = mock.MagicMock()
-        plugin_loader = mock.MagicMock()
-        PluginLoader.return_value = plugin_loader
+        bit_loader = mock.MagicMock()
+        BitLoader.return_value = bit_loader
         loader = ProjectLoader(yaml_handler, filesystem)
 
         filesystem.list_directories.return_value = ['cest']
-        plugin_loader.load_from.return_value = Plugin('cest')
+        bit_loader.load_from.return_value = Bit('cest')
 
-        plugins = loader.load_local_plugins()
+        bits = loader.load_local_bits()
 
-        assert plugins == [Plugin('cest')]
-        filesystem.list_directories.assert_called_once_with('plugins')
-        plugin_loader.load_from.assert_called_once_with('plugins/cest')
+        assert bits == [Bit('cest')]
+        filesystem.list_directories.assert_called_once_with('bits')
+        bit_loader.load_from.assert_called_once_with('bits/cest')
 
-    @mock.patch('cpm.domain.project_loader.PluginLoader')
-    def test_loading_local_plugins_when_plugins_directory_contains_many_plugins(self, PluginLoader):
+    @mock.patch('cpm.domain.project_loader.BitLoader')
+    def test_loading_local_bits_when_bits_directory_contains_many_bits(self, BitLoader):
         filesystem = mock.MagicMock()
         yaml_handler = mock.MagicMock()
-        plugin_loader = mock.MagicMock()
-        PluginLoader.return_value = plugin_loader
+        bit_loader = mock.MagicMock()
+        BitLoader.return_value = bit_loader
         loader = ProjectLoader(yaml_handler, filesystem)
 
         filesystem.list_directories.return_value = ['cest', 'base64']
-        plugin_loader.load_from.side_effect = [Plugin('cest'), Plugin('base64')]
+        bit_loader.load_from.side_effect = [Bit('cest'), Bit('base64')]
 
-        plugins = loader.load_local_plugins()
+        bits = loader.load_local_bits()
 
-        assert plugins == [Plugin('cest'), Plugin('base64')]
-        filesystem.list_directories.assert_called_once_with('plugins')
-        plugin_loader.load_from.assert_has_calls([
-            mock.call('plugins/cest'),
-            mock.call('plugins/base64')
+        assert bits == [Bit('cest'), Bit('base64')]
+        filesystem.list_directories.assert_called_once_with('bits')
+        bit_loader.load_from.assert_has_calls([
+            mock.call('bits/cest'),
+            mock.call('bits/base64')
         ])
 
     def test_loading_project_with_one_action(self):

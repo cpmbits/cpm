@@ -1,4 +1,4 @@
-from cpm.domain.plugin_loader import PluginLoader
+from cpm.domain.bit_loader import BitLoader
 from cpm.domain.project import ProjectAction
 from cpm.domain.project import Package
 from cpm.domain.project import Project
@@ -11,7 +11,7 @@ class ProjectLoader(object):
     def __init__(self, yaml_handler, filesystem):
         self.filesystem = filesystem
         self.yaml_handler = yaml_handler
-        self.plugin_loader = PluginLoader(yaml_handler, filesystem)
+        self.bit_loader = BitLoader(yaml_handler, filesystem)
 
     def load(self, directory='.'):
         try:
@@ -19,7 +19,7 @@ class ProjectLoader(object):
             project = Project(description['name'])
             project.version = description.get('version', "0.1")
             project.add_sources(['main.cpp'])
-            project.declared_plugins = description.get('plugins', {})
+            project.declared_bits = description.get('bits', {})
             for package in self.project_packages(description):
                 project.add_package(package)
                 project.add_include_directory(self.filesystem.parent_directory(package.path))
@@ -27,9 +27,9 @@ class ProjectLoader(object):
             project.add_tests(self.test_suites())
             for target in self.described_targets(description):
                 project.add_target(target)
-            for plugin in self.load_local_plugins():
-                project.add_plugin(plugin)
-                for directory in plugin.include_directories:
+            for bit in self.load_local_bits():
+                project.add_bit(bit)
+                for directory in bit.include_directories:
                     project.add_include_directory(directory)
             for library in self.link_libraries(description):
                 project.add_library(library)
@@ -46,14 +46,14 @@ class ProjectLoader(object):
                 yield Target(target, description['targets'][target])
         return []
 
-    def load_local_plugins(self):
-        plugin_directories = self.filesystem.list_directories('plugins')
-        return [self.plugin_loader.load_from(f'plugins/{directory}') for directory in plugin_directories]
+    def load_local_bits(self):
+        bit_directories = self.filesystem.list_directories('bits')
+        return [self.bit_loader.load_from(f'bits/{directory}') for directory in bit_directories]
 
-    def load_plugins(self, description):
-        if 'plugins' in description:
-            for plugin in description['plugins']:
-                yield self.plugin_loader.load(plugin)
+    def load_bits(self, description):
+        if 'bits' in description:
+            for bit in description['bits']:
+                yield self.bit_loader.load(bit)
         return []
 
     def project_packages(self, description):
