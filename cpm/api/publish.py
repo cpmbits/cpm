@@ -40,7 +40,7 @@ def publish_project(publish_service):
 
 def execute(argv):
     publish_parser = argparse.ArgumentParser(prog='cpm publish', description='Chromos Package Manager', add_help=False)
-    publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='http://localhost:8000/bits')
+    publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='https://repo.cpmbits.com:8000')
     args = publish_parser.parse_args(argv)
 
     filesystem = Filesystem()
