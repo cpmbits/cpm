@@ -9,7 +9,7 @@ from cpm.infrastructure import http_client
 
 
 class CpmHubConnectorV1(object):
-    def __init__(self, filesystem, repository_url='https://www.cpm-hub.com/api/v1/bits'):
+    def __init__(self, filesystem, repository_url='https://repo.cpmbits.com:8000'):
         self.filesystem = filesystem
         self.repository_url = repository_url
 
