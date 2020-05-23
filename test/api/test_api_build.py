@@ -9,29 +9,38 @@ from cpm.domain.project_loader import NotAChromosProject
 class TestApiBuild(unittest.TestCase):
     def test_build_fails_when_current_directory_is_not_a_chromos_project(self):
         recipe = mock.MagicMock()
-        build_service = mock.MagicMock()
-        build_service.build.side_effect = NotAChromosProject()
+        compilation_service = mock.MagicMock()
+        compilation_service.build.side_effect = NotAChromosProject()
 
-        result = build_project(build_service, recipe)
+        result = build_project(compilation_service, recipe)
 
         assert result.status_code == 1
-        build_service.build.assert_called_once_with(recipe)
+        compilation_service.build.assert_called_once_with(recipe)
 
     def test_run_tests_fails_when_compilation_fails(self):
         recipe = mock.MagicMock()
-        build_service = mock.MagicMock()
-        build_service.build.side_effect = CompilationError()
+        compilation_service = mock.MagicMock()
+        compilation_service.build.side_effect = CompilationError()
 
-        result = build_project(build_service, recipe)
+        result = build_project(compilation_service, recipe)
 
         assert result.status_code == 1
-        build_service.build.assert_called_once_with(recipe)
+        compilation_service.build.assert_called_once_with(recipe)
 
-    def test_build_project(self):
-        build_service = mock.MagicMock()
+    def test_build_project_for_host(self):
+        compilation_service = mock.MagicMock()
         recipe = mock.MagicMock()
 
-        result = build_project(build_service, recipe)
+        result = build_project(compilation_service, recipe)
 
         assert result.status_code == 0
-        build_service.build.assert_called_once_with(recipe)
+        compilation_service.build.assert_called_once_with(recipe)
+
+    def test_build_project_for_target(self):
+        compilation_service = mock.MagicMock()
+        recipe = mock.MagicMock()
+
+        result = build_project(compilation_service, recipe, target='raspberrypi4:64')
+
+        assert result.status_code == 0
+        compilation_service.build_target.assert_called_once_with('raspberrypi4:64')

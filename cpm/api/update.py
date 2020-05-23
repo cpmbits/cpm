@@ -1,7 +1,7 @@
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
-from cpm.domain.build_service import BuildService
+from cpm.domain.compilation_service import CompilationService
 from cpm.domain.cmake_recipe import CMakeRecipe
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.project_loader import ProjectLoader
@@ -9,9 +9,9 @@ from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 
 
-def update_project(build_service, recipe):
+def update_project(compilation_service, recipe):
     try:
-        build_service.update(recipe)
+        compilation_service.update(recipe)
     except NotAChromosProject:
         return Result(FAIL, f'error: not a Chromos project')
 
@@ -22,7 +22,7 @@ def execute(argv):
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
     project_loader = ProjectLoader(yaml_handler, filesystem)
-    service = BuildService(project_loader)
+    service = CompilationService(project_loader)
     recipe = CMakeRecipe(filesystem)
 
     result = update_project(service, recipe)
