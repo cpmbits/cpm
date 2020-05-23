@@ -27,7 +27,7 @@ class TestApiBuild(unittest.TestCase):
         assert result.status_code == 1
         compilation_service.build.assert_called_once_with(recipe)
 
-    def test_build_project(self):
+    def test_build_project_for_host(self):
         compilation_service = mock.MagicMock()
         recipe = mock.MagicMock()
 
@@ -35,3 +35,12 @@ class TestApiBuild(unittest.TestCase):
 
         assert result.status_code == 0
         compilation_service.build.assert_called_once_with(recipe)
+
+    def test_build_project_for_target(self):
+        compilation_service = mock.MagicMock()
+        recipe = mock.MagicMock()
+
+        result = build_project(compilation_service, recipe, target='raspberrypi4:64')
+
+        assert result.status_code == 0
+        compilation_service.build_target.assert_called_once_with('raspberrypi4:64')
