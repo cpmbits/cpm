@@ -1,4 +1,4 @@
-class BuildService(object):
+class CompilationService(object):
     def __init__(self, project_loader):
         self.project_loader = project_loader
 
