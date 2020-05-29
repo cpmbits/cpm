@@ -107,3 +107,16 @@ class TestInstallService(unittest.TestCase):
             call(bit_download),
             call(bit_download)
         ])
+
+    def test_it_does_not_install_bit_that_is_already_installed(self):
+        project_loader = MagicMock()
+        cpm_hub_connector = MagicMock()
+        bit_installer = MagicMock()
+        project = Project('Project')
+        project.add_bit(Bit('cest', '1.0'))
+        project_loader.load.return_value = project
+        service = InstallService(project_loader, bit_installer, cpm_hub_connector)
+
+        service.install('cest', '1.0')
+
+        cpm_hub_connector.download_bit.assert_not_called()

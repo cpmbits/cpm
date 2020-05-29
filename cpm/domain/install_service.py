@@ -1,3 +1,6 @@
+from cpm.domain.bit import Bit
+
+
 class InstallService(object):
     def __init__(self, project_loader, bit_installer, cpm_hub_connector):
         self.cpm_hub_connector = cpm_hub_connector
@@ -5,7 +8,10 @@ class InstallService(object):
         self.bit_installer = bit_installer
 
     def install(self, name, version):
-        self.project_loader.load()
+        project = self.project_loader.load()
+        if Bit(name, version) in project.bits:
+            print(f'bit already installed: {name}:{version}')
+            return
         print(f'installing {name}:{version}')
         bit_download = self.cpm_hub_connector.download_bit(name, version)
         return self.bit_installer.install(bit_download)
