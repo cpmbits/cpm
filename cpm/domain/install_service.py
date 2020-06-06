@@ -12,9 +12,19 @@ class InstallService(object):
         if Bit(name, version) in project.bits:
             print(f'bit already installed: {name}:{version}')
             return
-        print(f'installing {name}:{version}')
+        self._log_install_or_upgrade(project, name, version)
         bit_download = self.cpm_hub_connector.download_bit(name, version)
         return self.bit_installer.install(bit_download)
+
+    def _log_install_or_upgrade(self, project, name, version):
+        installed_bit = next((bit for bit in project.bits if bit.name == name), None)
+        if installed_bit:
+            if installed_bit.version < version:
+                print(f'upgrading {name}:{installed_bit.version} -> {version}')
+            else:
+                print(f'downgrading {name}:{installed_bit.version} -> {version}')
+        else:
+            print(f'installing {name}:{version}')
 
     def install_project_bits(self):
         project = self.project_loader.load()

@@ -120,3 +120,16 @@ class TestInstallService(unittest.TestCase):
         service.install('cest', '1.0')
 
         cpm_hub_connector.download_bit.assert_not_called()
+
+    def test_it_upgrades_bit_that_is_already_installed_to_a_newer_version(self):
+        project_loader = MagicMock()
+        cpm_hub_connector = MagicMock()
+        bit_installer = MagicMock()
+        project = Project('Project')
+        project.add_bit(Bit('cest', '1.0'))
+        project_loader.load.return_value = project
+        service = InstallService(project_loader, bit_installer, cpm_hub_connector)
+
+        service.install('cest', '1.1')
+
+        cpm_hub_connector.download_bit.assert_called_once_with('cest', '1.1')
