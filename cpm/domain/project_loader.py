@@ -20,6 +20,7 @@ class ProjectLoader(object):
             project.version = description.get('version', "0.1")
             project.add_sources(['main.cpp'])
             project.declared_bits = description.get('bits', {})
+            project.declared_test_bits = description.get('test_bits', {})
             for package in self.project_packages(description):
                 project.add_package(package)
                 project.add_include_directory(self.filesystem.parent_directory(package.path))
