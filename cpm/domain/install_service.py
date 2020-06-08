@@ -14,7 +14,9 @@ class InstallService(object):
             return
         self._log_install_or_upgrade(project, name, version)
         bit_download = self.cpm_hub_connector.download_bit(name, version)
-        return self.bit_installer.install(bit_download)
+        bit = self.bit_installer.install(bit_download)
+        for bit_name, version in bit.declared_bits.items():
+            self.install(bit_name, version)
 
     def _log_install_or_upgrade(self, project, name, version):
         installed_bit = next((bit for bit in project.bits if bit.name == name), None)

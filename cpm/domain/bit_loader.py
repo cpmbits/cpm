@@ -14,6 +14,7 @@ class BitLoader(object):
         description = self.yaml_handler.load(f'{directory}/bit.yaml')
         bit = Bit(description['name'])
         bit.version = description.get('version', "0.1")
+        bit.declared_bits = description.get('bits', {})
         for package in self.bit_packages(description, directory):
             bit.add_package(package)
             bit.add_include_directory(self.filesystem.parent_directory(package.path))
