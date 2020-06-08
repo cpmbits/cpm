@@ -81,6 +81,24 @@ class TestProjectLoader(unittest.TestCase):
             'cest': '1.0'
         }
 
+    def test_loading_project_with_one_declared_test_bit(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        yaml_handler.load.return_value = {
+            'name': 'Project',
+            'test_bits': {
+                'cest': '1.0'
+            }
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        loaded_project = loader.load()
+
+        assert loaded_project.name == 'Project'
+        assert loaded_project.declared_test_bits == {
+            'cest': '1.0'
+        }
+
     def test_loading_project_with_one_package(self):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()

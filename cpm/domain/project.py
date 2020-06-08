@@ -33,6 +33,7 @@ class Project(object):
         self.version = "0.1"
         self.tests = []
         self.declared_bits = {}
+        self.declared_test_bits = {}
         self.bits = []
         self.sources = []
         self.packages = []

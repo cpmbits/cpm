@@ -21,16 +21,15 @@ class InstallService(object):
     def _log_install_or_upgrade(self, project, name, version):
         installed_bit = next((bit for bit in project.bits if bit.name == name), None)
         if installed_bit:
-            if installed_bit.version < version:
-                print(f'upgrading {name}:{installed_bit.version} -> {version}')
-            else:
-                print(f'downgrading {name}:{installed_bit.version} -> {version}')
+            print(f'{"upgrading" if installed_bit.version < version else "downgrading"} {name}:{installed_bit.version} -> {version}')
         else:
             print(f'installing {name}:{version}')
 
     def install_project_bits(self):
         project = self.project_loader.load()
         for bit_name, version in project.declared_bits.items():
+            self.install(bit_name, version)
+        for bit_name, version in project.declared_test_bits.items():
             self.install(bit_name, version)
 
 

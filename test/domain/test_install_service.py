@@ -104,6 +104,27 @@ class TestInstallService(unittest.TestCase):
             call('fakeit', '1.0'),
         ])
 
+    def test_it_installs_test_bits_declared_in_project(self):
+        project_loader = MagicMock()
+        cpm_hub_connector = MagicMock()
+        bit_installer = MagicMock()
+        bit_download = MagicMock()
+        project = Project('Project')
+        project.declared_test_bits = {
+            'cest': '1.0',
+            'fakeit': '1.0',
+        }
+        project_loader.load.return_value = project
+        cpm_hub_connector.download_bit.return_value = bit_download
+        service = InstallService(project_loader, bit_installer, cpm_hub_connector)
+
+        service.install_project_bits()
+
+        cpm_hub_connector.download_bit.assert_has_calls([
+            call('cest', '1.0'),
+            call('fakeit', '1.0'),
+        ])
+
     def test_it_does_not_install_bit_that_is_already_installed(self):
         project_loader = MagicMock()
         cpm_hub_connector = MagicMock()
@@ -130,7 +151,7 @@ class TestInstallService(unittest.TestCase):
 
         cpm_hub_connector.download_bit.assert_called_once_with('cest', '1.1')
 
-    def test_it_installs_bit_transitive_depdencies(self):
+    def test_it_installs_bit_transitive_dependencies(self):
         project_loader = MagicMock()
         cpm_hub_connector = MagicMock()
         bit_installer = MagicMock()
