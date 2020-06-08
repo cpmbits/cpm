@@ -55,6 +55,25 @@ class TestBitLoader(unittest.TestCase):
         assert bit.name == 'cest'
         assert bit.include_directories == []
 
+    def test_loading_bit_with_transitive_dependencies(self):
+        filesystem = MagicMock()
+        yaml_handler = MagicMock()
+        yaml_handler.load.return_value = {
+            'name': 'cest',
+            'bits': {
+                'cest': '1.0'
+            }
+        }
+        loader = BitLoader(yaml_handler, filesystem)
+
+        bit = loader.load_from('bits/cest')
+
+        yaml_handler.load.assert_called_once_with('bits/cest/bit.yaml')
+        assert bit.name == 'cest'
+        assert bit.declared_bits == {
+            'cest': '1.0'
+        }
+
     def test_loading_bit_with_one_package(self):
         yaml_handler = MagicMock()
         filesystem = MagicMock()

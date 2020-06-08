@@ -5,6 +5,7 @@ class Bit(object):
         self.sources = []
         self.packages = []
         self.include_directories = []
+        self.declared_bits = {}
 
     def __eq__(self, other):
         return self.name == other.name and self.version == other.version

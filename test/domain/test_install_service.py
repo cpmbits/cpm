@@ -103,10 +103,6 @@ class TestInstallService(unittest.TestCase):
             call('cest', '1.0'),
             call('fakeit', '1.0'),
         ])
-        bit_installer.install.assert_has_calls([
-            call(bit_download),
-            call(bit_download)
-        ])
 
     def test_it_does_not_install_bit_that_is_already_installed(self):
         project_loader = MagicMock()
@@ -133,3 +129,23 @@ class TestInstallService(unittest.TestCase):
         service.install('cest', '1.1')
 
         cpm_hub_connector.download_bit.assert_called_once_with('cest', '1.1')
+
+    def test_it_installs_bit_transitive_depdencies(self):
+        project_loader = MagicMock()
+        cpm_hub_connector = MagicMock()
+        bit_installer = MagicMock()
+        bit_download = MagicMock()
+        chromos_bit = Bit('chromos', version='1.0')
+        chromos_bit.declared_bits = {'zeromq': '4.3.2'}
+        bit_installer.install.side_effect = [chromos_bit, Bit('zeromq', version='4.3.2')]
+        project = Project('Project')
+        project_loader.load.return_value = project
+        cpm_hub_connector.download_bit.return_value = bit_download
+        service = InstallService(project_loader, bit_installer, cpm_hub_connector)
+
+        service.install('chromos', '1.0')
+
+        cpm_hub_connector.download_bit.assert_has_calls([
+            call('chromos', '1.0'),
+            call('zeromq', '4.3.2'),
+        ])
