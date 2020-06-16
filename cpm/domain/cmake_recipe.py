@@ -43,7 +43,6 @@ class CMakeRecipe(object):
 
     def __generate_test_rules(self, cmake_builder, project):
         self.test_executables = [test_file.split('/')[-1].split('.')[0] for test_file in project.tests]
-
         if self.test_executables:
             sources_without_main = self._sources_without_main(project)
             if sources_without_main:
@@ -56,8 +55,8 @@ class CMakeRecipe(object):
                 cmake_builder.add_executable(executable, [test_file], object_libraries) \
                     .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11', '-g'])
                 bits_with_sources = list(filter(lambda p: p.sources, project.bits))
-                if project.link_options.libraries:
-                    link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
+                link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
+                if link_libraries:
                     cmake_builder.target_link_libraries(executable, link_libraries)
             cmake_builder.add_custom_target('test', 'echo "> Done', self.test_executables)
 
