@@ -237,6 +237,33 @@ class TestCMakeRecipe(unittest.TestCase):
             ')\n'
         )
 
+    def test_recipe_generation_with_one_test_suite_and_one_bit_and_no_link_libraries(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_with_one_bit('DeathStarBackend', ['bit.cpp'])
+        project.tests = ['tests/test_suite.cpp']
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('build')
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'add_library(cest STATIC bit.cpp)\n'
+            'add_executable(DeathStarBackend main.cpp)\n'
+            'target_link_libraries(DeathStarBackend cest)\n'
+            'add_executable(test_suite tests/test_suite.cpp)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
+            'target_link_libraries(test_suite cest)\n'
+            'add_custom_target(test\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+        )
+
     def test_recipe_generation_with_one_test_suite_and_one_bit_and_link_libraries(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_one_bit('DeathStarBackend', ['bit.cpp'])
