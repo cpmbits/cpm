@@ -1,6 +1,7 @@
 import unittest
-
 import mock
+
+import os
 
 from cpm.domain.bit import Bit
 from cpm.domain.project import Package, ProjectAction
@@ -234,7 +235,7 @@ class TestProjectLoader(unittest.TestCase):
         bits = loader.load_local_bits()
 
         assert bits == []
-        filesystem.list_directories.assert_called_once_with('bits')
+        filesystem.list_directories.assert_called_once_with(f'{os.getcwd()}/bits')
 
     @mock.patch('cpm.domain.project_loader.BitLoader')
     def test_loading_local_bits_when_bits_directory_contains_one_bit(self, BitLoader):
@@ -250,7 +251,7 @@ class TestProjectLoader(unittest.TestCase):
         bits = loader.load_local_bits()
 
         assert bits == [Bit('cest')]
-        filesystem.list_directories.assert_called_once_with('bits')
+        filesystem.list_directories.assert_called_once_with(f'{os.getcwd()}/bits')
         bit_loader.load_from.assert_called_once_with('bits/cest')
 
     @mock.patch('cpm.domain.project_loader.BitLoader')
@@ -267,7 +268,7 @@ class TestProjectLoader(unittest.TestCase):
         bits = loader.load_local_bits()
 
         assert bits == [Bit('cest'), Bit('base64')]
-        filesystem.list_directories.assert_called_once_with('bits')
+        filesystem.list_directories.assert_called_once_with(f'{os.getcwd()}/bits')
         bit_loader.load_from.assert_has_calls([
             mock.call('bits/cest'),
             mock.call('bits/base64')
@@ -288,4 +289,3 @@ class TestProjectLoader(unittest.TestCase):
 
         assert loaded_project.name == 'Project'
         assert loaded_project.actions == [ProjectAction('deploy', 'sudo make me a sandwich')]
-

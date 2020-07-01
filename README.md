@@ -1,7 +1,6 @@
-# cpm: The Chromos Project Manager  ![CI](https://github.com/jorsanpe/cpm/workflows/CI/badge.svg)
-A modern project management tool for C/C++ projects.
+# cpm: A modern project management tool for C/C++ projects  ![CI](https://github.com/jorsanpe/cpm/workflows/CI/badge.svg)
 
-The [docs](https://github.com/jorsanpe/cpm/wiki) are currently maintained in the repository wiki.
+You can find the [documentation](https://cpmbits.com/1_getting_started.html) at [combits.com](https://cpmbits.com/).
 
 ## Installation
 `pip3 install cpm-cli`
@@ -15,16 +14,16 @@ cd DeathStartLaserBackend
 cpm build
 ```
 
-After creating the project, the binary will be available in the project root directory. 
+After creating the project, the binary will be available in the project `build` directory. 
 ```
-./DeathStartLaserBackend
+./build/DeathStartLaserBackend
 ```
 
 ### Manage dependencies
 CPM manages your project dependencies through CPM-Hub. In order to install a package, simply run:
 
 ```
-cpm install R2D2-API
+cpm install cest
 ```
 
 ### Run your tests
@@ -32,5 +31,7 @@ cpm install R2D2-API
 cpm test
 ```
 
-Test sources reside in the `tests` directory. They are found recursively from the root directory
- using the expression `test_*.cpp`.
+Test sources reside in the `tests` directory. `cpm` will consider as test suites any files that match the expression
+`test_*.cpp`. 
+
+`cpm` hsa been developed very closely to `cest`, a testing framework 
