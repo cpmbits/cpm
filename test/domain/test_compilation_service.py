@@ -4,8 +4,8 @@ from mock import patch
 
 import os
 
-from cpm.domain.compilation_service import CompilationService
-from cpm.domain.project import Project
+from cpm.domain.compilation_service import CompilationService, DockerImageNotFound
+from cpm.domain.project import Project, Target
 from cpm.domain.project_loader import NotAChromosProject
 
 
@@ -92,3 +92,45 @@ class TestBuildService(unittest.TestCase):
             user=f'{os.getuid()}:{os.getgid()}',
             detach=True
         )
+
+    @patch('cpm.domain.compilation_service.docker')
+    def test_it_uses_image_declared_for_target(self, docker):
+        project = Project('Project')
+        project.add_target(Target('ubuntu', {'image': 'cpmhub/ubuntu'}))
+        project_loader = MagicMock()
+        project_loader.load.return_value = project
+        docker_client = MagicMock()
+        container = MagicMock()
+        container.logs.return_value = []
+        docker_client.containers.return_value = container
+        docker.from_env.return_value = docker_client
+        service = CompilationService(project_loader)
+
+        service.build_target('ubuntu')
+
+        project_loader.load.assert_called_once()
+        docker_client.containers.run.assert_called_once_with(
+            f'cpmhub/ubuntu',
+            'cpm build',
+            working_dir=f'/{project.name}',
+            volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
+            user=f'{os.getuid()}:{os.getgid()}',
+            detach=True
+        )
+
+    @patch('cpm.domain.compilation_service.docker')
+    def test_it_raises_an_exception_when_docker_image_is_not_found(self, docker):
+        project = Project('Project')
+        project.add_target(Target('ubuntu', {'image': 'cpmhub/ubuntu'}))
+        project_loader = MagicMock()
+        project_loader.load.return_value = project
+        docker_client = MagicMock()
+        docker.errors.ImageNotFound = RuntimeError
+        docker_client.images.pull.side_effect = docker.errors.ImageNotFound
+        docker.from_env.return_value = docker_client
+        service = CompilationService(project_loader)
+
+        self.assertRaises(DockerImageNotFound, service.build_target, 'ubuntu')
+
+        project_loader.load.assert_called_once()
+        docker_client.containers.run.assert_not_called()

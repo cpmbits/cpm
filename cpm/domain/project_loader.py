@@ -1,3 +1,4 @@
+import os
 from cpm.domain.bit_loader import BitLoader
 from cpm.domain.project import ProjectAction
 from cpm.domain.project import Package
@@ -48,7 +49,7 @@ class ProjectLoader(object):
         return []
 
     def load_local_bits(self):
-        bit_directories = self.filesystem.list_directories('bits')
+        bit_directories = self.filesystem.list_directories(f'{os.getcwd()}/bits')
         return [self.bit_loader.load_from(f'bits/{directory}') for directory in bit_directories]
 
     def load_bits(self, description):

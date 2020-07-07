@@ -4,6 +4,7 @@ from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.compilation_service import CompilationService
+from cpm.domain.compilation_service import DockerImageNotFound
 from cpm.domain.cmake_recipe import CMakeRecipe, CompilationError
 from cpm.domain.project_loader import NotAChromosProject
 from cpm.domain.project_loader import ProjectLoader
@@ -21,6 +22,8 @@ def build_project(compilation_service, recipe, target='host'):
         return Result(FAIL, f'error: not a Chromos project')
     except CompilationError:
         return Result(FAIL, f'error: compilation failed')
+    except DockerImageNotFound as e:
+        return Result(FAIL, f'error: docker image {e.image_name} not found for target {target}')
 
     return Result(OK, f'Build finished')
 
