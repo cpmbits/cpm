@@ -231,7 +231,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
-            'add_custom_target(test\n'
+            'add_custom_target(tests\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'
             ')\n'
@@ -258,7 +258,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(test_suite tests/test_suite.cpp)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'target_link_libraries(test_suite cest)\n'
-            'add_custom_target(test\n'
+            'add_custom_target(tests\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'
             ')\n'
@@ -286,7 +286,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(test_suite tests/test_suite.cpp)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'target_link_libraries(test_suite cest boost)\n'
-            'add_custom_target(test\n'
+            'add_custom_target(tests\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'
             ')\n'
@@ -313,7 +313,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'set_target_properties(test_suite_1 PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'add_executable(test_suite_2 tests/test_suite_2.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
             'set_target_properties(test_suite_2 PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
-            'add_custom_target(test\n'
+            'add_custom_target(tests\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite_1 test_suite_2\n'
             ')\n'
@@ -342,7 +342,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
             'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
             'target_link_libraries(test_suite pthread rt)\n'
-            'add_custom_target(test\n'
+            'add_custom_target(tests\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_suite\n'
             ')\n'
@@ -366,7 +366,7 @@ class TestCMakeRecipe(unittest.TestCase):
             'add_executable(Cest main.cpp)\n'
             'add_executable(test_cest tests/test_cest.cpp)\n'
             'set_target_properties(test_cest PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
-            'add_custom_target(test\n'
+            'add_custom_target(tests\n'
             '    COMMAND echo "> Done"\n'
             '    DEPENDS test_cest\n'
             ')\n'
@@ -434,7 +434,7 @@ class TestCMakeRecipe(unittest.TestCase):
                 cwd='build'
             ),
             call(
-                ['ninja', 'test'],
+                ['ninja', 'tests'],
                 cwd='build'
             )
         ])

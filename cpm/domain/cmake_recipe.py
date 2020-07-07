@@ -58,7 +58,7 @@ class CMakeRecipe(object):
                 link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
                 if link_libraries:
                     builder.target_link_libraries(executable, link_libraries)
-            builder.add_custom_target('test', 'echo "> Done', self.test_executables)
+            builder.add_custom_target('tests', 'echo "> Done', self.test_executables)
 
     def __generate_build_rules(self, builder, project):
         for package in project.packages:
@@ -98,7 +98,7 @@ class CMakeRecipe(object):
 
     def build_tests(self):
         self.run_compile_command(self.CMAKE_COMMAND, '-G', 'Ninja', '..')
-        self.run_compile_command('ninja', 'test')
+        self.run_compile_command('ninja', 'tests')
 
     def run_all_tests(self):
         self.run_tests(self.test_executables)

@@ -14,10 +14,16 @@ class CompilationService(object):
 
     def build_target(self, target):
         project = self.project_loader.load()
-        image = self.image_for_target(project, target)
+        image_name = self.image_for_target(project, target)
         client = docker.from_env()
+        try:
+            client.images.pull(image_name)
+        except docker.errors.ImageNotFound:
+            raise DockerImageNotFound(image_name)
+        except docker.errors.NotFound:
+            raise DockerImageNotFound(image_name)
         container = client.containers.run(
-            image,
+            image_name,
             'cpm build',
             working_dir=f'/{project.name}',
             volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
@@ -40,3 +46,9 @@ class CompilationService(object):
     def clean(self, cmake_recipe):
         self.project_loader.load()
         cmake_recipe.clean()
+
+
+class DockerImageNotFound(RuntimeError):
+    def __init__(self, image_name):
+        super(DockerImageNotFound, self).__init__()
+        self.image_name = image_name

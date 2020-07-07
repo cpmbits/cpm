@@ -1,6 +1,6 @@
 # cpm: A modern project management tool for C/C++ projects  ![CI](https://github.com/jorsanpe/cpm/workflows/CI/badge.svg)
 
-You can find the [documentation](https://cpmbits.com/1_getting_started.html) at [combits.com](https://cpmbits.com/).
+You can find the [documentation](https://cpmbits.com/1_getting_started.html) in the [cpmbits website](https://cpmbits.com).
 
 ## Installation
 `pip3 install cpm-cli`
@@ -33,5 +33,3 @@ cpm test
 
 Test sources reside in the `tests` directory. `cpm` will consider as test suites any files that match the expression
 `test_*.cpp`. 
-
-`cpm` hsa been developed very closely to `cest`, a testing framework 
