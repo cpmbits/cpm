@@ -14,9 +14,10 @@ class CompilationService(object):
 
     def build_target(self, target):
         project = self.project_loader.load()
+        image = self.image_for_target(project, target)
         client = docker.from_env()
         container = client.containers.run(
-            f'cpmbits/{target}',
+            image,
             'cpm build',
             working_dir=f'/{project.name}',
             volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
@@ -25,6 +26,12 @@ class CompilationService(object):
         )
         for log in container.logs(stream=True):
             sys.stdout.write(log.decode())
+
+    def image_for_target(self, project, target):
+        if target in project.targets:
+            return project.targets[target].properties['image']
+        else:
+            return f'cpmbits/{target}'
 
     def update(self, cmake_recipe):
         project = self.project_loader.load()
