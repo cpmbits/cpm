@@ -9,7 +9,7 @@ from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 
 
-def update_project(compilation_service, recipe):
+def prep_project(compilation_service, recipe):
     try:
         compilation_service.update(recipe)
     except NotAChromosProject:
@@ -25,6 +25,6 @@ def execute(argv):
     service = CompilationService(project_loader)
     recipe = CMakeRecipe(filesystem)
 
-    result = update_project(service, recipe)
+    result = prep_project(service, recipe)
 
     return result
