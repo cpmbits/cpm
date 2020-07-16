@@ -3,6 +3,7 @@ import argparse
 import importlib
 import sys
 import pkgutil
+import pkg_resources
 
 import cpm.api
 from cpm.api.project_actions import discover_project_actions
@@ -20,9 +21,14 @@ def main():
     for project_action in discover_project_actions():
         actions[project_action.name] = ProjectActionRunner(project_action.name, project_action.command)
 
-    action_parser = argparse.ArgumentParser(description='Chromos Package Manager')
-    action_parser.add_argument('action', choices=list(actions.keys()) + ['list-actions'])
-    args = action_parser.parse_args(sys.argv[1:2])
+    top_level_parser = argparse.ArgumentParser(description='Chromos Package Manager')
+    top_level_parser.add_argument('-v', '--version', action='version', version=f'cpm version {pkg_resources.require("cpm-cli")[0].version}')
+    top_level_parser.add_argument('action', choices=list(actions.keys()) + ['list-actions'], nargs='?')
+    args = top_level_parser.parse_args(sys.argv[1:2])
+
+    if not args.action:
+        top_level_parser.print_help()
+        sys.exit(0)
 
     if args.action == 'list-actions':
         print(' '.join(actions.keys()))
