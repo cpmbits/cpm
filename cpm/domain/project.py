@@ -42,6 +42,9 @@ class Project(object):
         self.link_options = LinkOptions()
         self.actions = []
         self.targets = {}
+        self.test_packages = []
+        self.test_include_directories = []
+        self.test_sources = []
 
     def add_target(self, target):
         self.targets[target.name] = target
@@ -60,6 +63,15 @@ class Project(object):
 
     def add_include_directory(self, directory):
         self.include_directories.append(directory)
+
+    def add_test_package(self, package):
+        self.test_packages.append(package)
+
+    def add_test_include_directory(self, directory):
+        self.test_include_directories.append(directory)
+
+    def add_test_sources(self, sources):
+        self.test_sources.extend(sources)
 
     def add_library(self, library):
         self.link_options.libraries.append(library)

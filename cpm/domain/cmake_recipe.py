@@ -52,12 +52,14 @@ class CMakeRecipe(object):
             else:
                 object_libraries = []
             for executable, test_file in zip(self.test_executables, project.tests):
-                builder.add_executable(executable, [test_file], object_libraries) \
+                builder.add_executable(executable, [test_file] + project.test_sources, object_libraries) \
                     .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11', '-g'])
                 bits_with_sources = list(filter(lambda p: p.sources, project.bits))
                 link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
                 if link_libraries:
                     builder.target_link_libraries(executable, link_libraries)
+                if project.test_include_directories:
+                    builder.target_include_directories(executable, project.test_include_directories)
             builder.add_custom_target('tests', 'echo "> Done', self.test_executables)
 
     def __generate_build_rules(self, builder, project):

@@ -289,3 +289,20 @@ class TestProjectLoader(unittest.TestCase):
 
         assert loaded_project.name == 'Project'
         assert loaded_project.actions == [ProjectAction('deploy', 'sudo make me a sandwich')]
+
+    def test_loading_project_with_one_test_package(self):
+        yaml_handler = mock.MagicMock()
+        filesystem = mock.MagicMock()
+        filesystem.find.return_value = []
+        filesystem.parent_directory.return_value = '.'
+        yaml_handler.load.return_value = {
+            'name': 'Project',
+            'test_packages': {'mocks': None},
+        }
+        loader = ProjectLoader(yaml_handler, filesystem)
+
+        project = loader.load()
+
+        assert project.name == 'Project'
+        assert Package(path='mocks') in project.test_packages
+        assert project.test_include_directories == ['.']

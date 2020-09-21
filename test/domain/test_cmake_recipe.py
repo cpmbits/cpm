@@ -372,6 +372,59 @@ class TestCMakeRecipe(unittest.TestCase):
             ')\n'
         )
 
+    def test_recipe_generation_with_one_test_suite_and_test_include_directories(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_with_sources('DeathStarBackend', ['source.cpp'])
+        project.test_include_directories = ['mocks', 'fakes']
+        project.tests = ['tests/test_suite.cpp']
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('build')
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'add_executable(DeathStarBackend main.cpp source.cpp)\n'
+            'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
+            'add_executable(test_suite tests/test_suite.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
+            'target_include_directories(test_suite PUBLIC mocks fakes)\n'
+            'add_custom_target(tests\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+        )
+
+    def test_recipe_generation_with_one_test_suite_and_test_sources(self):
+        filesystem = self.filesystemMockWithoutRecipeFiles()
+        project = _project_with_sources('DeathStarBackend', ['source.cpp'])
+        project.test_sources = ['mocks/mock.cpp', 'mocks/fake.cpp']
+        project.tests = ['tests/test_suite.cpp']
+        cmake_recipe = CMakeRecipe(filesystem)
+
+        cmake_recipe.generate(project)
+
+        filesystem.create_directory.assert_called_once_with('build')
+        filesystem.create_file.assert_called_once_with(
+            'CMakeLists.txt',
+
+            'cmake_minimum_required (VERSION 3.7)\n'
+            'project(DeathStarBackend)\n'
+            'include_directories()\n'
+            'add_executable(DeathStarBackend main.cpp source.cpp)\n'
+            'add_library(DeathStarBackend_object_library OBJECT source.cpp)\n'
+            'add_executable(test_suite tests/test_suite.cpp mocks/mock.cpp mocks/fake.cpp $<TARGET_OBJECTS:DeathStarBackend_object_library>)\n'
+            'set_target_properties(test_suite PROPERTIES COMPILE_FLAGS "-std=c++11 -g")\n'
+            'add_custom_target(tests\n'
+            '    COMMAND echo "> Done"\n'
+            '    DEPENDS test_suite\n'
+            ')\n'
+        )
+
     def test_recipe_is_updated_when_recipe_files_are_found(self):
         filesystem = self.filesystemMockWithRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
