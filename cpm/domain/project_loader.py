@@ -26,6 +26,10 @@ class ProjectLoader(object):
                 project.add_package(package)
                 project.add_include_directory(self.filesystem.parent_directory(package.path))
                 project.add_sources(package.sources)
+            for package in self.project_test_packages(description):
+                project.add_test_package(package)
+                project.add_test_include_directory(self.filesystem.parent_directory(package.path))
+                project.add_test_sources(package.sources)
             project.add_tests(self.test_suites())
             for target in self.described_targets(description):
                 project.add_target(target)
@@ -61,6 +65,11 @@ class ProjectLoader(object):
     def project_packages(self, description):
         for package in description.get('packages', []):
             yield self.load_package(package, description['packages'][package])
+        return []
+
+    def project_test_packages(self, description):
+        for package in description.get('test_packages', []):
+            yield self.load_package(package, description['test_packages'][package])
         return []
 
     def load_package(self, package, package_description):
