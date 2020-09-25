@@ -33,7 +33,7 @@ class CMakeRecipe(object):
         builder = cmake_builder.a_cmake() \
             .minimum_required('3.7') \
             .project(project.name) \
-            .include(project.include_directories)
+            .include(project.build.include_directories)
 
         self.__generate_build_rules(builder, project)
 
@@ -52,31 +52,31 @@ class CMakeRecipe(object):
             else:
                 object_libraries = []
             for executable, test_file in zip(self.test_executables, project.tests):
-                builder.add_executable(executable, [test_file] + project.test_sources, object_libraries) \
+                builder.add_executable(executable, [test_file] + project.test.sources, object_libraries) \
                     .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11', '-g'])
-                bits_with_sources = list(filter(lambda p: p.sources, project.bits))
-                link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
+                bits_with_sources = list(filter(lambda p: p.sources, project.build.bits))
+                link_libraries = [bit.name for bit in bits_with_sources] + project.build.link_options.libraries
                 if link_libraries:
                     builder.target_link_libraries(executable, link_libraries)
-                if project.test_include_directories:
-                    builder.target_include_directories(executable, project.test_include_directories)
+                if project.test.include_directories:
+                    builder.target_include_directories(executable, project.test.include_directories)
             builder.add_custom_target('tests', 'echo "> Done', self.test_executables)
 
     def __generate_build_rules(self, builder, project):
-        for package in project.packages:
+        for package in project.build.packages:
             if package.cflags:
                 builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
-        for bit in project.bits:
+        for bit in project.build.bits:
             self.__generate_bit_build_rules(builder, bit)
-        builder.add_executable(project.name, project.sources)
-        if project.compile_flags:
-            builder.set_target_properties(project.name, 'COMPILE_FLAGS', project.compile_flags)
+        builder.add_executable(project.name, project.build.sources)
+        if project.build.compile_flags:
+            builder.set_target_properties(project.name, 'COMPILE_FLAGS', project.build.compile_flags)
         self.__generate_link_libraries_rule(builder, project)
 
     def __generate_link_libraries_rule(self, builder, project):
-        bits_with_sources = list(filter(lambda p: p.sources, project.bits))
-        if project.link_options.libraries or bits_with_sources:
-            link_libraries = [bit.name for bit in bits_with_sources] + project.link_options.libraries
+        bits_with_sources = list(filter(lambda p: p.sources, project.build.bits))
+        if project.build.link_options.libraries or bits_with_sources:
+            link_libraries = [bit.name for bit in bits_with_sources] + project.build.link_options.libraries
             builder.target_link_libraries(project.name, link_libraries)
 
     def __generate_bit_build_rules(self, builder, bit):
@@ -87,7 +87,7 @@ class CMakeRecipe(object):
                 builder.set_source_files_properties(package.sources, 'COMPILE_FLAGS', package.cflags)
 
     def _sources_without_main(self, project):
-        return list(filter(lambda x: x != "main.cpp", project.sources))
+        return list(filter(lambda x: x != "main.cpp", project.build.sources))
 
     def build(self, project):
         self.run_compile_command(self.CMAKE_COMMAND, '-G', 'Ninja', '..')

@@ -1,9 +1,7 @@
 import os
+
 from cpm.domain.bit_loader import BitLoader
-from cpm.domain.project import ProjectAction
-from cpm.domain.project import Package
-from cpm.domain.project import Project
-from cpm.domain.project import Target
+from cpm.domain.project import Project, ProjectAction, CompileRecipe, Package, Target
 
 PROJECT_DESCRIPTOR_FILE = 'project.yaml'
 
@@ -19,32 +17,33 @@ class ProjectLoader(object):
             description = self.yaml_handler.load(f'{directory}/{PROJECT_DESCRIPTOR_FILE}')
             project = Project(description['name'])
             project.version = description.get('version', "0.1")
-            project.add_sources(['main.cpp'])
-            project.declared_bits = description.get('bits', {})
-            project.declared_test_bits = description.get('test_bits', {})
-            for package in self.project_packages(description):
-                project.add_package(package)
-                project.add_include_directory(self.filesystem.parent_directory(package.path))
-                project.add_sources(package.sources)
-            for package in self.project_test_packages(description):
-                project.add_test_package(package)
-                project.add_test_include_directory(self.filesystem.parent_directory(package.path))
-                project.add_test_sources(package.sources)
+            project.add_build_recipe(self.load_compile_recipe(description))
+            project.add_test_recipe(self.load_compile_recipe(description.get('test', {})))
+            project.build.add_sources(['main.cpp'])
+            for bit in self.load_local_bits():
+                project.build.add_bit(bit)
+                for directory in bit.include_directories:
+                    project.build.add_include_directory(directory)
             project.add_tests(self.test_suites())
             for target in self.described_targets(description):
                 project.add_target(target)
-            for bit in self.load_local_bits():
-                project.add_bit(bit)
-                for directory in bit.include_directories:
-                    project.add_include_directory(directory)
-            for library in self.link_libraries(description):
-                project.add_library(library)
-            project.add_compile_flags(self.compile_flags(description))
             for action in self.project_actions(description):
                 project.add_action(action)
             return project
         except FileNotFoundError:
             raise NotAChromosProject()
+
+    def load_compile_recipe(self, description):
+        compile_recipe = CompileRecipe()
+        compile_recipe.declared_bits = description.get('bits', {})
+        for package in self.project_packages(description):
+            compile_recipe.add_package(package)
+            compile_recipe.add_include_directory(self.filesystem.parent_directory(package.path))
+            compile_recipe.add_sources(package.sources)
+        for library in self.link_libraries(description):
+            compile_recipe.add_library(library)
+        compile_recipe.add_compile_flags(self.compile_flags(description))
+        return compile_recipe
 
     def described_targets(self, description):
         if 'targets' in description:

@@ -70,6 +70,7 @@ class TestCreationService(unittest.TestCase):
             './project.yaml',
             'name: AwesomeProject\n'
         )
+
     def test_creation_service_generates_default_sample_code_when_selected(self):
         filesystem = mock.MagicMock()
         project_loader = mock.MagicMock()
@@ -97,5 +98,5 @@ class TestCreationService(unittest.TestCase):
         project = creation_service.create(creation_options)
 
         assert project.name == 'AwesomeProject'
-        assert project.sources == ['main.cpp']
+        assert project.build.sources == ['main.cpp']
 

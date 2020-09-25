@@ -78,7 +78,7 @@ class TestProjectLoader(unittest.TestCase):
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
-        assert loaded_project.declared_bits == {
+        assert loaded_project.build.declared_bits == {
             'cest': '1.0'
         }
 
@@ -87,8 +87,8 @@ class TestProjectLoader(unittest.TestCase):
         filesystem = mock.MagicMock()
         yaml_handler.load.return_value = {
             'name': 'Project',
-            'test_bits': {
-                'cest': '1.0'
+            'test': {
+                'bits': {'cest': '1.0'}
             }
         }
         loader = ProjectLoader(yaml_handler, filesystem)
@@ -96,7 +96,7 @@ class TestProjectLoader(unittest.TestCase):
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
-        assert loaded_project.declared_test_bits == {
+        assert loaded_project.test.declared_bits == {
             'cest': '1.0'
         }
 
@@ -114,8 +114,8 @@ class TestProjectLoader(unittest.TestCase):
         project = loader.load()
 
         assert project.name == 'Project'
-        assert Package(path='cpm-hub') in project.packages
-        assert project.include_directories == ['.']
+        assert Package(path='cpm-hub') in project.build.packages
+        assert project.build.include_directories == ['.']
 
     def test_loading_project_with_one_package_with_cflags(self):
         yaml_handler = mock.MagicMock()
@@ -133,7 +133,7 @@ class TestProjectLoader(unittest.TestCase):
 
         project = loader.load()
 
-        assert Package(path='cpm-hub', cflags=['-std=c++11']) in project.packages
+        assert Package(path='cpm-hub', cflags=['-std=c++11']) in project.build.packages
 
     def test_loading_project_with_with_libraries_link_option(self):
         yaml_handler = mock.MagicMock()
@@ -149,7 +149,7 @@ class TestProjectLoader(unittest.TestCase):
 
         project = loader.load()
 
-        assert 'pthread' in project.link_options.libraries
+        assert 'pthread' in project.build.link_options.libraries
 
     def test_loading_project_with_with_global_compile_flags(self):
         yaml_handler = mock.MagicMock()
@@ -163,7 +163,7 @@ class TestProjectLoader(unittest.TestCase):
 
         project = loader.load()
 
-        assert '-g' in project.compile_flags
+        assert '-g' in project.build.compile_flags
 
     def test_loading_project_with_one_target(self):
         yaml_handler = mock.MagicMock()
@@ -198,8 +198,8 @@ class TestProjectLoader(unittest.TestCase):
         loaded_project = loader.load()
 
         assert loaded_project.name == 'Project'
-        assert loaded_project.bits == [Bit('cest')]
-        assert loaded_project.include_directories == ['bits/cest']
+        assert loaded_project.build.bits == [Bit('cest')]
+        assert loaded_project.build.include_directories == ['bits/cest']
 
     def test_loading_package_with_sources(self):
         filesystem = mock.MagicMock()
@@ -297,12 +297,12 @@ class TestProjectLoader(unittest.TestCase):
         filesystem.parent_directory.return_value = '.'
         yaml_handler.load.return_value = {
             'name': 'Project',
-            'test_packages': {'mocks': None},
+            'test': { 'packages': {'mocks': None} }
         }
         loader = ProjectLoader(yaml_handler, filesystem)
 
         project = loader.load()
 
         assert project.name == 'Project'
-        assert Package(path='mocks') in project.test_packages
-        assert project.test_include_directories == ['.']
+        assert Package(path='mocks') in project.test.packages
+        assert project.test.include_directories == ['.']
