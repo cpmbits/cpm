@@ -6,7 +6,7 @@ class BitPackager(object):
         self.filesystem = filesystem
 
     def pack(self, project, build_directory):
-        if not project.packages:
+        if not project.build.packages:
             raise PackagingFailure(cause='project contains no packages')
 
         if self.filesystem.directory_exists(build_directory):
@@ -14,7 +14,7 @@ class BitPackager(object):
 
         self.filesystem.create_directory(build_directory)
         self.filesystem.copy_file(PROJECT_DESCRIPTOR_FILE, f'{build_directory}/bit.yaml')
-        for package in project.packages:
+        for package in project.build.packages:
             self.filesystem.copy_directory(package.path, f'{build_directory}/{package.path}')
         self.filesystem.zip(build_directory, f'{project.name}')
         self.filesystem.remove_directory(build_directory)

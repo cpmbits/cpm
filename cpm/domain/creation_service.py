@@ -37,7 +37,7 @@ class CreationService:
         return project
 
     def generate_sample_code(self, project):
-        project.add_sources(['main.cpp'])
+        project.build.add_sources(['main.cpp'])
         self.filesystem.create_file(
             f'{project.name}/main.cpp',
             CPP_HELLO_WORLD

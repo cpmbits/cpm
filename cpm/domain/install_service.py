@@ -9,7 +9,7 @@ class InstallService(object):
 
     def install(self, name, version):
         project = self.project_loader.load()
-        if Bit(name, version) in project.bits:
+        if Bit(name, version) in project.build.bits:
             print(f'bit already installed: {name}:{version}')
             return
         self._log_install_or_upgrade(project, name, version)
@@ -19,7 +19,7 @@ class InstallService(object):
             self.install(bit_name, version)
 
     def _log_install_or_upgrade(self, project, name, version):
-        installed_bit = next((bit for bit in project.bits if bit.name == name), None)
+        installed_bit = next((bit for bit in project.build.bits if bit.name == name), None)
         if installed_bit:
             print(f'{"upgrading" if installed_bit.version < version else "downgrading"} {name}:{installed_bit.version} -> {version}')
         else:
@@ -27,9 +27,9 @@ class InstallService(object):
 
     def install_project_bits(self):
         project = self.project_loader.load()
-        for bit_name, version in project.declared_bits.items():
+        for bit_name, version in project.build.declared_bits.items():
             self.install(bit_name, version)
-        for bit_name, version in project.declared_test_bits.items():
+        for bit_name, version in project.test.declared_bits.items():
             self.install(bit_name, version)
 
 

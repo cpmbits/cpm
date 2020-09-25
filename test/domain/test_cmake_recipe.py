@@ -35,8 +35,8 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_target_link_libraries(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
-        project.add_library('pthread')
-        project.add_library('rt')
+        project.build.add_library('pthread')
+        project.build.add_library('rt')
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -55,8 +55,8 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_one_package(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
-        project.add_package(Package('package'))
-        project.add_include_directory('package')
+        project.build.add_package(Package('package'))
+        project.build.add_include_directory('package')
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -74,10 +74,10 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_one_package_with_global_compile_flags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
-        project.add_package(Package('package', sources=['package.cpp']))
-        project.add_include_directory('package')
-        project.add_sources(['package.cpp'])
-        project.compile_flags = ['-g']
+        project.build.add_package(Package('package', sources=['package.cpp']))
+        project.build.add_include_directory('package')
+        project.build.add_sources(['package.cpp'])
+        project.build.compile_flags = ['-g']
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -95,9 +95,9 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_one_package_with_cflags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
-        project.add_package(Package('package', cflags=['-std=c++11', '-DMACRO'], sources=['package.cpp']))
-        project.add_include_directory('package')
-        project.add_sources(['package.cpp'])
+        project.build.add_package(Package('package', cflags=['-std=c++11', '-DMACRO'], sources=['package.cpp']))
+        project.build.add_include_directory('package')
+        project.build.add_sources(['package.cpp'])
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -115,11 +115,11 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_many_packages_with_cflags(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_without_sources('DeathStarBackend')
-        project.add_package(Package('package1', cflags=['-std=c++11'], sources=['package1.cpp']))
-        project.add_package(Package('package2', cflags=['-Wall'], sources=['package2.cpp']))
-        project.add_include_directory('package')
-        project.add_sources(['package1.cpp'])
-        project.add_sources(['package2.cpp'])
+        project.build.add_package(Package('package1', cflags=['-std=c++11'], sources=['package1.cpp']))
+        project.build.add_package(Package('package2', cflags=['-Wall'], sources=['package2.cpp']))
+        project.build.add_include_directory('package')
+        project.build.add_sources(['package1.cpp'])
+        project.build.add_sources(['package2.cpp'])
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -194,7 +194,7 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_one_bit_and_link_libraries(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_one_bit('DeathStarBackend', sources=['bit.cpp'], cflags=['-DDEFINE'])
-        project.add_library('boost')
+        project.build.add_library('boost')
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -268,7 +268,7 @@ class TestCMakeRecipe(unittest.TestCase):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_one_bit('DeathStarBackend', ['bit.cpp'])
         project.tests = ['tests/test_suite.cpp']
-        project.add_library('boost')
+        project.build.add_library('boost')
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -323,8 +323,8 @@ class TestCMakeRecipe(unittest.TestCase):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_sources('DeathStarBackend', ['source.cpp'])
         project.tests = ['tests/test_suite.cpp']
-        project.add_library('pthread')
-        project.add_library('rt')
+        project.build.add_library('pthread')
+        project.build.add_library('rt')
         cmake_recipe = CMakeRecipe(filesystem)
 
         cmake_recipe.generate(project)
@@ -375,7 +375,7 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_one_test_suite_and_test_include_directories(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_sources('DeathStarBackend', ['source.cpp'])
-        project.test_include_directories = ['mocks', 'fakes']
+        project.test.include_directories = ['mocks', 'fakes']
         project.tests = ['tests/test_suite.cpp']
         cmake_recipe = CMakeRecipe(filesystem)
 
@@ -402,7 +402,7 @@ class TestCMakeRecipe(unittest.TestCase):
     def test_recipe_generation_with_one_test_suite_and_test_sources(self):
         filesystem = self.filesystemMockWithoutRecipeFiles()
         project = _project_with_sources('DeathStarBackend', ['source.cpp'])
-        project.test_sources = ['mocks/mock.cpp', 'mocks/fake.cpp']
+        project.test.sources = ['mocks/mock.cpp', 'mocks/fake.cpp']
         project.tests = ['tests/test_suite.cpp']
         cmake_recipe = CMakeRecipe(filesystem)
 
@@ -615,21 +615,21 @@ class TestCMakeRecipe(unittest.TestCase):
 
 def _project_without_sources(name):
     project = Project(name)
-    project.sources = ['main.cpp']
+    project.build.sources = ['main.cpp']
     return project
 
 
 def _project_with_one_bit(name, sources=[], cflags=[]):
     project = Project(name)
-    project.sources = ['main.cpp']
+    project.build.sources = ['main.cpp']
     bit = Bit('cest')
     bit.add_package(Package('bits/cest', sources=sources, cflags=cflags))
     bit.add_sources(sources)
-    project.add_bit(bit)
+    project.build.add_bit(bit)
     return project
 
 
 def _project_with_sources(name, sources):
     project = Project(name)
-    project.sources = ['main.cpp'] + sources
+    project.build.sources = ['main.cpp'] + sources
     return project

@@ -19,7 +19,7 @@ class TestBitPackager(unittest.TestCase):
         filesystem.directory_exists.return_value = True
         packager = BitPackager(filesystem)
         project = Project('cest')
-        project.add_package(Package('fakeit'))
+        project.build.add_package(Package('fakeit'))
 
         self.assertRaises(PackagingFailure, packager.pack, project, 'dist')
 
@@ -28,8 +28,8 @@ class TestBitPackager(unittest.TestCase):
         filesystem.directory_exists.return_value = False
         packager = BitPackager(filesystem)
         project = Project('cest')
-        project.add_package(Package('api'))
-        project.add_package(Package('domain'))
+        project.build.add_package(Package('api'))
+        project.build.add_package(Package('domain'))
 
         packager.pack(project, 'dist')
 

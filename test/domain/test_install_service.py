@@ -89,7 +89,7 @@ class TestInstallService(unittest.TestCase):
         bit_installer = MagicMock()
         bit_download = MagicMock()
         project = Project('Project')
-        project.declared_bits = {
+        project.build.declared_bits = {
             'cest': '1.0',
             'fakeit': '1.0',
         }
@@ -110,7 +110,7 @@ class TestInstallService(unittest.TestCase):
         bit_installer = MagicMock()
         bit_download = MagicMock()
         project = Project('Project')
-        project.declared_test_bits = {
+        project.test.declared_bits = {
             'cest': '1.0',
             'fakeit': '1.0',
         }
@@ -130,7 +130,7 @@ class TestInstallService(unittest.TestCase):
         cpm_hub_connector = MagicMock()
         bit_installer = MagicMock()
         project = Project('Project')
-        project.add_bit(Bit('cest', '1.0'))
+        project.build.add_bit(Bit('cest', '1.0'))
         project_loader.load.return_value = project
         service = InstallService(project_loader, bit_installer, cpm_hub_connector)
 
@@ -143,7 +143,7 @@ class TestInstallService(unittest.TestCase):
         cpm_hub_connector = MagicMock()
         bit_installer = MagicMock()
         project = Project('Project')
-        project.add_bit(Bit('cest', '1.0'))
+        project.build.add_bit(Bit('cest', '1.0'))
         project_loader.load.return_value = project
         service = InstallService(project_loader, bit_installer, cpm_hub_connector)
 
