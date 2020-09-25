@@ -55,7 +55,7 @@ class CMakeRecipe(object):
                 builder.add_executable(executable, [test_file] + project.test.sources, object_libraries) \
                     .set_target_properties(executable, 'COMPILE_FLAGS', ['-std=c++11', '-g'])
                 bits_with_sources = list(filter(lambda p: p.sources, project.build.bits))
-                link_libraries = [bit.name for bit in bits_with_sources] + project.build.link_options.libraries
+                link_libraries = [bit.name for bit in bits_with_sources] + project.build.link_options.libraries + project.test.link_options.libraries
                 if link_libraries:
                     builder.target_link_libraries(executable, link_libraries)
                 if project.test.include_directories:
