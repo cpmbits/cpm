@@ -4,6 +4,7 @@ import importlib
 import sys
 import pkgutil
 import pkg_resources
+import datetime
 
 import cpm.api
 from cpm.api.project_actions import discover_project_actions
@@ -34,9 +35,13 @@ def main():
         print(' '.join(actions.keys()))
         sys.exit(0)
 
+    start_time = datetime.datetime.now()
+
     result = actions[args.action].execute(sys.argv[2:])
 
-    finish(result)
+    elapsed_time = datetime.datetime.now() - start_time
+
+    finish(result, elapsed_time)
 
 
 def module_name(api_action):
@@ -47,6 +52,13 @@ def api_actions():
     return list(pkgutil.iter_modules(cpm.api.__path__, cpm.api.__name__+'.'))
 
 
-def finish(result):
-    print(f'CPM: {result.message}')
+def finish(result, elapsed_time):
+    print(f'CPM: {result.message}  (took {__format(elapsed_time)})')
     sys.exit(result.status_code)
+
+
+def __format(elapsed_time):
+    if elapsed_time.seconds >= 60:
+        return '%dm %d.%ds' % (elapsed_time.seconds/60, elapsed_time.seconds % 60, elapsed_time.microseconds/1000)
+    else:
+        return '%d.%ds' % (elapsed_time.seconds, elapsed_time.microseconds/1000)
