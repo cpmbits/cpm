@@ -7,11 +7,20 @@ class TestService(object):
         if not project.tests:
             raise NoTestsFound()
         recipe.generate(project)
-        recipe.build_tests()
         if not patterns:
+            recipe.build_tests()
             recipe.run_all_tests()
         else:
+            self.build_matching_tests(recipe, patterns)
             self.run_matching_tests(recipe, patterns)
+
+    def build_matching_tests(self, recipe, patterns):
+        tests = list(filter(
+            lambda exe: any(pattern in exe for pattern in patterns),
+            recipe.test_executables
+        ))
+        for test in tests:
+            recipe.build_test(test)
 
     def run_matching_tests(self, recipe, patterns):
         tests = list(filter(
