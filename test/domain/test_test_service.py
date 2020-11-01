@@ -52,7 +52,7 @@ class TestTestService(unittest.TestCase):
 
     def test_service_runs_one_test_when_one_executable_matches_one_pattern(self):
         test_recipe = mock.MagicMock()
-        test_recipe.test_executables = ['test_one']
+        test_recipe.test_executables = ['test_one', 'test_two']
         project_loader = mock.MagicMock()
         project = Project('ProjectName')
         project.tests = ['test']
@@ -62,6 +62,7 @@ class TestTestService(unittest.TestCase):
         service.run_tests(test_recipe, patterns=['test_one'])
 
         test_recipe.run_all_tests.assert_not_called()
+        test_recipe.build_test.assert_called_once_with('test_one')
         test_recipe.run_tests.assert_called_once_with(['test_one'])
 
     def test_service_runs_no_tests_when_one_executable_doesnt_match_one_pattern(self):

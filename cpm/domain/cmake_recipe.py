@@ -102,6 +102,10 @@ class CMakeRecipe(object):
         self.run_compile_command(self.CMAKE_COMMAND, '-G', 'Ninja', '..')
         self.run_compile_command('ninja', 'tests')
 
+    def build_test(self, test):
+        self.run_compile_command(self.CMAKE_COMMAND, '-G', 'Ninja', '..')
+        self.run_compile_command('ninja', test)
+
     def run_all_tests(self):
         self.run_tests(self.test_executables)
 
