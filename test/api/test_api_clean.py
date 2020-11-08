@@ -2,7 +2,7 @@ import unittest
 from mock import MagicMock
 
 from cpm.api.clean import clean_project
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 
 
 class TestApiClean(unittest.TestCase):

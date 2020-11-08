@@ -5,7 +5,7 @@ from cpm.domain.project import Project
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 
 
 class TestCreationService(unittest.TestCase):

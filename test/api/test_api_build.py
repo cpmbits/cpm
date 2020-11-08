@@ -4,7 +4,7 @@ import mock
 from cpm.api.build import build_project
 from cpm.domain.cmake_recipe import CompilationError
 from cpm.domain.compilation_service import DockerImageNotFound
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 
 
 class TestApiBuild(unittest.TestCase):

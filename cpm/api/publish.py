@@ -3,11 +3,11 @@ import argparse
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
-from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.domain.bit_packager import BitPackager
 from cpm.domain.publish_service import PublishService
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_hub_connector_v1 import InvalidCpmHubUrl
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure

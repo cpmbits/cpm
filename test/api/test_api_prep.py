@@ -2,7 +2,7 @@ import unittest
 import mock
 
 from cpm.api.prep import prep_project
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 
 
 class TestApiUpdate(unittest.TestCase):

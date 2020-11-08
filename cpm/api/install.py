@@ -6,8 +6,8 @@ from cpm.api.result import FAIL
 from cpm.domain.install_service import BitNotFound, InstallService
 from cpm.domain.bit_installer import BitInstaller
 from cpm.domain.bit_loader import BitLoader
-from cpm.domain.project_loader import NotAChromosProject
-from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_user_configuration import CpmUserConfiguration
 from cpm.infrastructure.filesystem import Filesystem

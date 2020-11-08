@@ -1,4 +1,4 @@
-from cpm.domain.project_loader import PROJECT_DESCRIPTOR_FILE
+from cpm.domain.project_loader_v1 import PROJECT_DESCRIPTOR_FILE
 
 
 class BitPackager(object):

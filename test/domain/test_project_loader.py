@@ -5,9 +5,9 @@ import os
 
 from cpm.domain.bit import Bit
 from cpm.domain.project import Package, ProjectAction
-from cpm.domain.project_loader import NotAChromosProject
-from cpm.domain.project_loader import PROJECT_DESCRIPTOR_FILE
-from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import PROJECT_DESCRIPTOR_FILE
+from cpm.domain.project_loader_v1 import ProjectLoader
 
 
 class TestProjectLoader(unittest.TestCase):
@@ -181,7 +181,7 @@ class TestProjectLoader(unittest.TestCase):
         assert loaded_project.name == 'Project'
         assert 'ubuntu' in loaded_project.targets
 
-    @mock.patch('cpm.domain.project_loader.BitLoader')
+    @mock.patch('cpm.domain.project_loader_v1.BitLoader')
     def test_loading_project_with_one_bit(self, BitLoader):
         filesystem = mock.MagicMock()
         bit_loader = mock.MagicMock()
@@ -237,7 +237,7 @@ class TestProjectLoader(unittest.TestCase):
         assert bits == []
         filesystem.list_directories.assert_called_once_with(f'{os.getcwd()}/bits')
 
-    @mock.patch('cpm.domain.project_loader.BitLoader')
+    @mock.patch('cpm.domain.project_loader_v1.BitLoader')
     def test_loading_local_bits_when_bits_directory_contains_one_bit(self, BitLoader):
         filesystem = mock.MagicMock()
         yaml_handler = mock.MagicMock()
@@ -254,7 +254,7 @@ class TestProjectLoader(unittest.TestCase):
         filesystem.list_directories.assert_called_once_with(f'{os.getcwd()}/bits')
         bit_loader.load_from.assert_called_once_with('bits/cest')
 
-    @mock.patch('cpm.domain.project_loader.BitLoader')
+    @mock.patch('cpm.domain.project_loader_v1.BitLoader')
     def test_loading_local_bits_when_bits_directory_contains_many_bits(self, BitLoader):
         filesystem = mock.MagicMock()
         yaml_handler = mock.MagicMock()

@@ -6,8 +6,8 @@ from cpm.api.result import FAIL
 from cpm.domain.compilation_service import CompilationService
 from cpm.domain.compilation_service import DockerImageNotFound
 from cpm.domain.cmake_recipe import CMakeRecipe, CompilationError
-from cpm.domain.project_loader import NotAChromosProject
-from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 

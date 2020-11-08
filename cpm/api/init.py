@@ -5,7 +5,7 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
-from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 

@@ -3,7 +3,7 @@ import mock
 
 from cpm.domain.clean_service import CleanService
 from cpm.domain.cmake_recipe import BUILD_DIRECTORY
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 
 
 class TestCleanService(unittest.TestCase):

@@ -10,8 +10,8 @@ class DeclaredBit:
 @dataclass
 class Package:
     path: str
-    sources: list = field(default_factory=list)
     cflags: list = field(default_factory=list)
+    sources: list = field(default_factory=list)
 
 
 @dataclass
@@ -23,3 +23,6 @@ class CompilationPlan:
     ldflags: list = field(default_factory=list)
     libraries: list = field(default_factory=list)
     include_directories: list = field(default_factory=list)
+    targets: list = field(default_factory=list)     # TODO: Targets
+
+# yaml --load--> parsed yaml --parse--> project plan --digest--> project

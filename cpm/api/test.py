@@ -3,12 +3,12 @@ import argparse
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
-from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.domain.test_service import TestService
 from cpm.domain.cmake_recipe import CMakeRecipe
 from cpm.domain.cmake_recipe import TestsFailed
 from cpm.domain.cmake_recipe import CompilationError
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 from cpm.domain.test_service import NoTestsFound
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler

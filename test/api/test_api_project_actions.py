@@ -5,7 +5,7 @@ from mock import patch
 
 from cpm.api.project_actions import discover_project_actions
 from cpm.domain.project import Project, ProjectAction
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotAChromosProject
 from cpm.infrastructure.project_action_runner import ProjectActionRunner
 
 

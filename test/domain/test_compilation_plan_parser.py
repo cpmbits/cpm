@@ -1,13 +1,13 @@
 import unittest
 
-from cpm.domain.project_descriptor_parser import compilation_plan_parser
+from cpm.domain.project_loader import project_descriptor_parser
 from cpm.domain.project.compilation_plan import CompilationPlan, DeclaredBit, Package
 
 
 class TestCompilationPlanParser(unittest.TestCase):
     def test_parsing_empty_compilation_plan(self):
         plan_description = {}
-        compilation_plan = compilation_plan_parser.parse(plan_description)
+        compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
         assert compilation_plan == CompilationPlan()
 
     def test_parsing_compilation_plan_with_declared_bits(self):
@@ -17,7 +17,7 @@ class TestCompilationPlanParser(unittest.TestCase):
                 'base64': '3.22'
             }
         }
-        compilation_plan = compilation_plan_parser.parse(plan_description)
+        compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
         assert compilation_plan.bits == [DeclaredBit('sqlite3', '1.0'), DeclaredBit('base64', '3.22')]
 
     def test_parsing_compilation_plan_with_declared_packages(self):
@@ -27,7 +27,7 @@ class TestCompilationPlanParser(unittest.TestCase):
                 'cpmhub/http': {}
             }
         }
-        compilation_plan = compilation_plan_parser.parse(plan_description)
+        compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
         assert compilation_plan.packages == [Package('cpmhub/bits'), Package('cpmhub/http')]
 
     def test_parsing_compilation_plan_with_declared_packages_with_cflags(self):
@@ -38,7 +38,7 @@ class TestCompilationPlanParser(unittest.TestCase):
                 },
             }
         }
-        compilation_plan = compilation_plan_parser.parse(plan_description)
+        compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
         assert compilation_plan.packages == [Package('cpmhub/bits', cflags=['-O2'])]
 
     def test_parsing_compilation_plan_with_flags_and_libraries(self):
@@ -47,7 +47,7 @@ class TestCompilationPlanParser(unittest.TestCase):
             'cppflags': ['-std=c++11'],
             'libraries': ['pthread']
         }
-        compilation_plan = compilation_plan_parser.parse(plan_description)
+        compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
         assert compilation_plan.cflags == ['-O0']
         assert compilation_plan.cppflags == ['-std=c++11']
         assert compilation_plan.libraries == ['pthread']
