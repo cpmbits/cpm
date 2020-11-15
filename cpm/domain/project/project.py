@@ -1,21 +1,38 @@
 from dataclasses import dataclass, field
 
-from cpm.domain.project.compilation_plan import CompilationPlan
-
 
 @dataclass
-class ProjectInformation:
-    name: str = ''
-    version: str = ''
-    description: str = ''
+class Package:
+    path: str
+    sources: list = field(default_factory=list)
+    cflags: list = field(default_factory=list)
+    cppflags: list = field(default_factory=list)
+    ldflags: list = field(default_factory=list)
 
 
 @dataclass
 class Target:
     name: str
+    executable: str = ''
+    main: str = 'main.cpp'
     image: str = ''
-    build: CompilationPlan = field(default_factory=CompilationPlan)
-    test: CompilationPlan = field(default_factory=CompilationPlan)
+    packages: list = field(default_factory=list)
+    include_directories: list = field(default_factory=list)
+    cflags: list = field(default_factory=list)
+    cppflags: list = field(default_factory=list)
+    ldflags: list = field(default_factory=list)
+
+
+@dataclass
+class Test:
+    name: str
+    target: Target
+    main: str
+    packages: list = field(default_factory=list)
+    include_directories: list = field(default_factory=list)
+    cflags: list = field(default_factory=list)
+    cppflags: list = field(default_factory=list)
+    ldflags: list = field(default_factory=list)
 
 
 @dataclass
@@ -23,6 +40,5 @@ class Project:
     name: str = ''
     version: str = ''
     description: str = ''
-    build: CompilationPlan = field(default_factory=CompilationPlan)
-    test: CompilationPlan = field(default_factory=CompilationPlan)
-    targets: dict = field(default_factory=dict)
+    targets: list = field(default_factory=list)
+    tests: list = field(default_factory=list)

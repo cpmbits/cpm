@@ -3,24 +3,22 @@ import argparse
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
+from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.compilation_service import CompilationService
 from cpm.domain.compilation_service import DockerImageNotFound
-from cpm.domain.cmake_recipe import CMakeRecipe, CompilationError
-from cpm.domain.project_loader_v1 import NotAChromosProject
-from cpm.domain.project_loader_v1 import ProjectLoader
+from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project_builder import ProjectBuilder, BuildError
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 
 
-def build_project(compilation_service, recipe, target='host'):
+def build_project(compilation_service, target='default'):
     try:
-        if target == 'host':
-            compilation_service.build(recipe)
-        else:
-            compilation_service.build_target(target)
+        compilation_service.build(target)
     except NotAChromosProject:
         return Result(FAIL, f'error: not a Chromos project')
-    except CompilationError:
+    except BuildError:
         return Result(FAIL, f'error: compilation failed')
     except DockerImageNotFound as e:
         return Result(FAIL, f'error: docker image {e.image_name} not found for target {target}')
@@ -30,16 +28,16 @@ def build_project(compilation_service, recipe, target='host'):
 
 def execute(argv):
     create_parser = argparse.ArgumentParser(prog='cpm build', description='Chromos Package Manager', add_help=False)
-    create_parser.add_argument('target', nargs='?', default='host')
+    create_parser.add_argument('target', nargs='?', default='default')
     args = create_parser.parse_args(argv)
 
     filesystem = Filesystem()
     yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    service = CompilationService(loader)
-    recipe = CMakeRecipe(filesystem)
+    project_loader = ProjectLoader(yaml_handler, filesystem)
+    cmakelists_builder = CMakeListsBuilder()
+    project_builder = ProjectBuilder(filesystem)
+    service = CompilationService(project_loader, cmakelists_builder, project_builder)
 
-    result = build_project(service, recipe, args.target)
+    result = build_project(service, args.target)
 
     return result
-

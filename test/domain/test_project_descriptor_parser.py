@@ -1,7 +1,6 @@
 import unittest
 
-from cpm.domain.project.compilation_plan import Package
-from cpm.domain.project.project import Project, Target
+from cpm.domain.project.project_description import ProjectDescription, TargetDescription, PackageDescription
 from cpm.domain.project_loader import project_descriptor_parser
 
 
@@ -13,11 +12,11 @@ class TestProjectDescriptorParser(unittest.TestCase):
             'description': 'kill all humans'
         }
         project = project_descriptor_parser.parse(project_description)
-        assert project == Project(
+        assert project == ProjectDescription(
             name='bender bender rodriguez',
             version='1.0',
             description='kill all humans',
-            targets={'default': Target('default')})
+            targets={'default': TargetDescription('default')})
 
     def test_parse_project_descriptor_with_build_compilation_plan(self):
         project_description = {
@@ -32,7 +31,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
             }
         }
         project = project_descriptor_parser.parse(project_description)
-        assert project.build.packages == [Package('cpmhub/bits'), Package('cpmhub/http')]
+        assert project.build.packages == [PackageDescription('cpmhub/bits'), PackageDescription('cpmhub/http')]
 
     def test_parse_project_descriptor_with_test_compilation_plan(self):
         project_description = {
@@ -47,7 +46,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
             }
         }
         project = project_descriptor_parser.parse(project_description)
-        assert project.test.packages == [Package('cpmhub/bits'), Package('cpmhub/http')]
+        assert project.test.packages == [PackageDescription('cpmhub/bits'), PackageDescription('cpmhub/http')]
 
     def test_parse_project_descriptor_with_default_target_image(self):
         project_description = {
@@ -62,7 +61,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
         }
         project = project_descriptor_parser.parse(project_description)
         assert project.targets == {
-            'default': Target('default', image='cpmbits/bender')
+            'default': TargetDescription('default', image='cpmbits/bender')
         }
 
     def test_parse_project_descriptor_with_target_build_compilation_plan(self):
@@ -82,7 +81,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
             }
         }
         project = project_descriptor_parser.parse(project_description)
-        assert project.targets['arduino'].build.packages == [Package('arduino')]
+        assert project.targets['arduino'].build.packages == [PackageDescription('arduino')]
 
     def test_parse_project_descriptor_with_target_test_compilation_plan(self):
         project_description = {
@@ -101,4 +100,4 @@ class TestProjectDescriptorParser(unittest.TestCase):
             }
         }
         project = project_descriptor_parser.parse(project_description)
-        assert project.targets['arduino'].test.packages == [Package('arduino')]
+        assert project.targets['arduino'].test.packages == [PackageDescription('arduino')]

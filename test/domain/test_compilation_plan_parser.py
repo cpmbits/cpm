@@ -1,7 +1,7 @@
 import unittest
 
 from cpm.domain.project_loader import project_descriptor_parser
-from cpm.domain.project.compilation_plan import CompilationPlan, DeclaredBit, Package
+from cpm.domain.project.project_description import DeclaredBit, CompilationPlan, PackageDescription
 
 
 class TestCompilationPlanParser(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestCompilationPlanParser(unittest.TestCase):
             }
         }
         compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
-        assert compilation_plan.packages == [Package('cpmhub/bits'), Package('cpmhub/http')]
+        assert compilation_plan.packages == [PackageDescription('cpmhub/bits'), PackageDescription('cpmhub/http')]
 
     def test_parsing_compilation_plan_with_declared_packages_with_cflags(self):
         plan_description = {
@@ -39,7 +39,7 @@ class TestCompilationPlanParser(unittest.TestCase):
             }
         }
         compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
-        assert compilation_plan.packages == [Package('cpmhub/bits', cflags=['-O2'])]
+        assert compilation_plan.packages == [PackageDescription('cpmhub/bits', cflags=['-O2'])]
 
     def test_parsing_compilation_plan_with_flags_and_libraries(self):
         plan_description = {

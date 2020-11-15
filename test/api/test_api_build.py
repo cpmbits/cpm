@@ -2,9 +2,9 @@ import unittest
 import mock
 
 from cpm.api.build import build_project
-from cpm.domain.cmake_recipe import CompilationError
 from cpm.domain.compilation_service import DockerImageNotFound
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_builder import BuildError
+from cpm.domain.project_loader import NotAChromosProject
 
 
 class TestApiBuild(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestApiBuild(unittest.TestCase):
     def test_build_fails_when_compilation_fails(self):
         recipe = mock.MagicMock()
         compilation_service = mock.MagicMock()
-        compilation_service.build.side_effect = CompilationError()
+        compilation_service.build.side_effect = BuildError()
 
         result = build_project(compilation_service, recipe)
 
@@ -51,7 +51,7 @@ class TestApiBuild(unittest.TestCase):
         compilation_service = mock.MagicMock()
         recipe = mock.MagicMock()
 
-        result = build_project(compilation_service, recipe, target='raspberrypi4:64')
+        result = build_project(compilation_service, target='raspberrypi4:64')
 
         assert result.status_code == 0
-        compilation_service.build_target.assert_called_once_with('raspberrypi4:64')
+        compilation_service.build.assert_called_once_with('raspberrypi4:64')
