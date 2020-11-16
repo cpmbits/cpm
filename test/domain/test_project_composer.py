@@ -19,8 +19,8 @@ class TestProjectComposer(unittest.TestCase):
         assert project.version == '1.0'
         assert project.description == 'I want to believe'
         assert len(project.targets) == 1
-        assert project.targets[0].name == 'default'
-        assert project.targets[0].main == 'main.cpp'
+        assert project.targets['default'].name == 'default'
+        assert project.targets['default'].main == 'main.cpp'
 
     def test_should_compose_project_from_project_description_with_one_build_package(self):
         yaml_load = {
@@ -36,10 +36,10 @@ class TestProjectComposer(unittest.TestCase):
         filesystem.parent_directory.return_value = '.'
         project_description = project_descriptor_parser.parse(yaml_load)
         project = project_composer.compose(project_description, filesystem)
-        assert len(project.targets[0].packages) == 1
-        assert project.targets[0].packages[0].path == 'shaders'
-        assert project.targets[0].packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
-        assert project.targets[0].include_directories == ['.']
+        assert len(project.targets['default'].packages) == 1
+        assert project.targets['default'].packages[0].path == 'shaders'
+        assert project.targets['default'].packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
+        assert project.targets['default'].include_directories == ['.']
 
     def test_should_compose_project_from_project_description_with_one_test(self):
         yaml_load = {

@@ -10,7 +10,7 @@ def compose(project_description, filesystem):
 
 def compose_target(target_name, project_description, filesystem, project):
     target = Target(target_name)
-    project.targets.append(target)
+    project.targets[target_name] = target
     for package_description in project_description.build.packages:
         package = Package(package_description.path)
         package.sources = filesystem.find(package.path, '*.cpp') + filesystem.find(package.path, '*.c')
@@ -21,6 +21,6 @@ def compose_target(target_name, project_description, filesystem, project):
 def compose_tests(target_name, project_description, filesystem, project):
     for test_file in filesystem.find('tests', 'test_*.cpp'):
         name = test_file.split('/')[-1].split('.')[0]
-        target = next(target for target in project.targets if target.name == target_name)
+        target = project.targets[target_name]
         test = Test(name, target, test_file)
         project.tests.append(test)

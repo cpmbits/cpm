@@ -40,5 +40,5 @@ class Project:
     name: str = ''
     version: str = ''
     description: str = ''
-    targets: list = field(default_factory=list)
+    targets: dict = field(default_factory=dict)
     tests: list = field(default_factory=list)

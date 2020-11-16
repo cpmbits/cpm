@@ -45,6 +45,7 @@ class ProjectDescription:
     name: str = ''
     version: str = ''
     description: str = ''
+    bits: list = field(default_factory=list)
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     targets: dict = field(default_factory=dict)

@@ -8,9 +8,7 @@ class CMakeListsBuilder(object):
             cmakelists_file.write(self.contents)
 
     def build_contents(self, project, target_name):
-        print(target_name)
-        print(project.targets)
-        target = next(target for target in project.targets if target.name == target_name)
+        target = project.targets[target_name]
         self.minimum_required('3.7')
         self.project(project.name)
         self.add_executable(project.name, [target.main])
