@@ -11,11 +11,13 @@ def compose(project_description, filesystem):
 def compose_target(target_name, project_description, filesystem, project):
     target = Target(target_name)
     project.targets[target_name] = target
+    target.cflags = project_description.build.cflags
     for package_description in project_description.build.packages:
         package = Package(package_description.path)
         package.sources = filesystem.find(package.path, '*.cpp') + filesystem.find(package.path, '*.c')
+        package.cflags = package_description.cflags
         target.packages.append(package)
-        target.include_directories.append(filesystem.parent_directory(package.path))
+        target.include_directories.add(filesystem.parent_directory(package.path))
 
 
 def compose_tests(target_name, project_description, filesystem, project):

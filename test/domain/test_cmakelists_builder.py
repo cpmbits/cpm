@@ -1,8 +1,7 @@
 import unittest
 
-import io
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
-from cpm.domain.project.project import Project, Target
+from cpm.domain.project.project import Project, Target, Package
 
 
 def a_project(name):
@@ -14,16 +13,19 @@ class TestCmakelistsBuilder(unittest.TestCase):
         cmakelists_builder = CMakeListsBuilder()
         project = a_project('Project') \
             .with_target('default') \
-            .with_include_directories('default') \
+            .with_cflags(['-std=c++11']) \
+            .with_package('package', ['file.cpp', 'file.c'], ['-DHOLA']) \
             .project
 
         cmakelists_content = cmakelists_builder.build_contents(project, 'default')
 
         assert 'cmake_minimum_required (VERSION 3.7)' in cmakelists_content
         assert 'project(Project)' in cmakelists_content
-        assert 'add_executable(Project main.cpp)' in cmakelists_content
-        assert 'add_executable(Project main.cpp)' in cmakelists_content
-        # assert 'include_directories(cpm-hub)' in cmakelists_content
+        assert 'add_library(package_object_library OBJECT file.cpp file.c)' in cmakelists_content
+        assert 'set_target_properties(package_object_library PROPERTIES COMPILE_FLAGS "-DHOLA")' in cmakelists_content
+        assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
+        assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
+        assert 'include_directories(package)' in cmakelists_content
 
 
 class TestProjectBuilder:
@@ -37,6 +39,14 @@ class TestProjectBuilder:
         self.project.targets[target_name] = target
         return self
 
-    def with_include_directories(self, directories):
-        target = None
+    def with_cflags(self, cflags):
+        self.project.targets[self.target_name].cflags = cflags
+        return self
+
+    def with_package(self, path, sources, cflags):
+        package = Package(path)
+        package.sources = sources
+        package.cflags = cflags
+        self.project.targets[self.target_name].packages.append(package)
+        self.project.targets[self.target_name].include_directories.add(path)
         return self

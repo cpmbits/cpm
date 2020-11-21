@@ -27,8 +27,11 @@ class TestProjectComposer(unittest.TestCase):
             'name': 'HalfLife3',
             'build': {
                 'packages': {
-                    'shaders': {}
-                }
+                    'shaders': {
+                        'cflags': ['-DUSE_PORTAL_GUN']
+                    }
+                },
+                'cflags': ['-std=c++11']
             }
         }
         filesystem = MagicMock()
@@ -39,7 +42,9 @@ class TestProjectComposer(unittest.TestCase):
         assert len(project.targets['default'].packages) == 1
         assert project.targets['default'].packages[0].path == 'shaders'
         assert project.targets['default'].packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
-        assert project.targets['default'].include_directories == ['.']
+        assert project.targets['default'].packages[0].cflags == ['-DUSE_PORTAL_GUN']
+        assert project.targets['default'].cflags == ['-std=c++11']
+        assert project.targets['default'].include_directories == {'.'}
 
     def test_should_compose_project_from_project_description_with_one_test(self):
         yaml_load = {

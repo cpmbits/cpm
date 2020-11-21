@@ -25,13 +25,17 @@ class TestProjectDescriptorParser(unittest.TestCase):
             'description': 'kill all humans',
             'build': {
                 'packages': {
-                    'cpmhub/bits': {},
-                    'cpmhub/http': {}
-                }
+                    'cpmhub/bits': {
+                        'cflags': ['-DHOLA']
+                    },
+                    'cpmhub/http': None
+                },
+                'cflags': ['-std=c++11']
             }
         }
         project = project_descriptor_parser.parse(project_description)
-        assert project.build.packages == [PackageDescription('cpmhub/bits'), PackageDescription('cpmhub/http')]
+        assert project.build.packages == [PackageDescription('cpmhub/bits', cflags=['-DHOLA']), PackageDescription('cpmhub/http')]
+        assert project.build.cflags == ['-std=c++11']
 
     def test_parse_project_descriptor_with_test_compilation_plan(self):
         project_description = {

@@ -11,8 +11,17 @@ class CMakeListsBuilder(object):
         target = project.targets[target_name]
         self.minimum_required('3.7')
         self.project(project.name)
-        self.add_executable(project.name, [target.main])
+        for package in target.packages:
+            package_library_name = self.object_library_name(package.path)
+            self.add_object_library(package_library_name, package.sources)
+            self.set_target_properties(package_library_name, 'COMPILE_FLAGS', package.cflags)
+        self.add_executable(project.name, [target.main], [self.object_library_name(package.path) for package in target.packages])
+        self.set_target_properties(project.name, 'COMPILE_FLAGS', target.cflags)
+        self.include_directories(target.include_directories)
         return self.contents
+
+    def object_library_name(self, package_path):
+        return f'{package_path}_object_library'
 
     def minimum_required(self, version):
         self.contents += f'cmake_minimum_required (VERSION {version})\n'
@@ -20,7 +29,7 @@ class CMakeListsBuilder(object):
     def project(self, name):
         self.contents += f'project({name})\n'
 
-    def include(self, directories):
+    def include_directories(self, directories):
         self.contents += f'include_directories({" ".join(directories)})\n'
 
     def set_source_files_properties(self, sources, property, values):

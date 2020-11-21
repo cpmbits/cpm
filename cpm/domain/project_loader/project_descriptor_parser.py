@@ -8,7 +8,7 @@ def parse_compilation_plan(plan_description):
         compilation_plan.bits.append(declared_bit)
     for package_path in plan_description.get('packages', {}):
         package = PackageDescription(package_path,
-                                     cflags=plan_description['packages'][package_path].get('cflags', []))
+                                     cflags=package_cflags(plan_description['packages'][package_path]))
         compilation_plan.packages.append(package)
     compilation_plan.cflags = plan_description.get('cflags', [])
     compilation_plan.cppflags = plan_description.get('cppflags', [])
@@ -41,3 +41,7 @@ def parse(project_description):
     project.test = parse_compilation_plan(project_description.get('test', {}))
     project.targets = parse_targets(project_description.get('targets', {}))
     return project
+
+
+def package_cflags(package_description):
+    return package_description.get('cflags', []) if type(package_description) is dict else []
