@@ -21,6 +21,7 @@ class Target:
     cflags: list = field(default_factory=list)
     cppflags: list = field(default_factory=list)
     ldflags: list = field(default_factory=list)
+    bits: list = field(default_factory=list)
 
 
 @dataclass

@@ -18,7 +18,7 @@ class TestCompilationPlanParser(unittest.TestCase):
             }
         }
         compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
-        assert compilation_plan.bits == [DeclaredBit('sqlite3', '1.0'), DeclaredBit('base64', '3.22')]
+        assert compilation_plan.declared_bits == [DeclaredBit('sqlite3', '1.0'), DeclaredBit('base64', '3.22')]
 
     def test_parsing_compilation_plan_with_declared_packages(self):
         plan_description = {

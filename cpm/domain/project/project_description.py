@@ -16,7 +16,8 @@ class PackageDescription:
 
 @dataclass
 class CompilationPlan:
-    bits: list = field(default_factory=list)
+    declared_bits: list = field(default_factory=list)
+    bits: dict = field(default_factory=dict)
     packages: list = field(default_factory=list)
     cflags: list = field(default_factory=list)
     cppflags: list = field(default_factory=list)
@@ -45,7 +46,6 @@ class ProjectDescription:
     name: str = ''
     version: str = ''
     description: str = ''
-    bits: list = field(default_factory=list)
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     targets: dict = field(default_factory=dict)

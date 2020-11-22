@@ -11,17 +11,26 @@ class CMakeListsBuilder(object):
         target = project.targets[target_name]
         self.minimum_required('3.7')
         self.project(project.name)
+        for bit in target.bits:
+            for package in bit.packages:
+                self.build_package_recipe(package)
         for package in target.packages:
-            package_library_name = self.object_library_name(package.path)
-            self.add_object_library(package_library_name, package.sources)
-            self.set_target_properties(package_library_name, 'COMPILE_FLAGS', package.cflags)
-        self.add_executable(project.name, [target.main], [self.object_library_name(package.path) for package in target.packages])
+            self.build_package_recipe(package)
+        self.add_executable(project.name,
+                            [target.main],
+                            [self.object_library_name(package.path) for package in target.packages] +
+                            [self.object_library_name(package.path) for bit in target.bits for package in bit.packages])
         self.set_target_properties(project.name, 'COMPILE_FLAGS', target.cflags)
         self.include_directories(target.include_directories)
         return self.contents
 
+    def build_package_recipe(self, package):
+        package_library_name = self.object_library_name(package.path)
+        self.add_object_library(package_library_name, package.sources)
+        self.set_target_properties(package_library_name, 'COMPILE_FLAGS', package.cflags)
+
     def object_library_name(self, package_path):
-        return f'{package_path}_object_library'
+        return f'{package_path.replace("/", "_")}_object_library'
 
     def minimum_required(self, version):
         self.contents += f'cmake_minimum_required (VERSION {version})\n'

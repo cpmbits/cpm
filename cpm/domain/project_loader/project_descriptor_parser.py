@@ -5,7 +5,7 @@ def parse_compilation_plan(plan_description):
     compilation_plan = CompilationPlan()
     for bit_name in plan_description.get('bits', {}):
         declared_bit = DeclaredBit(bit_name, plan_description['bits'][bit_name])
-        compilation_plan.bits.append(declared_bit)
+        compilation_plan.declared_bits.append(declared_bit)
     for package_path in plan_description.get('packages', {}):
         package = PackageDescription(package_path,
                                      cflags=package_cflags(plan_description['packages'][package_path]))

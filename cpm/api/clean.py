@@ -2,10 +2,9 @@ from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
-from cpm.domain.cmake_recipe import CMakeRecipe
 from cpm.domain.project_builder import ProjectBuilder
-from cpm.domain.project_loader_v1 import NotAChromosProject
-from cpm.domain.project_loader_v1 import ProjectLoader
+from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader import ProjectLoader
 from cpm.domain.compilation_service import CompilationService
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
@@ -27,7 +26,6 @@ def execute(argv):
     cmakelists_builder = CMakeListsBuilder()
     project_builder = ProjectBuilder(filesystem)
     service = CompilationService(project_loader, cmakelists_builder, project_builder)
-    recipe = CMakeRecipe(filesystem)
 
     result = clean_project(service)
 

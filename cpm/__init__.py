@@ -62,3 +62,7 @@ def __format(elapsed_time):
         return '%dm %d.%ds' % (elapsed_time.seconds/60, elapsed_time.seconds % 60, elapsed_time.microseconds/1000)
     else:
         return '%d.%ds' % (elapsed_time.seconds, elapsed_time.microseconds/1000)
+
+
+if __name__ == '__main__':
+    main()

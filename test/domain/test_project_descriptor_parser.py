@@ -1,6 +1,7 @@
 import unittest
 
-from cpm.domain.project.project_description import ProjectDescription, TargetDescription, PackageDescription
+from cpm.domain.project.project_description import ProjectDescription, TargetDescription, PackageDescription, \
+    DeclaredBit
 from cpm.domain.project_loader import project_descriptor_parser
 
 
@@ -30,12 +31,17 @@ class TestProjectDescriptorParser(unittest.TestCase):
                     },
                     'cpmhub/http': None
                 },
+                'bits': {
+                    'sqlite3': '3.32.3'
+                },
                 'cflags': ['-std=c++11']
             }
         }
         project = project_descriptor_parser.parse(project_description)
         assert project.build.packages == [PackageDescription('cpmhub/bits', cflags=['-DHOLA']), PackageDescription('cpmhub/http')]
         assert project.build.cflags == ['-std=c++11']
+        assert len(project.build.declared_bits) == 1
+        assert project.build.declared_bits[0] == DeclaredBit('sqlite3', '3.32.3')
 
     def test_parse_project_descriptor_with_test_compilation_plan(self):
         project_description = {
