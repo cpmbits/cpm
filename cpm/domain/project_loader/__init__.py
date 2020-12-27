@@ -30,5 +30,5 @@ class ProjectLoader(object):
                 self.parse_build_bit_descriptors(bits, next_declared_bits(bit_description), next_declared_bits)
 
 
-class NotAChromosProject(RuntimeError):
+class NotACpmProject(RuntimeError):
     pass

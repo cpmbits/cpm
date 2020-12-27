@@ -20,7 +20,7 @@ def init_project(creation_service, options=CreationOptions(init_from_existing_so
 
 
 def execute(argv):
-    create_parser = argparse.ArgumentParser(prog='cpm init', description='Chromos Package Manager', add_help=False)
+    create_parser = argparse.ArgumentParser(prog='cpm init', description='cpm Package Manager', add_help=False)
     create_parser.add_argument('project_name')
     args = create_parser.parse_args(argv)
 

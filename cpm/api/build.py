@@ -6,9 +6,9 @@ from cpm.api.result import FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.compilation_service import CompilationService
 from cpm.domain.compilation_service import DockerImageNotFound
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_loader import NotACpmProject
 from cpm.domain.project_loader import ProjectLoader
-from cpm.domain.project_builder import ProjectBuilder, BuildError
+from cpm.domain.project_commands import ProjectCommands, BuildError
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 
@@ -16,8 +16,8 @@ from cpm.infrastructure.yaml_handler import YamlHandler
 def build_project(compilation_service, target='default'):
     try:
         compilation_service.build(target)
-    except NotAChromosProject:
-        return Result(FAIL, f'error: not a Chromos project')
+    except NotACpmProject:
+        return Result(FAIL, f'error: not a cpm project')
     except BuildError:
         return Result(FAIL, f'error: compilation failed')
     except DockerImageNotFound as e:
@@ -27,7 +27,7 @@ def build_project(compilation_service, target='default'):
 
 
 def execute(argv):
-    create_parser = argparse.ArgumentParser(prog='cpm build', description='Chromos Package Manager', add_help=False)
+    create_parser = argparse.ArgumentParser(prog='cpm build', description='cpm build', add_help=False)
     create_parser.add_argument('target', nargs='?', default='default')
     args = create_parser.parse_args(argv)
 
@@ -35,8 +35,8 @@ def execute(argv):
     yaml_handler = YamlHandler(filesystem)
     project_loader = ProjectLoader(yaml_handler, filesystem)
     cmakelists_builder = CMakeListsBuilder()
-    project_builder = ProjectBuilder(filesystem)
-    service = CompilationService(project_loader, cmakelists_builder, project_builder)
+    project_commands = ProjectCommands(filesystem)
+    service = CompilationService(project_loader, cmakelists_builder, project_commands)
 
     result = build_project(service, args.target)
 

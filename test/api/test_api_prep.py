@@ -2,14 +2,14 @@ import unittest
 import mock
 
 from cpm.api.prep import prep_project
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader import NotACpmProject
 
 
 class TestApiUpdate(unittest.TestCase):
     def test_update_fails_when_current_directory_is_not_a_chromos_project(self):
         recipe = mock.MagicMock()
         compilation_service = mock.MagicMock()
-        compilation_service.update.side_effect = NotAChromosProject()
+        compilation_service.update.side_effect = NotACpmProject()
 
         result = prep_project(compilation_service, recipe)
 

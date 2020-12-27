@@ -5,7 +5,7 @@ import os
 
 from cpm.domain.bit import Bit
 from cpm.domain.project import Package, ProjectAction
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 from cpm.domain.project_loader_v1 import PROJECT_DESCRIPTOR_FILE
 from cpm.domain.project_loader_v1 import ProjectLoader
 
@@ -22,7 +22,7 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler.load.side_effect = FileNotFoundError()
         loader = ProjectLoader(yaml_handler, filesystem)
 
-        self.assertRaises(NotAChromosProject, loader.load)
+        self.assertRaises(NotACpmProject, loader.load)
 
     def test_loading_project(self):
         yaml_handler = mock.MagicMock()

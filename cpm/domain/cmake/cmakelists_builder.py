@@ -22,6 +22,13 @@ class CMakeListsBuilder(object):
                             [self.object_library_name(package.path) for bit in target.bits for package in bit.packages])
         self.set_target_properties(project.name, 'COMPILE_FLAGS', target.cflags)
         self.include_directories(target.include_directories)
+        for test in project.tests:
+            self.add_executable(test.name,
+                                [test.main],
+                                [self.object_library_name(package.path) for package in target.packages] +
+                                [self.object_library_name(package.path) for bit in target.bits for package in bit.packages])
+        if project.tests:
+            self.add_custom_target('tests', 'echo "> Done', [test.name for test in project.tests])
         return self.contents
 
     def build_package_recipe(self, package):

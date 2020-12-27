@@ -5,7 +5,7 @@ from cpm.domain.project import Project
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 
 
 class TestCreationService(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestCreationService(unittest.TestCase):
     def test_project_does_not_exist_when_loading_the_project_fails(self):
         filesystem = mock.MagicMock()
         project_loader = mock.MagicMock()
-        project_loader.load.side_effect = NotAChromosProject
+        project_loader.load.side_effect = NotACpmProject
         creation_service = CreationService(filesystem, project_loader)
         directory = 'project_location'
 
@@ -49,7 +49,7 @@ class TestCreationService(unittest.TestCase):
         filesystem.create_directory.assert_called_once_with('AwesomeProject')
         filesystem.create_file.assert_called_once_with(
             'AwesomeProject/project.yaml',
-            'name: AwesomeProject\n'
+            mock.ANY
         )
 
     def test_it_only_creates_descriptor_file_when_creating_project_from_existing_sources(self):
@@ -68,7 +68,7 @@ class TestCreationService(unittest.TestCase):
         filesystem.create_directory.assert_not_called()
         filesystem.create_file.assert_called_once_with(
             './project.yaml',
-            'name: AwesomeProject\n'
+            mock.ANY
         )
 
     def test_creation_service_generates_default_sample_code_when_selected(self):

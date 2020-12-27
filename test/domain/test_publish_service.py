@@ -3,7 +3,7 @@ from mock import MagicMock
 
 from cpm.domain.project import Project
 from cpm.domain.publish_service import PublishService
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 from cpm.domain.bit_packager import PackagingFailure
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
 
@@ -11,12 +11,12 @@ from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
 class TestPublishService(unittest.TestCase):
     def test_publish_service_fails_when_loader_fails_to_load_project(self):
         project_loader = MagicMock()
-        project_loader.load.side_effect = NotAChromosProject
+        project_loader.load.side_effect = NotACpmProject
         bit_packager = MagicMock()
         cpm_hub_connector = MagicMock()
         service = PublishService(project_loader, bit_packager, cpm_hub_connector)
 
-        self.assertRaises(NotAChromosProject, service.publish)
+        self.assertRaises(NotACpmProject, service.publish)
 
     def test_publish_service_fails_when_packing_project_fails(self):
         project = Project('cpm-hub')

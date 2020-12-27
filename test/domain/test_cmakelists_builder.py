@@ -1,7 +1,7 @@
 import unittest
 
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
-from cpm.domain.project.project import Project, Target, Package
+from cpm.domain.project.project import Project, Target, Package, Test
 
 
 def a_project(name):
@@ -15,6 +15,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
             .with_target('default') \
             .with_cflags(['-std=c++11']) \
             .with_package('package', ['file.cpp', 'file.c'], ['-DHOLA']) \
+            .with_test('test_case') \
             .project
 
         cmakelists_content = cmakelists_builder.build_contents(project, 'default')
@@ -26,17 +27,23 @@ class TestCmakelistsBuilder(unittest.TestCase):
         assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
         assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
         assert 'include_directories(package)' in cmakelists_content
+        assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
+        assert ('add_custom_target(tests\n'
+               '    COMMAND echo "> Done"\n'
+               '    DEPENDS test_case\n'
+               ')\n') in cmakelists_content
 
 
 class TestProjectBuilder:
     def __init__(self, name):
         self.target_name = ''
+        self.target = None
         self.project = Project(name)
 
     def with_target(self, target_name):
         self.target_name = target_name
-        target = Target(target_name)
-        self.project.targets[target_name] = target
+        self.target = Target(target_name)
+        self.project.targets[target_name] = self.target
         return self
 
     def with_cflags(self, cflags):
@@ -49,4 +56,9 @@ class TestProjectBuilder:
         package.cflags = cflags
         self.project.targets[self.target_name].packages.append(package)
         self.project.targets[self.target_name].include_directories.add(path)
+        return self
+
+    def with_test(self, test_name):
+        test = Test(test_name, self.target, f'{test_name}.cpp')
+        self.project.tests.append(test)
         return self

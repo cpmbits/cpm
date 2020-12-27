@@ -7,7 +7,7 @@ from cpm.domain.install_service import InstallService
 from cpm.domain.install_service import BitNotFound
 from cpm.domain.bit import Bit
 from cpm.domain.project import Project
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
 
 
@@ -22,10 +22,10 @@ class TestInstallService(unittest.TestCase):
         project_loader = MagicMock()
         cpm_hub_connector = MagicMock()
         bit_installer = MagicMock()
-        project_loader.load.side_effect = NotAChromosProject
+        project_loader.load.side_effect = NotACpmProject
         service = InstallService(project_loader, bit_installer, cpm_hub_connector)
 
-        self.assertRaises(NotAChromosProject, service.install, 'cest', 'latest')
+        self.assertRaises(NotACpmProject, service.install, 'cest', 'latest')
 
         project_loader.load.assert_called_once()
 

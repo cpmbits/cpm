@@ -6,7 +6,7 @@ from cpm.api.result import FAIL
 from cpm.domain.install_service import BitNotFound, InstallService
 from cpm.domain.bit_installer import BitInstaller
 from cpm.domain.bit_loader import BitLoader
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_user_configuration import CpmUserConfiguration
@@ -18,8 +18,8 @@ from cpm.infrastructure.yaml_handler import YamlHandler
 def install_bit(install_service, name, version='latest'):
     try:
         install_service.install(name, version)
-    except NotAChromosProject:
-        return Result(FAIL, 'error: not a Chromos project')
+    except NotACpmProject:
+        return Result(FAIL, 'error: not a cpm project')
     except BitNotFound:
         return Result(FAIL, f'error: bit {name} not found in CPM Hub')
     except HttpConnectionError as error:
@@ -31,8 +31,8 @@ def install_bit(install_service, name, version='latest'):
 def install_project_bits(install_service):
     try:
         install_service.install_project_bits()
-    except NotAChromosProject:
-        return Result(FAIL, 'error: not a Chromos project')
+    except NotACpmProject:
+        return Result(FAIL, 'error: not a cpm project')
     except BitNotFound as e:
         return Result(FAIL, f'error: bit {e} not found in CPM Hub')
     except HttpConnectionError as error:
@@ -42,7 +42,7 @@ def install_project_bits(install_service):
 
 
 def execute(argv):
-    install_bit_arg_parser = argparse.ArgumentParser(prog='cpm install', description='Chromos Package Manager', add_help=False)
+    install_bit_arg_parser = argparse.ArgumentParser(prog='cpm install', description='cpm Package Manager', add_help=False)
     install_bit_arg_parser.add_argument('bit_name', nargs='?')
     args = install_bit_arg_parser.parse_args(argv)
 

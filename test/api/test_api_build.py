@@ -3,15 +3,15 @@ import mock
 
 from cpm.api.build import build_project
 from cpm.domain.compilation_service import DockerImageNotFound
-from cpm.domain.project_builder import BuildError
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project_commands import BuildError
+from cpm.domain.project_loader import NotACpmProject
 
 
 class TestApiBuild(unittest.TestCase):
     def test_build_fails_when_current_directory_is_not_a_chromos_project(self):
         recipe = mock.MagicMock()
         compilation_service = mock.MagicMock()
-        compilation_service.build.side_effect = NotAChromosProject()
+        compilation_service.build.side_effect = NotACpmProject()
 
         result = build_project(compilation_service, recipe)
 

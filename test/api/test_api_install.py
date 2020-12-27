@@ -6,14 +6,14 @@ from cpm.api.install import install_project_bits
 from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.install_service import BitNotFound
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 from cpm.infrastructure.http_client import HttpConnectionError
 
 
 class TestApiInstall(unittest.TestCase):
     def test_bit_install_fails_when_current_directory_is_not_a_chromos_project(self):
         install_service = mock.MagicMock()
-        install_service.install.side_effect = NotAChromosProject
+        install_service.install.side_effect = NotACpmProject
 
         result = install_bit(install_service, 'cest')
 
@@ -64,7 +64,7 @@ class TestApiInstall(unittest.TestCase):
 
     def test_bit_install_of_all_bits_in_project_fails_when_current_directory_is_not_a_chromos_project(self):
         install_service = mock.MagicMock()
-        install_service.install_project_bits.side_effect = NotAChromosProject
+        install_service.install_project_bits.side_effect = NotACpmProject
 
         result = install_project_bits(install_service)
 

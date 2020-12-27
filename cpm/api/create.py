@@ -5,7 +5,7 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
-from cpm.domain.project_loader_v1 import ProjectLoader
+from cpm.domain.project_loader import ProjectLoader
 from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.yaml_handler import YamlHandler
 
@@ -19,7 +19,7 @@ def new_project(creation_service, options=CreationOptions()):
 
 
 def execute(argv):
-    create_parser = argparse.ArgumentParser(prog='cpm create', description='Chromos Package Manager', add_help=False)
+    create_parser = argparse.ArgumentParser(prog='cpm create', description='cpm Package Manager', add_help=False)
     create_parser.add_argument('project_name')
     create_parser.add_argument('-s', '--no-sample-code', required=False, action='store_true', default=False)
     args = create_parser.parse_args(argv)

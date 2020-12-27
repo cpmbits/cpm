@@ -31,7 +31,7 @@ class ProjectLoader(object):
                 project.add_action(action)
             return project
         except FileNotFoundError:
-            raise NotAChromosProject()
+            raise NotACpmProject()
 
     def load_compile_recipe(self, description):
         compile_recipe = CompileRecipe()
@@ -94,5 +94,5 @@ class ProjectLoader(object):
         return description.get('compile_flags', [])
 
 
-class NotAChromosProject(RuntimeError):
+class NotACpmProject(RuntimeError):
     pass

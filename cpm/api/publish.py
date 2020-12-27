@@ -7,7 +7,7 @@ from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.domain.bit_packager import BitPackager
 from cpm.domain.publish_service import PublishService
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_hub_connector_v1 import InvalidCpmHubUrl
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
@@ -20,7 +20,7 @@ from cpm.infrastructure.yaml_handler import YamlHandler
 def publish_project(publish_service):
     try:
         publish_service.publish()
-    except NotAChromosProject:
+    except NotACpmProject:
         return Result(FAIL, f'error: not a CPM project')
     except PackagingFailure as error:
         return Result(FAIL, f'error: {error.cause}')
@@ -39,7 +39,7 @@ def publish_project(publish_service):
 
 
 def execute(argv):
-    publish_parser = argparse.ArgumentParser(prog='cpm publish', description='Chromos Package Manager', add_help=False)
+    publish_parser = argparse.ArgumentParser(prog='cpm publish', description='cpm Package Manager', add_help=False)
     publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='https://repo.cpmbits.com:8000')
     args = publish_parser.parse_args(argv)
 

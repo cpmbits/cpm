@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
 from cpm.domain.project import Project
-from cpm.domain.project_loader_v1 import NotAChromosProject
+from cpm.domain.project_loader_v1 import NotACpmProject
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 
 
 @dataclass
 class CreationOptions:
-    project_name: str = 'MyProject'
+    project_name: str = 'ProjectName'
     directory: str = '.'
     generate_sample_code: bool = True
     init_from_existing_sources: bool = False
@@ -22,7 +22,7 @@ class CreationService:
         try:
             self.project_loader.load(directory)
             return True
-        except NotAChromosProject:
+        except NotACpmProject:
             return False
 
     def create(self, options):
@@ -45,8 +45,13 @@ class CreationService:
 
     def create_project_descriptor_file(self, options):
         self.filesystem.create_file(
-            f'{options.directory}/project.yaml',
-            f'name: {options.project_name}\n'
+            f"{options.directory}/project.yaml",
+            f"name: '{options.project_name}\n'"
+            f"version: {options.project_name}\n"
+            f"build:\n"
+            f"  packages:\n"
+            f"  bits:\n"
+            f"test:\n"
         )
 
     def create_project_directory(self, project_name):
