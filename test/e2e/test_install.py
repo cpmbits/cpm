@@ -8,8 +8,6 @@ from cpm.api import install
 from cpm.api import build
 from cpm.api.result import Result
 
-from cpm.infrastructure import cpm_user_configuration
-
 
 class TestInstall(unittest.TestCase):
     PROJECT_NAME = 'test_project'
@@ -28,20 +26,17 @@ class TestInstall(unittest.TestCase):
 
     def test_bit_installation_from_command_line_passed_bit(self):
         os.chdir(self.PROJECT_DIRECTORY)
-        cpm_user_configuration.DEFAULT_CONFIGURATION['cpm_hub_url'] = 'http://localhost:8000'
         result = install.execute(['-s', 'http://localhost:8000', 'test:1.0'])
         assert result == Result(0, 'installed bit test:1.0')
 
     def test_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
-        cpm_user_configuration.DEFAULT_CONFIGURATION['cpm_hub_url'] = 'http://localhost:8000'
         self.add_bit('test', '1.0')
         result = install.execute(['-s', 'http://localhost:8000'])
         assert result == Result(0, 'installed bits')
 
     def test_build_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
-        cpm_user_configuration.DEFAULT_CONFIGURATION['cpm_hub_url'] = 'http://localhost:8000'
         self.add_bit('test', '1.0')
         install.execute(['-s', 'http://localhost:8000'])
         build.execute([])

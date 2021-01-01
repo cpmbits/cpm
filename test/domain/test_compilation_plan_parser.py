@@ -1,6 +1,6 @@
 import unittest
 
-from cpm.domain.project_loader import project_descriptor_parser
+from cpm.domain.project import project_descriptor_parser
 from cpm.domain.project.project_descriptor import DeclaredBit, CompilationPlan, PackageDescription
 
 

@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project_loader_v1 import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.infrastructure.http_client import HttpConnectionError
 from cpm.api.publish import publish_project
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure

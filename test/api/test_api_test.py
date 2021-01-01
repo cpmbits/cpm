@@ -3,7 +3,7 @@ import mock
 
 from cpm.api.test import run_tests
 from cpm.domain.project_commands import BuildError
-from cpm.domain.project_loader import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.domain.project_commands import TestsFailed
 from cpm.domain.test_service import NoTestsFound
 

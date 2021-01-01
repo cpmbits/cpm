@@ -2,8 +2,7 @@ from cpm.domain.project import project_descriptor_parser
 
 
 class PublishService(object):
-    def __init__(self, project_loader, bit_packager, cpm_hub_connector):
-        self.project_loader = project_loader
+    def __init__(self, bit_packager, cpm_hub_connector):
         self.bit_packager = bit_packager
         self.cpm_hub_connector = cpm_hub_connector
 

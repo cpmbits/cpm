@@ -6,7 +6,7 @@ import os
 
 from cpm.domain.compilation_service import CompilationService, DockerImageNotFound
 from cpm.domain.project.project import Project, Target
-from cpm.domain.project_loader import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 
 
 class TestCompilationService(unittest.TestCase):

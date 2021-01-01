@@ -1,44 +1,37 @@
 import unittest
 import mock
 
-import cpm.domain.project.project_loader
-from cpm.domain import project_loader
+from cpm.domain.project import project_loader
 from cpm.domain.project.project_descriptor import ProjectDescriptor, DeclaredBit
 
 
 class TestProjectLoader(unittest.TestCase):
-    @mock.patch('cpm.domain.project_loader.project_descriptor_parser')
-    @mock.patch('cpm.domain.project_loader.project_composer')
+    @mock.patch('cpm.domain.project.project_loader.project_descriptor_parser')
+    @mock.patch('cpm.domain.project.project_loader.project_composer')
     def test_project_loader_without_bits(self, project_composer, project_descriptor_parser):
-        yaml_handler = mock.MagicMock()
-        filesystem = mock.MagicMock()
         # Given
-        yaml_handler.load.return_value = 'yaml_load'
-        project_descriptor_parser.parse_yaml.return_value = ProjectDescriptor()
-        loader = cpm.domain.project.project_loader.ProjectLoader(yaml_handler, filesystem)
+        project_descriptor_parser.parse_from.return_value = ProjectDescriptor()
+        loader = project_loader.ProjectLoader()
         # When
         loader.load('.')
         # Then
-        yaml_handler.load.assert_called_once_with('./project.yaml')
-        project_descriptor_parser.parse_yaml.assert_called_once_with('yaml_load')
-        project_composer.compose.assert_called_once_with(project_descriptor_parser.parse_yaml.return_value, filesystem)
+        project_descriptor_parser.parse_from.assert_called_once_with('.')
+        project_composer.compose.assert_called_once_with(project_descriptor_parser.parse_from.return_value)
 
-    @mock.patch('cpm.domain.project_loader.project_descriptor_parser')
-    @mock.patch('cpm.domain.project_loader.project_composer')
+    @mock.patch('cpm.domain.project.project_loader.project_descriptor_parser')
+    @mock.patch('cpm.domain.project.project_loader.project_composer')
     def test_project_loader_with_declared_bits(self, project_composer, project_descriptor_parser):
-        yaml_handler = mock.MagicMock()
-        filesystem = mock.MagicMock()
         # Given
-        project_description = ProjectDescriptor()
-        project_description.build.declared_bits = [DeclaredBit('bit', '2.2')]
-        project_descriptor_parser.parse_yaml.return_value = project_description
-        loader = cpm.domain.project.project_loader.ProjectLoader(yaml_handler, filesystem)
+        project_descriptor = ProjectDescriptor()
+        project_descriptor.build.declared_bits = [DeclaredBit('bit', '2.2')]
+        project_descriptor_parser.parse_from.return_value = project_descriptor
+        loader = project_loader.ProjectLoader()
         # When
         loader.load('.')
         # Then
-        yaml_handler.load.assert_has_calls([
-            mock.call('./project.yaml'),
-            mock.call('bits/bit/project.yaml')
+        project_descriptor_parser.parse_from.assert_has_calls([
+            mock.call('.'),
+            mock.call('bits/bit')
         ])
-        project_composer.compose.assert_called_once_with(project_description, filesystem)
+        project_composer.compose.assert_called_once_with(project_descriptor)
 

@@ -2,7 +2,7 @@ import unittest
 import mock
 
 from cpm.domain.project import Project
-from cpm.domain.project_loader import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.domain.test_service import TestService, NoTestsFound
 
 
