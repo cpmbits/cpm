@@ -5,6 +5,6 @@ class PublishService(object):
         self.cpm_hub_connector = cpm_hub_connector
 
     def publish(self):
-        project = self.project_loader.load()
+        project = self.project_loader.load('.')
         package_name = self.bit_packager.pack(project, 'dist')
         self.cpm_hub_connector.publish_bit(project, package_name)

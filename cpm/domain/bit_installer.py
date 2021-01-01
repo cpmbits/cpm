@@ -1,17 +1,17 @@
 import base64
 
+from cpm.infrastructure import filesystem
+
 
 class BitInstaller(object):
-    def __init__(self, filesystem, bit_loader):
-        self.bit_loader = bit_loader
-        self.filesystem = filesystem
+    def __init__(self, project_loader):
+        self.project_loader = project_loader
 
     def install(self, bit_download):
         bit_directory = f'bits/{bit_download.bit_name}'
-        if self.filesystem.directory_exists(bit_directory):
-            self.filesystem.remove_directory(bit_directory)
-        self.filesystem.create_directory(bit_directory)
-        self.filesystem.unzips(base64.b64decode(bit_download.payload), bit_directory)
+        if filesystem.directory_exists(bit_directory):
+            filesystem.remove_directory(bit_directory)
+        filesystem.create_directory(bit_directory)
+        filesystem.unzips(base64.b64decode(bit_download.payload), bit_directory)
 
-        return self.bit_loader.load(bit_download.bit_name)
-
+        return self.project_loader.load(bit_directory)

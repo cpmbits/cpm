@@ -1,15 +1,12 @@
-from cpm.domain.project_loader_v1 import ProjectLoader
-from cpm.domain.project_loader_v1 import NotACpmProject
-from cpm.infrastructure.filesystem import Filesystem
-from cpm.infrastructure.yaml_handler import YamlHandler
+from cpm.domain.project.project_loader import ProjectLoader
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 
 
 def discover_project_actions():
-    filesystem = Filesystem()
-    project_loader = ProjectLoader(YamlHandler(filesystem), filesystem)
+    project_loader = ProjectLoader()
 
     try:
-        project = project_loader.load()
+        project = project_loader.load('.')
         return project.actions
     except NotACpmProject:
         return []

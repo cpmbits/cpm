@@ -1,23 +1,21 @@
+from cpm.infrastructure import yaml_handler
+from cpm.infrastructure import filesystem
 from cpm.domain.bit import Bit
 from cpm.domain.project import Package
 
 
 class BitLoader(object):
-    def __init__(self, yaml_handler, filesystem):
-        self.filesystem = filesystem
-        self.yaml_handler = yaml_handler
-
     def load(self, name):
         return self.load_from(f'bits/{name}')
 
     def load_from(self, directory):
-        description = self.yaml_handler.load(f'{directory}/bit.yaml')
+        description = yaml_handler.load(f'{directory}/bit.yaml')
         bit = Bit(description['name'])
         bit.version = description.get('version', "0.1")
         bit.declared_bits = description.get('bits', {})
         for package in self.bit_packages(description, directory):
             bit.add_package(package)
-            bit.add_include_directory(self.filesystem.parent_directory(package.path))
+            bit.add_include_directory(filesystem.parent_directory(package.path))
             bit.add_sources(package.sources)
         return bit
 
@@ -36,4 +34,4 @@ class BitLoader(object):
         return [source for package in packages for source in self.all_sources(package.path)]
 
     def all_sources(self, path):
-        return self.filesystem.find(path, '*.cpp') + self.filesystem.find(path, '*.c')
+        return filesystem.find(path, '*.cpp') + filesystem.find(path, '*.c')

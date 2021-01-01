@@ -1,26 +1,32 @@
 import unittest
 
-from cpm.domain.project.project_description import ProjectDescription, TargetDescription, PackageDescription, \
-    DeclaredBit
-from cpm.domain.project_loader import project_descriptor_parser
+from cpm.domain.project import project_descriptor
+from cpm.domain.project import project_descriptor_parser
 
 
 class TestProjectDescriptorParser(unittest.TestCase):
     def test_parse_project_descriptor_with_just_the_project_information(self):
-        project_description = {
+        yaml_contents = {
             'name': 'bender bender rodriguez',
             'version': '1.0',
-            'description': 'kill all humans'
+            'description': 'kill all humans',
+            'build': {
+                'packages': None,
+                'bits': None,
+                'cflags': None
+            },
+            'test': None,
+            'targets': None
         }
-        project = project_descriptor_parser.parse(project_description)
-        assert project == ProjectDescription(
+        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        assert project == project_descriptor.ProjectDescriptor(
             name='bender bender rodriguez',
             version='1.0',
             description='kill all humans',
-            targets={'default': TargetDescription('default')})
+            targets={'default': project_descriptor.TargetDescription('default')})
 
     def test_parse_project_descriptor_with_build_compilation_plan(self):
-        project_description = {
+        yaml_contents = {
             'name': 'bender bender rodriguez',
             'version': '1.0',
             'description': 'kill all humans',
@@ -37,14 +43,17 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 'cflags': ['-std=c++11']
             }
         }
-        project = project_descriptor_parser.parse(project_description)
-        assert project.build.packages == [PackageDescription('cpmhub/bits', cflags=['-DHOLA']), PackageDescription('cpmhub/http')]
+        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        assert project.build.packages == [
+            project_descriptor.PackageDescription('cpmhub/bits', cflags=['-DHOLA']),
+            project_descriptor.PackageDescription('cpmhub/http')
+        ]
         assert project.build.cflags == ['-std=c++11']
         assert len(project.build.declared_bits) == 1
-        assert project.build.declared_bits[0] == DeclaredBit('sqlite3', '3.32.3')
+        assert project.build.declared_bits[0] == project_descriptor.DeclaredBit('sqlite3', '3.32.3')
 
     def test_parse_project_descriptor_with_test_compilation_plan(self):
-        project_description = {
+        yaml_contents = {
             'name': 'bender bender rodriguez',
             'version': '1.0',
             'description': 'kill all humans',
@@ -55,11 +64,14 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse(project_description)
-        assert project.test.packages == [PackageDescription('cpmhub/bits'), PackageDescription('cpmhub/http')]
+        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        assert project.test.packages == [
+            project_descriptor.PackageDescription('cpmhub/bits'),
+            project_descriptor.PackageDescription('cpmhub/http')
+        ]
 
     def test_parse_project_descriptor_with_default_target_image(self):
-        project_description = {
+        yaml_contents = {
             'name': 'bender bender rodriguez',
             'version': '1.0',
             'description': 'kill all humans',
@@ -69,13 +81,13 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse(project_description)
+        project = project_descriptor_parser.parse_yaml(yaml_contents)
         assert project.targets == {
-            'default': TargetDescription('default', image='cpmbits/bender')
+            'default': project_descriptor.TargetDescription('default', image='cpmbits/bender')
         }
 
     def test_parse_project_descriptor_with_target_build_compilation_plan(self):
-        project_description = {
+        yaml_contents = {
             'name': 'bender bender rodriguez',
             'version': '1.0',
             'description': 'kill all humans',
@@ -90,11 +102,13 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse(project_description)
-        assert project.targets['arduino'].build.packages == [PackageDescription('arduino')]
+        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        assert project.targets['arduino'].build.packages == [
+            project_descriptor.PackageDescription('arduino')
+        ]
 
     def test_parse_project_descriptor_with_target_test_compilation_plan(self):
-        project_description = {
+        yaml_contents = {
             'name': 'bender bender rodriguez',
             'version': '1.0',
             'description': 'kill all humans',
@@ -109,5 +123,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse(project_description)
-        assert project.targets['arduino'].test.packages == [PackageDescription('arduino')]
+        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        assert project.targets['arduino'].test.packages == [
+            project_descriptor.PackageDescription('arduino')
+        ]

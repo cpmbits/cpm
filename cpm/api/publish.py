@@ -3,18 +3,16 @@ import argparse
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
-from cpm.domain.project_loader_v1 import ProjectLoader
 from cpm.domain.bit_packager import BitPackager
 from cpm.domain.publish_service import PublishService
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project_loader_v1 import NotACpmProject
+from cpm.domain.project.project_loader import ProjectLoader
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_hub_connector_v1 import InvalidCpmHubUrl
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
 from cpm.infrastructure.cpm_hub_connector_v1 import PublicationFailure
-from cpm.infrastructure.filesystem import Filesystem
 from cpm.infrastructure.http_client import HttpConnectionError
-from cpm.infrastructure.yaml_handler import YamlHandler
 
 
 def publish_project(publish_service):
@@ -41,13 +39,12 @@ def publish_project(publish_service):
 def execute(argv):
     publish_parser = argparse.ArgumentParser(prog='cpm publish', description='cpm Package Manager', add_help=False)
     publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='https://repo.cpmbits.com:8000')
+    publish_parser.add_argument('-d', '--dry-run', required=False, action='store_true', default=False)
     args = publish_parser.parse_args(argv)
 
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    loader = ProjectLoader(yaml_handler, filesystem)
-    packager = BitPackager(filesystem)
-    cpm_hub_connector = CpmHubConnectorV1(filesystem, repository_url=args.repository_url)
+    loader = ProjectLoader()
+    packager = BitPackager()
+    cpm_hub_connector = CpmHubConnectorV1(repository_url=args.repository_url, dry_run=args.dry_run)
     service = PublishService(loader, packager, cpm_hub_connector)
 
     result = publish_project(service)

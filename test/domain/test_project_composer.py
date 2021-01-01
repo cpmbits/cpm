@@ -13,7 +13,7 @@ class TestProjectComposer(unittest.TestCase):
             'description': 'I want to believe'
         }
         filesystem = MagicMock()
-        project_description = project_descriptor_parser.parse(yaml_load)
+        project_description = project_descriptor_parser.parse_yaml(yaml_load)
         project = project_composer.compose(project_description, filesystem)
         assert project.name == 'HalfLife3'
         assert project.version == '1.0'
@@ -37,7 +37,7 @@ class TestProjectComposer(unittest.TestCase):
         filesystem = MagicMock()
         filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
         filesystem.parent_directory.return_value = '.'
-        project_description = project_descriptor_parser.parse(yaml_load)
+        project_description = project_descriptor_parser.parse_yaml(yaml_load)
         project = project_composer.compose(project_description, filesystem)
         assert len(project.targets['default'].packages) == 1
         assert project.targets['default'].packages[0].path == 'shaders'
@@ -53,7 +53,7 @@ class TestProjectComposer(unittest.TestCase):
         filesystem = MagicMock()
         filesystem.find.side_effect = [['tests/test_one.cpp']]
         filesystem.parent_directory.return_value = '.'
-        project_description = project_descriptor_parser.parse(yaml_load)
+        project_description = project_descriptor_parser.parse_yaml(yaml_load)
         project = project_composer.compose(project_description, filesystem)
         assert len(project.tests) == 1
         assert project.tests[0].name == 'test_one'

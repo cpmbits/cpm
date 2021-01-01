@@ -60,11 +60,11 @@ class TestApiInstall(unittest.TestCase):
         result = install_project_bits(install_service)
 
         assert result.status_code == OK
-        install_service.install_project_bits.assert_called_once()
+        install_service.install_all.assert_called_once()
 
     def test_bit_install_of_all_bits_in_project_fails_when_current_directory_is_not_a_chromos_project(self):
         install_service = mock.MagicMock()
-        install_service.install_project_bits.side_effect = NotACpmProject
+        install_service.install_all.side_effect = NotACpmProject
 
         result = install_project_bits(install_service)
 
@@ -72,7 +72,7 @@ class TestApiInstall(unittest.TestCase):
 
     def test_bit_install_of_all_bits_in_project_fails_when_http_connection_fails(self):
         install_service = mock.MagicMock()
-        install_service.install_project_bits.side_effect = HttpConnectionError
+        install_service.install_all.side_effect = HttpConnectionError
 
         result = install_project_bits(install_service)
 
@@ -80,7 +80,7 @@ class TestApiInstall(unittest.TestCase):
 
     def test_bit_install_of_all_bits_in_project_fails_when_one_bit_does_not_exist(self):
         install_service = mock.MagicMock()
-        install_service.install_project_bits.side_effect = BitNotFound
+        install_service.install_all.side_effect = BitNotFound
 
         result = install_project_bits(install_service)
 

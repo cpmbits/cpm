@@ -1,0 +1,8 @@
+version: '3'
+services:
+  cpm_hub_mock:
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+        - ./samples:/samples

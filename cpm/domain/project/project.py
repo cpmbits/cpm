@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from cpm.domain.project.project_descriptor import ProjectDescriptor
+
 
 @dataclass
 class Package:
@@ -41,5 +43,8 @@ class Project:
     name: str = ''
     version: str = ''
     description: str = ''
+    descriptor: ProjectDescriptor = field(default_factory=ProjectDescriptor)
     targets: dict = field(default_factory=dict)
     tests: list = field(default_factory=list)
+    declared_bits: list = field(default_factory=list)
+    actions: list = field(default_factory=list)

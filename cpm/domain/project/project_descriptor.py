@@ -42,10 +42,11 @@ class TargetDescription:
 
 
 @dataclass
-class ProjectDescription:
+class ProjectDescriptor:
     name: str = ''
     version: str = ''
     description: str = ''
+    schema: str = 'v1'
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     targets: dict = field(default_factory=dict)

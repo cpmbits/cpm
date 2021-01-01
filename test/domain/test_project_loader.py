@@ -1,8 +1,9 @@
 import unittest
 import mock
 
+import cpm.domain.project.project_loader
 from cpm.domain import project_loader
-from cpm.domain.project.project_description import ProjectDescription, DeclaredBit
+from cpm.domain.project.project_descriptor import ProjectDescriptor, DeclaredBit
 
 
 class TestProjectLoader(unittest.TestCase):
@@ -13,14 +14,14 @@ class TestProjectLoader(unittest.TestCase):
         filesystem = mock.MagicMock()
         # Given
         yaml_handler.load.return_value = 'yaml_load'
-        project_descriptor_parser.parse.return_value = ProjectDescription()
-        loader = project_loader.ProjectLoader(yaml_handler, filesystem)
+        project_descriptor_parser.parse_yaml.return_value = ProjectDescriptor()
+        loader = cpm.domain.project.project_loader.ProjectLoader(yaml_handler, filesystem)
         # When
         loader.load('.')
         # Then
         yaml_handler.load.assert_called_once_with('./project.yaml')
-        project_descriptor_parser.parse.assert_called_once_with('yaml_load')
-        project_composer.compose.assert_called_once_with(project_descriptor_parser.parse.return_value, filesystem)
+        project_descriptor_parser.parse_yaml.assert_called_once_with('yaml_load')
+        project_composer.compose.assert_called_once_with(project_descriptor_parser.parse_yaml.return_value, filesystem)
 
     @mock.patch('cpm.domain.project_loader.project_descriptor_parser')
     @mock.patch('cpm.domain.project_loader.project_composer')
@@ -28,10 +29,10 @@ class TestProjectLoader(unittest.TestCase):
         yaml_handler = mock.MagicMock()
         filesystem = mock.MagicMock()
         # Given
-        project_description = ProjectDescription()
+        project_description = ProjectDescriptor()
         project_description.build.declared_bits = [DeclaredBit('bit', '2.2')]
-        project_descriptor_parser.parse.return_value = project_description
-        loader = project_loader.ProjectLoader(yaml_handler, filesystem)
+        project_descriptor_parser.parse_yaml.return_value = project_description
+        loader = cpm.domain.project.project_loader.ProjectLoader(yaml_handler, filesystem)
         # When
         loader.load('.')
         # Then

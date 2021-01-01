@@ -1,32 +1,27 @@
 import subprocess
 import signal
 
-BUILD_DIRECTORY = 'build'
-CMAKELISTS = 'CMakeLists.txt'
-CMAKE_COMMAND = 'cmake'
-NINJA_COMMAND = 'ninja'
+from cpm.infrastructure import filesystem
+from cpm.domain import constants
 
 
 class ProjectCommands(object):
-    def __init__(self, filesystem):
-        self.filesystem = filesystem
-
     def build(self, project, target_name):
-        if not self.filesystem.directory_exists(BUILD_DIRECTORY):
-            self.filesystem.create_directory(BUILD_DIRECTORY)
-        self.__run_command(CMAKE_COMMAND, '-G', 'Ninja', '..')
-        self.__run_command(NINJA_COMMAND, project.name)
+        if not filesystem.directory_exists(constants.BUILD_DIRECTORY):
+            filesystem.create_directory(constants.BUILD_DIRECTORY)
+        self.__run_command(constants.CMAKE_COMMAND, '-G', 'Ninja', '..')
+        self.__run_command(constants.NINJA_COMMAND, project.name)
 
     def clean(self, project):
-        if self.filesystem.directory_exists(BUILD_DIRECTORY):
-            self.__run_command(NINJA_COMMAND, 'clean')
-            self.filesystem.remove_directory(BUILD_DIRECTORY)
-        _ignore_exception(lambda: self.filesystem.delete_file(CMAKELISTS))
+        if filesystem.directory_exists(constants.BUILD_DIRECTORY):
+            self.__run_command(constants.NINJA_COMMAND, 'clean')
+            filesystem.remove_directory(constants.BUILD_DIRECTORY)
+        _ignore_exception(lambda: filesystem.delete_file(constants.CMAKELISTS))
 
     def build_tests(self, project, target_name, files_or_dirs):
-        if not self.filesystem.directory_exists(BUILD_DIRECTORY):
-            self.filesystem.create_directory(BUILD_DIRECTORY)
-        self.__run_command(CMAKE_COMMAND, '-G', 'Ninja', '..')
+        if not filesystem.directory_exists(constants.BUILD_DIRECTORY):
+            filesystem.create_directory(constants.BUILD_DIRECTORY)
+        self.__run_command(constants.CMAKE_COMMAND, '-G', 'Ninja', '..')
         self.__run_command('ninja', 'tests')
 
     def run_tests(self, project, target_name, files_or_dirs):
@@ -37,13 +32,13 @@ class ProjectCommands(object):
     def run_test(self, executable):
         result = subprocess.run(
             [f'./{executable}'],
-            cwd=BUILD_DIRECTORY
+            cwd=constants.BUILD_DIRECTORY
         )
         if result.returncode < 0:
             print(f'{executable} failed with {result.returncode} ({signal.Signals(-result.returncode).name})')
         return result
 
-    def __run_command(self, *args, cwd=BUILD_DIRECTORY):
+    def __run_command(self, *args, cwd=constants.BUILD_DIRECTORY):
         return subprocess.run([*args], cwd=cwd)
 
 

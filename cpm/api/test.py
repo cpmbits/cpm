@@ -3,11 +3,9 @@ import argparse
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
-from cpm.infrastructure.filesystem import Filesystem
-from cpm.infrastructure.yaml_handler import YamlHandler
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
-from cpm.domain.project_loader import ProjectLoader
-from cpm.domain.project_loader import NotACpmProject
+from cpm.domain.project.project_loader import ProjectLoader
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.domain.test_service import TestService
 from cpm.domain.test_service import NoTestsFound
 from cpm.domain.project_commands import BuildError
@@ -38,11 +36,9 @@ def execute(argv):
     add_target_parser.add_argument('files_or_dirs', nargs=argparse.REMAINDER)
     args = add_target_parser.parse_args(argv)
 
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    project_loader = ProjectLoader(yaml_handler, filesystem)
+    project_loader = ProjectLoader()
     cmakelists_builder = CMakeListsBuilder()
-    project_commands = ProjectCommands(filesystem)
+    project_commands = ProjectCommands()
     service = TestService(project_loader, cmakelists_builder, project_commands)
 
     result = run_tests(service, args.files_or_dirs)

@@ -1,0 +1,5 @@
+PROJECT_DESCRIPTOR_FILE = 'project.yaml'
+BUILD_DIRECTORY = 'build'
+CMAKELISTS = 'CMakeLists.txt'
+CMAKE_COMMAND = 'cmake'
+NINJA_COMMAND = 'ninja'

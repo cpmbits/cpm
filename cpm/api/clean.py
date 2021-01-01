@@ -3,11 +3,9 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.project_commands import ProjectCommands
-from cpm.domain.project_loader import NotACpmProject
-from cpm.domain.project_loader import ProjectLoader
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_loader import ProjectLoader
 from cpm.domain.compilation_service import CompilationService
-from cpm.infrastructure.filesystem import Filesystem
-from cpm.infrastructure.yaml_handler import YamlHandler
 
 
 def clean_project(compilation_service):
@@ -20,11 +18,9 @@ def clean_project(compilation_service):
 
 
 def execute(argv):
-    filesystem = Filesystem()
-    yaml_handler = YamlHandler(filesystem)
-    project_loader = ProjectLoader(yaml_handler, filesystem)
+    project_loader = ProjectLoader()
     cmakelists_builder = CMakeListsBuilder()
-    project_builder = ProjectCommands(filesystem)
+    project_builder = ProjectCommands()
     service = CompilationService(project_loader, cmakelists_builder, project_builder)
 
     result = clean_project(service)
