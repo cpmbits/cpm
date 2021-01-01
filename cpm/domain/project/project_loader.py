@@ -16,6 +16,6 @@ class ProjectLoader(object):
     def parse_build_bit_descriptors(self, bits, declared_bits, next_declared_bits):
         for declared_bit in declared_bits:
             if declared_bit.name not in bits:
-                bit_description = project_descriptor_parser.parse_from(f'bits/{declared_bit.name}')
-                bits[declared_bit.name] = bit_description
-                self.parse_build_bit_descriptors(bits, next_declared_bits(bit_description), next_declared_bits)
+                bit_descriptor = project_descriptor_parser.parse_from(f'bits/{declared_bit.name}')
+                bits[declared_bit.name] = bit_descriptor
+                self.parse_build_bit_descriptors(bits, next_declared_bits(bit_descriptor), next_declared_bits)

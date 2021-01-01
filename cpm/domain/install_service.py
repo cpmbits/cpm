@@ -30,12 +30,17 @@ class InstallService(object):
         else:
             print(f'installing {name}:{version}')
 
-    def install_all(self, recursive=False, directory='.'):
-        project = self.project_loader.load(directory)
-        for bit_name, version in project.build.declared_bits.items():
-            self.install(bit_name, version)
-        for bit_name, version in project.test.declared_bits.items():
-            self.install(bit_name, version)
+    def install_all(self, directory='.'):
+        self.__install_recursively(directory)
+        project_descriptor = project_descriptor_parser.parse_from(directory)
+        for declared_bit in project_descriptor.test.declared_bits:
+            self.install(declared_bit.name, declared_bit.version)
+
+    def __install_recursively(self, directory='.'):
+        project_descriptor = project_descriptor_parser.parse_from(directory)
+        for declared_bit in project_descriptor.build.declared_bits:
+            self.install(declared_bit.name, declared_bit.version)
+            self.__install_recursively(f'bits/{declared_bit.name}')
 
 
 class BitNotFound(RuntimeError):

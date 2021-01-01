@@ -14,13 +14,13 @@ class CpmHubConnectorV1(object):
         self.dry_run = dry_run
         self.repository_url = repository_url
 
-    def publish_bit(self, project, file_name):
+    def publish_bit(self, project_descriptor, file_name):
         payload = base64.b64encode(filesystem.read_file(file_name, 'rb')).decode('utf-8')
         username = input('username: ')
         password = getpass(prompt='password: ', stream=None)
         body = {
-            'bit_name': project.name,
-            'version': project.version,
+            'bit_name': project_descriptor.name,
+            'version': project_descriptor.version,
             'payload': payload,
             'username': username,
             'password': password,

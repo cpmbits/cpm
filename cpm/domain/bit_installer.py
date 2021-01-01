@@ -13,5 +13,3 @@ class BitInstaller(object):
             filesystem.remove_directory(bit_directory)
         filesystem.create_directory(bit_directory)
         filesystem.unzips(base64.b64decode(bit_download.payload), bit_directory)
-
-        return self.project_loader.load(bit_directory)
