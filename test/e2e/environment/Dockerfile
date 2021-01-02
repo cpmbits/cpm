@@ -1,7 +1,5 @@
-FROM python:3.7
+FROM ubuntu:20.04
 
-WORKDIR /cpmhub_mock
-COPY cpmhub_mock.py /cpmhub_mock
-RUN pip install --upgrade flask
+RUN apt-get update
+RUN apt install -yq ninja-build g++ cmake
 
-ENTRYPOINT ["python3", "cpmhub_mock.py"]
