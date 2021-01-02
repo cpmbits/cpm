@@ -42,10 +42,9 @@ def execute(argv):
     publish_parser.add_argument('-d', '--dry-run', required=False, action='store_true', default=False)
     args = publish_parser.parse_args(argv)
 
-    loader = ProjectLoader()
     packager = BitPackager()
     cpm_hub_connector = CpmHubConnectorV1(repository_url=args.repository_url, dry_run=args.dry_run)
-    service = PublishService(loader, packager, cpm_hub_connector)
+    service = PublishService(packager, cpm_hub_connector)
 
     result = publish_project(service)
 

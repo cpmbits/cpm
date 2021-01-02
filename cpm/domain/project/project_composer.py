@@ -54,5 +54,13 @@ def compose_tests(target_name, project_descriptor, project):
         name = test_file.split('/')[-1].split('.')[0]
         target = project.targets[target_name]
         test = Test(name, target, test_file)
+        for bit_description in project_descriptor.test.bits.values():
+            adjust_bit_packages_base_path(bit_description)
+            add_bit_packages_to_test_includes(bit_description, test)
+            target.bits.append(compose_target(target_name, bit_description))
         project.tests.append(test)
 
+
+def add_bit_packages_to_test_includes(bit_description, test):
+    for package_description in bit_description.build.packages:
+        test.include_directories.add(package_path(package_description))

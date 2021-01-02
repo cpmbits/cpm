@@ -11,25 +11,41 @@ class CMakeListsBuilder(object):
         target = project.targets[target_name]
         self.minimum_required('3.7')
         self.project(project.name)
-        for bit in target.bits:
-            for package in bit.packages:
-                self.build_package_recipe(package)
-        for package in target.packages:
+        for package in self.bit_packages_with_sources(target):
             self.build_package_recipe(package)
-        self.add_executable(project.name,
-                            [target.main],
-                            [self.object_library_name(package.path) for package in target.packages] +
-                            [self.object_library_name(package.path) for bit in target.bits for package in bit.packages])
+        for package in self.target_packages_with_sources(target):
+            self.build_package_recipe(package)
+        self.add_executable(
+            project.name,
+            [target.main],
+            [self.object_library_name(package.path) for package in self.target_packages_with_sources(target)] +
+            [self.object_library_name(package.path) for package in self.bit_packages_with_sources(target)]
+        )
         self.set_target_properties(project.name, 'COMPILE_FLAGS', target.cflags)
         self.include_directories(target.include_directories)
         for test in project.tests:
-            self.add_executable(test.name,
-                                [test.main],
-                                [self.object_library_name(package.path) for package in target.packages] +
-                                [self.object_library_name(package.path) for bit in target.bits for package in bit.packages])
+            for package in self.test_packages_with_sources(test):
+                self.build_package_recipe(package)
+            self.add_executable(
+                test.name,
+                [test.main],
+                [self.object_library_name(package.path) for package in self.target_packages_with_sources(target)] +
+                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(target)] +
+                [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)]
+            )
+            self.target_include_directories(test.name, test.include_directories)
         if project.tests:
             self.add_custom_target('tests', 'echo "> Done', [test.name for test in project.tests])
         return self.contents
+
+    def target_packages_with_sources(self, target):
+        return [package for package in target.packages if package.sources]
+
+    def bit_packages_with_sources(self, target):
+        return [package for bit in target.bits for package in bit.packages if package.sources]
+
+    def test_packages_with_sources(self, test):
+        return [package for package in test.packages if package.sources]
 
     def build_package_recipe(self, package):
         package_library_name = self.object_library_name(package.path)

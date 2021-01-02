@@ -15,7 +15,11 @@ class TestCmakelistsBuilder(unittest.TestCase):
             .with_target('default') \
             .with_cflags(['-std=c++11']) \
             .with_package('package', ['file.cpp', 'file.c'], ['-DHOLA']) \
+            .with_package('spdlog', [], []) \
             .with_test('test_case') \
+            .with_test_package('bits/cest', [], []) \
+            .with_test_package('bits/mock', ['bits/mock/mock.cpp'], []) \
+            .sort_include_directories() \
             .project
 
         cmakelists_content = cmakelists_builder.build_contents(project, 'default')
@@ -26,8 +30,10 @@ class TestCmakelistsBuilder(unittest.TestCase):
         assert 'set_target_properties(package_object_library PROPERTIES COMPILE_FLAGS "-DHOLA")' in cmakelists_content
         assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
         assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
-        assert 'include_directories(package)' in cmakelists_content
-        assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
+        assert 'include_directories(package spdlog)' in cmakelists_content
+        assert 'add_library(bits_mock_object_library OBJECT bits/mock/mock.cpp)' in cmakelists_content
+        assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bits_mock_object_library>)' in cmakelists_content
+        assert 'target_include_directories(test_case PUBLIC bits/cest bits/mock)' in cmakelists_content
         assert ('add_custom_target(tests\n'
                '    COMMAND echo "> Done"\n'
                '    DEPENDS test_case\n'
@@ -61,4 +67,19 @@ class TestProjectBuilder:
     def with_test(self, test_name):
         test = Test(test_name, self.target, f'{test_name}.cpp')
         self.project.tests.append(test)
+        return self
+
+    def with_test_package(self, path, sources, cflags):
+        package = Package(path)
+        package.sources = sources
+        package.cflags = cflags
+        for test in self.project.tests:
+            test.packages.append(package)
+            test.include_directories.add(path)
+        return self
+
+    def sort_include_directories(self):
+        self.target.include_directories = sorted(list(self.target.include_directories))
+        for test in self.project.tests:
+            test.include_directories = sorted(list(test.include_directories))
         return self
