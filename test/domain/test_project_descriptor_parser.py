@@ -97,7 +97,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
             'description': 'kill all humans',
             'targets': {
                 'arduino': {
-                    'image': 'cpmbits/arduino',
+                    'dockerfile': 'Dockerfile',
                     'build': {
                         'packages': {
                             'arduino': {},
@@ -110,6 +110,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
         assert project.targets['arduino'].build.packages == [
             project_descriptor.PackageDescription('arduino')
         ]
+        assert project.targets['arduino'].dockerfile == 'Dockerfile'
 
     def test_parse_project_descriptor_with_target_test_compilation_plan(self):
         yaml_contents = {

@@ -2,8 +2,7 @@ import unittest
 import mock
 
 from cpm.api.build import build_project
-from cpm.domain.compilation_service import DockerImageNotFound
-from cpm.domain.project_commands import BuildError
+from cpm.domain.project_commands import DockerImageNotFound, BuildError
 from cpm.domain.project.project_descriptor_parser import NotACpmProject
 
 

@@ -18,6 +18,7 @@ class Target:
     executable: str = ''
     main: str = 'main.cpp'
     image: str = ''
+    dockerfile: str = ''
     packages: list = field(default_factory=list)
     include_directories: set = field(default_factory=set)
     cflags: list = field(default_factory=list)

@@ -23,6 +23,7 @@ def parse_compilation_plan(plan_description):
 def parse_target(target_name, target_description):
     target = TargetDescription(target_name)
     target.image = target_description.get('image', '')
+    target.dockerfile = target_description.get('dockerfile', '')
     target.build = parse_compilation_plan(target_description.get('build', {}))
     target.test = parse_compilation_plan(target_description.get('test', {}))
     return target

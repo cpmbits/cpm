@@ -48,6 +48,18 @@ class TestInstall(unittest.TestCase):
         install.execute(['-s', 'http://localhost:8000'])
         build.execute([])
 
+    def test_build_from_docker_image(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.set_target_image('default', 'cpmbits/ubuntu:20.04')
+        install.execute(['-s', 'http://localhost:8000'])
+        build.execute([])
+
+    def test_build_from_dockerfile(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.set_target_dockerfile('default', f'../environment')
+        install.execute(['-s', 'http://localhost:8000'])
+        build.execute([])
+
     def test_test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
@@ -88,3 +100,17 @@ class TestInstall(unittest.TestCase):
             '    });\n'
             '});\n'
         )
+
+    def set_target_image(self, target_name, image):
+        with open(f'project.yaml') as stream:
+            project_descriptor = yaml.safe_load(stream)
+        project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['image'] = image
+        with open(f'project.yaml', 'w') as stream:
+            yaml.dump(project_descriptor, stream)
+
+    def set_target_dockerfile(self, target_name, dockerfile):
+        with open(f'project.yaml') as stream:
+            project_descriptor = yaml.safe_load(stream)
+        project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['dockerfile'] = dockerfile
+        with open(f'project.yaml', 'w') as stream:
+            yaml.dump(project_descriptor, stream)

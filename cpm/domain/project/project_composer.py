@@ -20,6 +20,8 @@ def compose_target(target_name, project_descriptor):
     target.cflags = project_descriptor.build.cflags
     target.ldflags = project_descriptor.build.ldflags
     target.libraries = project_descriptor.build.libraries
+    target.image = project_descriptor.targets[target_name].image
+    target.dockerfile = project_descriptor.targets[target_name].dockerfile
     compose_packages(project_descriptor.build.packages, target)
     for bit_description in project_descriptor.build.bits.values():
         adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
