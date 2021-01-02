@@ -15,7 +15,7 @@ def parse_compilation_plan(plan_description):
                                      cflags=package_cflags(plan_description['packages'][package_path]))
         compilation_plan.packages.append(package)
     compilation_plan.cflags = get_or_default_to(plan_description, 'cflags', [])
-    compilation_plan.cppflags = get_or_default_to(plan_description, 'cppflags', [])
+    compilation_plan.ldflags = get_or_default_to(plan_description, 'ldflags', [])
     compilation_plan.libraries = get_or_default_to(plan_description, 'libraries', [])
     return compilation_plan
 

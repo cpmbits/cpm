@@ -18,22 +18,31 @@ def compose(project_descriptor):
 def compose_target(target_name, project_descriptor):
     target = Target(target_name)
     target.cflags = project_descriptor.build.cflags
+    target.ldflags = project_descriptor.build.ldflags
+    target.libraries = project_descriptor.build.libraries
     compose_packages(project_descriptor.build.packages, target)
     for bit_description in project_descriptor.build.bits.values():
-        adjust_bit_packages_base_path(bit_description)
-        add_bit_packages_to_target_includes(bit_description, target)
+        adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
+        add_packages_to_target_includes(bit_description.build.packages, target)
         target.bits.append(compose_target(target_name, bit_description))
     return target
 
 
-def add_bit_packages_to_target_includes(bit_description, target):
-    for package_description in bit_description.build.packages:
-        target.include_directories.add(package_path(package_description))
-
-
-def adjust_bit_packages_base_path(bit_description):
-    for package_description in bit_description.build.packages:
-        package_description.path = f'bits/{bit_description.name}/{package_description.path}'
+def compose_tests(target_name, project_descriptor, project):
+    for bit_description in project_descriptor.test.bits.values():
+        adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
+    for test_file in filesystem.find('tests', 'test_*.cpp'):
+        name = test_file.split('/')[-1].split('.')[0]
+        target = project.targets[target_name]
+        test = Test(name, target, test_file)
+        test.cflags = project_descriptor.test.cflags
+        test.ldflags = project_descriptor.test.ldflags
+        test.libraries = project_descriptor.test.libraries
+        compose_packages(project_descriptor.test.packages, test)
+        for bit_description in project_descriptor.test.bits.values():
+            add_packages_to_target_includes(bit_description.build.packages, test)
+            target.bits.append(compose_target(target_name, bit_description))
+        project.tests.append(test)
 
 
 def compose_packages(packages, target):
@@ -49,18 +58,12 @@ def package_path(package):
     return filesystem.parent_directory(package.path)
 
 
-def compose_tests(target_name, project_descriptor, project):
-    for test_file in filesystem.find('tests', 'test_*.cpp'):
-        name = test_file.split('/')[-1].split('.')[0]
-        target = project.targets[target_name]
-        test = Test(name, target, test_file)
-        for bit_description in project_descriptor.test.bits.values():
-            adjust_bit_packages_base_path(bit_description)
-            add_bit_packages_to_test_includes(bit_description, test)
-            target.bits.append(compose_target(target_name, bit_description))
-        project.tests.append(test)
+def add_packages_to_target_includes(packages, target):
+    for package_description in packages:
+        target.include_directories.add(package_path(package_description))
 
 
-def add_bit_packages_to_test_includes(bit_description, test):
-    for package_description in bit_description.build.packages:
-        test.include_directories.add(package_path(package_description))
+def adjust_bit_packages_base_path(bit_description, packages):
+    for package_description in packages:
+        package_description.path = f'bits/{bit_description.name}/{package_description.path}'
+

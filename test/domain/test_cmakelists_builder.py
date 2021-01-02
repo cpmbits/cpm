@@ -14,6 +14,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
         project = a_project('Project') \
             .with_target('default') \
             .with_cflags(['-std=c++11']) \
+            .with_libraries(['pthread']) \
             .with_package('package', ['file.cpp', 'file.c'], ['-DHOLA']) \
             .with_package('spdlog', [], []) \
             .with_test('test_case') \
@@ -28,6 +29,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
         assert 'project(Project)' in cmakelists_content
         assert 'add_library(package_object_library OBJECT file.cpp file.c)' in cmakelists_content
         assert 'set_target_properties(package_object_library PROPERTIES COMPILE_FLAGS "-DHOLA")' in cmakelists_content
+        assert 'link_libraries(pthread)' in cmakelists_content
         assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
         assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
         assert 'include_directories(package spdlog)' in cmakelists_content
@@ -54,6 +56,10 @@ class TestProjectBuilder:
 
     def with_cflags(self, cflags):
         self.project.targets[self.target_name].cflags = cflags
+        return self
+
+    def with_libraries(self, libraries):
+        self.project.targets[self.target_name].libraries = libraries
         return self
 
     def with_package(self, path, sources, cflags):

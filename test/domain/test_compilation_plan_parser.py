@@ -44,11 +44,9 @@ class TestCompilationPlanParser(unittest.TestCase):
     def test_parsing_compilation_plan_with_flags_and_libraries(self):
         plan_description = {
             'cflags': ['-O0'],
-            'cppflags': ['-std=c++11'],
             'libraries': ['pthread']
         }
         compilation_plan = project_descriptor_parser.parse_compilation_plan(plan_description)
         assert compilation_plan.cflags == ['-O0']
-        assert compilation_plan.cppflags == ['-std=c++11']
         assert compilation_plan.libraries == ['pthread']
 

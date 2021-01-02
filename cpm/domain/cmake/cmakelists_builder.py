@@ -15,6 +15,7 @@ class CMakeListsBuilder(object):
             self.build_package_recipe(package)
         for package in self.target_packages_with_sources(target):
             self.build_package_recipe(package)
+        self.link_libraries(target.libraries)
         self.add_executable(
             project.name,
             [target.main],
@@ -33,7 +34,9 @@ class CMakeListsBuilder(object):
                 [self.object_library_name(package.path) for package in self.bit_packages_with_sources(target)] +
                 [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)]
             )
+            self.set_target_properties(project.name, 'COMPILE_FLAGS', test.cflags)
             self.target_include_directories(test.name, test.include_directories)
+            self.target_link_libraries(test.name, test.libraries)
         if project.tests:
             self.add_custom_target('tests', 'echo "> Done', [test.name for test in project.tests])
         return self.contents
@@ -62,7 +65,7 @@ class CMakeListsBuilder(object):
         self.contents += f'project({name})\n'
 
     def include_directories(self, directories):
-        self.contents += f'include_directories({" ".join(directories)})\n'
+        self.contents += f'include_directories({" ".join(sorted(directories))})\n'
 
     def set_source_files_properties(self, sources, property, values):
         self.contents += f'set_source_files_properties({" ".join(sources)} PROPERTIES {property} "{" ".join(values)}")\n'
@@ -80,13 +83,20 @@ class CMakeListsBuilder(object):
         self.contents += ')\n'
 
     def set_target_properties(self, target, property, values):
-        self.contents += f'set_target_properties({target} PROPERTIES {property} "{" ".join(values)}")\n'
+        if values:
+            self.contents += f'set_target_properties({target} PROPERTIES {property} "{" ".join(values)}")\n'
 
     def target_link_libraries(self, target, libraries):
-        self.contents += f'target_link_libraries({target} {" ".join(libraries)})\n'
+        if libraries:
+            self.contents += f'target_link_libraries({target} {" ".join(libraries)})\n'
+
+    def link_libraries(self, libraries):
+        if libraries:
+            self.contents += f'link_libraries({" ".join(libraries)})\n'
 
     def target_include_directories(self, target, directories):
-        self.contents += f'target_include_directories({target} PUBLIC {" ".join(directories)})\n'
+        if directories:
+            self.contents += f'target_include_directories({target} PUBLIC {" ".join(sorted(directories))})\n'
 
     def add_custom_target(self, target, command, depends):
         self.contents += f'add_custom_target({target}\n' \

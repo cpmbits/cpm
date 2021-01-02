@@ -31,7 +31,9 @@ class TestProjectComposer(unittest.TestCase):
                         'cflags': ['-DUSE_PORTAL_GUN']
                     }
                 },
-                'cflags': ['-std=c++11']
+                'cflags': ['-Wall'],
+                'ldflags': ['-pg'],
+                'libraries': ['pthread']
             }
         }
         filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
@@ -42,7 +44,9 @@ class TestProjectComposer(unittest.TestCase):
         assert project.targets['default'].packages[0].path == 'shaders'
         assert project.targets['default'].packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
         assert project.targets['default'].packages[0].cflags == ['-DUSE_PORTAL_GUN']
-        assert project.targets['default'].cflags == ['-std=c++11']
+        assert project.targets['default'].cflags == ['-Wall']
+        assert project.targets['default'].ldflags == ['-pg']
+        assert project.targets['default'].libraries == ['pthread']
         assert project.targets['default'].include_directories == {'.'}
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
