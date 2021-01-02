@@ -5,7 +5,7 @@ from mock import patch
 
 from cpm.api.project_actions import discover_project_actions
 from cpm.domain.project import Project, ProjectAction
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.infrastructure.project_action_runner import ProjectActionRunner
 
 
@@ -14,7 +14,7 @@ class TestApiProjectActions(unittest.TestCase):
     def test_project_actions_discovers_zero_actions_when_current_directory_is_not_a_cpm_project(self, ProjectLoader):
         project_loader = MagicMock()
         ProjectLoader.return_value = project_loader
-        project_loader.load.side_effect = NotAChromosProject
+        project_loader.load.side_effect = NotACpmProject
         assert discover_project_actions() == []
 
     @patch("cpm.api.project_actions.ProjectLoader")

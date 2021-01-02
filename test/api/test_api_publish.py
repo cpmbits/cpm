@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project_loader import NotAChromosProject
+from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.infrastructure.http_client import HttpConnectionError
 from cpm.api.publish import publish_project
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
@@ -13,7 +13,7 @@ from cpm.infrastructure.cpm_hub_connector_v1 import PublicationFailure
 class TestApiPublish(unittest.TestCase):
     def test_publish_fails_when_current_directory_is_not_a_chromos_project(self):
         publish_service = mock.MagicMock()
-        publish_service.publish.side_effect = NotAChromosProject
+        publish_service.publish.side_effect = NotACpmProject
 
         result = publish_project(publish_service)
 

@@ -22,7 +22,7 @@ def main():
     for project_action in discover_project_actions():
         actions[project_action.name] = ProjectActionRunner(project_action.name, project_action.command)
 
-    top_level_parser = argparse.ArgumentParser(description='Chromos Package Manager')
+    top_level_parser = argparse.ArgumentParser(description='cpm Package Manager')
     top_level_parser.add_argument('-v', '--version', action='version', version=f'cpm version {pkg_resources.require("cpm-cli")[0].version}')
     top_level_parser.add_argument('action', choices=list(actions.keys()) + ['list-actions'], nargs='?')
     args = top_level_parser.parse_args(sys.argv[1:2])
@@ -53,7 +53,7 @@ def api_actions():
 
 
 def finish(result, elapsed_time):
-    print(f'CPM: {result.message}  (took {__format(elapsed_time)})')
+    print(f'cpm: {result.message}  (took {__format(elapsed_time)})')
     sys.exit(result.status_code)
 
 
@@ -62,3 +62,7 @@ def __format(elapsed_time):
         return '%dm %d.%ds' % (elapsed_time.seconds/60, elapsed_time.seconds % 60, elapsed_time.microseconds/1000)
     else:
         return '%d.%ds' % (elapsed_time.seconds, elapsed_time.microseconds/1000)
+
+
+if __name__ == '__main__':
+    main()
