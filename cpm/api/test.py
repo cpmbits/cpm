@@ -22,7 +22,7 @@ def run_tests(test_service, files_or_dirs=None, target='default'):
     except NotACpmProject:
         return Result(FAIL, 'error: not a cpm project')
     except BuildError as e:
-        return Result(FAIL, f'error: build failed')
+        return Result(FAIL, f'error: failed building tests')
     except TestsFailed:
         return Result(FAIL, '✖ FAIL')
     except NoTestsFound:
