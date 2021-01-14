@@ -36,6 +36,11 @@ class CpmHubConnectorV1(object):
             raise AuthenticationFailure()
         if response.status_code == HTTPStatus.NOT_FOUND:
             raise InvalidCpmHubUrl()
+        if response.status_code == HTTPStatus.BAD_REQUEST:
+            raise PublicationFailure()
+        if response.status_code == HTTPStatus.CONFLICT:
+            raise PublicationFailure(
+                f'bit {project_descriptor.name}:{project_descriptor.version} has already been used and cannot be published again')
         if response.status_code != HTTPStatus.OK:
             raise PublicationFailure()
 

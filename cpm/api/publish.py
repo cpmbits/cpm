@@ -6,7 +6,6 @@ from cpm.api.result import FAIL
 from cpm.domain.bit_packager import BitPackager
 from cpm.domain.publish_service import PublishService
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project.project_loader import ProjectLoader
 from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_hub_connector_v1 import InvalidCpmHubUrl
@@ -28,8 +27,8 @@ def publish_project(publish_service):
         return Result(FAIL, f'error: invalid CPM Hub URL')
     except AuthenticationFailure:
         return Result(FAIL, f'error: invalid credentials')
-    except PublicationFailure:
-        return Result(FAIL, f'error: publish failed')
+    except PublicationFailure as error:
+        return Result(FAIL, f'error: {error}')
     except KeyboardInterrupt:
         return Result(FAIL, f'interrupted')
 

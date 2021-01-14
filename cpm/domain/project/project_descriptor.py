@@ -47,7 +47,7 @@ class ProjectDescriptor:
     name: str = ''
     version: str = ''
     description: str = ''
-    schema: str = 'v1'
+    schema: str = '1.0'
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     targets: dict = field(default_factory=dict)
