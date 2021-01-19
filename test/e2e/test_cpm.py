@@ -63,6 +63,7 @@ class TestInstall(unittest.TestCase):
     def test_test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
+        self.add_cflags(['-std=c++11'])
         self.add_test()
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute([])
@@ -84,6 +85,13 @@ class TestInstall(unittest.TestCase):
         project_descriptor[plan]['bits'] = {
             name: version
         }
+        with open(f'project.yaml', 'w') as stream:
+            yaml.dump(project_descriptor, stream)
+
+    def add_cflags(self, cflags):
+        with open(f'project.yaml') as stream:
+            project_descriptor = yaml.safe_load(stream)
+        project_descriptor['build']['cflags'] = cflags
         with open(f'project.yaml', 'w') as stream:
             yaml.dump(project_descriptor, stream)
 

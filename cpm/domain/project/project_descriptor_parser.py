@@ -5,6 +5,44 @@ from cpm.domain import constants
 from cpm.domain.project.project_descriptor import ProjectDescriptor, TargetDescription, DeclaredBit, CompilationPlan, PackageDescription
 
 
+def parse_from(project_directory):
+    try:
+        yaml_contents = yaml_handler.load(project_yaml_file(project_directory))
+    except FileNotFoundError:
+        raise NotACpmProject
+    return parse_yaml(yaml_contents)
+
+
+def parse_yaml(yaml_contents):
+    project_description = ProjectDescriptor(yaml_contents['name'])
+    project_description.version = yaml_contents.get('version', '')
+    project_description.description = yaml_contents.get('description', '')
+    project_description.build = parse_compilation_plan(get_or_default_to(yaml_contents, 'build', {}))
+    project_description.test = parse_compilation_plan(get_or_default_to(yaml_contents, 'test', {}))
+    project_description.targets = parse_targets(get_or_default_to(yaml_contents, 'targets', {}))
+    return project_description
+
+
+def parse_targets(targets_description):
+    targets = {
+        'default': TargetDescription('default')
+    }
+    for target_name in targets_description:
+        targets[target_name] = parse_target(target_name, targets_description[target_name])
+    return targets
+
+
+def parse_target(target_name, target_description):
+    target = TargetDescription(target_name)
+    target.image = target_description.get('image', '')
+    target.dockerfile = target_description.get('dockerfile', '')
+    target.format = target_description.get('format', 'binary')
+    target.main = target_description.get('main', '')
+    target.build = parse_compilation_plan(target_description.get('build', {}))
+    target.test = parse_compilation_plan(target_description.get('test', {}))
+    return target
+
+
 def parse_compilation_plan(plan_description):
     compilation_plan = CompilationPlan()
     for bit_name in get_or_default_to(plan_description, 'bits', {}):
@@ -20,44 +58,8 @@ def parse_compilation_plan(plan_description):
     return compilation_plan
 
 
-def parse_target(target_name, target_description):
-    target = TargetDescription(target_name)
-    target.image = target_description.get('image', '')
-    target.dockerfile = target_description.get('dockerfile', '')
-    target.build = parse_compilation_plan(target_description.get('build', {}))
-    target.test = parse_compilation_plan(target_description.get('test', {}))
-    return target
-
-
-def parse_targets(targets_description):
-    targets = {
-        'default': TargetDescription('default')
-    }
-    for target_name in targets_description:
-        targets[target_name] = parse_target(target_name, targets_description[target_name])
-    return targets
-
-
-def parse_yaml(yaml_contents):
-    project_description = ProjectDescriptor(yaml_contents['name'])
-    project_description.version = yaml_contents.get('version', '')
-    project_description.description = yaml_contents.get('description', '')
-    project_description.build = parse_compilation_plan(get_or_default_to(yaml_contents, 'build', {}))
-    project_description.test = parse_compilation_plan(get_or_default_to(yaml_contents, 'test', {}))
-    project_description.targets = parse_targets(get_or_default_to(yaml_contents, 'targets', {}))
-    return project_description
-
-
 def get_or_default_to(dictionary, key, default):
     return dictionary.get(key, default) or default
-
-
-def parse_from(project_directory):
-    try:
-        yaml_contents = yaml_handler.load(project_yaml_file(project_directory))
-    except FileNotFoundError:
-        raise NotACpmProject
-    return parse_yaml(yaml_contents)
 
 
 def project_yaml_file(project_directory):

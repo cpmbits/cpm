@@ -81,13 +81,14 @@ class TestProjectDescriptorParser(unittest.TestCase):
             'description': 'kill all humans',
             'targets': {
                 'default': {
-                    'image': 'cpmbits/bender'
+                    'image': 'cpmbits/bender',
+                    'main': 'main.c'
                 }
             }
         }
         project = project_descriptor_parser.parse_yaml(yaml_contents)
         assert project.targets == {
-            'default': project_descriptor.TargetDescription('default', image='cpmbits/bender')
+            'default': project_descriptor.TargetDescription('default', image='cpmbits/bender', main='main.c')
         }
 
     def test_parse_project_descriptor_with_target_build_compilation_plan(self):
