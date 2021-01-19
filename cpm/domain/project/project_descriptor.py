@@ -37,6 +37,7 @@ class TargetDescription:
     name: str
     image: str = ''
     dockerfile: str = ''
+    format: str = 'binary'
     main: str = 'main.cpp'
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)

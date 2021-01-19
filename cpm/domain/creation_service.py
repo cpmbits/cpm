@@ -52,6 +52,9 @@ class CreationService:
             f"  packages:\n"
             f"  bits:\n"
             f"test:\n"
+            f"targets:\n"
+            f"  default:\n"
+            f"    main: 'main.cpp'\n"
         )
 
     def create_project_directory(self, project_name):
