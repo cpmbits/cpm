@@ -12,7 +12,7 @@ class ProjectCommands(object):
     def build(self, project, target_name):
         if not filesystem.directory_exists(constants.BUILD_DIRECTORY):
             filesystem.create_directory(constants.BUILD_DIRECTORY)
-        self.__build(project, target_name, project.name)
+        self.__build(project, target_name, [project.name])
 
     def clean(self, project):
         if filesystem.directory_exists(constants.BUILD_DIRECTORY):
@@ -23,25 +23,30 @@ class ProjectCommands(object):
     def build_tests(self, project, target_name, files_or_dirs):
         if not filesystem.directory_exists(constants.BUILD_DIRECTORY):
             filesystem.create_directory(constants.BUILD_DIRECTORY)
-        self.__build(project, target_name, 'tests')
-
-    def __build(self, project, target_name, goal):
-        if project.targets[target_name].image:
-            self.__build_using_image(project, project.targets[target_name].image, goal)
-        elif project.targets[target_name].dockerfile:
-            self.__build_using_dockerfile(project, project.targets[target_name].dockerfile, goal)
+        if not files_or_dirs:
+            self.__build(project, target_name, ['tests'])
         else:
-            self.__build_goal(goal)
+            tests_to_run = self.tests_from_args(project, target_name, files_or_dirs)
+            self.__build(project, target_name, [test.name for test in tests_to_run])
 
-    def __build_goal(self, goal):
+    def __build(self, project, target_name, goals):
+        if project.targets[target_name].image:
+            self.__build_using_image(project, project.targets[target_name].image, goals)
+        elif project.targets[target_name].dockerfile:
+            self.__build_using_dockerfile(project, project.targets[target_name].dockerfile, goals)
+        else:
+            self.__build_goal(goals)
+
+    def __build_goal(self, goals):
         if any(result.returncode != 0 for result in [
             self.__run_command(constants.CMAKE_COMMAND, '-G', 'Ninja', '..'),
-            self.__run_command(constants.NINJA_COMMAND, goal)
+            self.__run_command(constants.NINJA_COMMAND, *goals)
         ]):
             raise BuildError
 
     def run_tests(self, project, target_name, files_or_dirs):
-        test_results = [self.run_test(test.name) for test in project.tests]
+        tests_to_run = project.tests if not files_or_dirs else self.tests_from_args(project, target_name, files_or_dirs)
+        test_results = [self.run_test(test.name) for test in tests_to_run]
         if any(result.returncode != 0 for result in test_results):
             raise TestsFailed('tests failed')
 
@@ -95,6 +100,23 @@ class ProjectCommands(object):
         if exit_code['StatusCode'] != 0:
             raise BuildError
         container.remove()
+
+    def tests_from_args(self, project, target_name, files_or_dirs):
+        if not files_or_dirs:
+            return 'tests'
+        tests = []
+        for arg in files_or_dirs:
+            if filesystem.is_file(arg):
+                tests.append(self.test_from_test_file(project, target_name, arg))
+            elif filesystem.is_directory(arg):
+                tests.extend(self.test_list_from_directory(project, target_name, arg))
+        return tests
+
+    def test_list_from_directory(self, project, target_name, directory):
+        return [self.test_from_test_file(project, target_name, test_file) for test_file in filesystem.find(directory, 'test_*.cpp')]
+
+    def test_from_test_file(self, project, target_name, test_file):
+        return next(test for test in project.tests if test.main == test_file)
 
 
 def _ignore_exception(call):
