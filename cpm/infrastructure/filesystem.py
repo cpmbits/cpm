@@ -40,6 +40,14 @@ def directory_exists(name):
     return os.path.exists(name) and os.path.isdir(name)
 
 
+def is_directory(path):
+    return os.path.isdir(path)
+
+
+def is_file(path):
+    return os.path.isfile(path)
+
+
 def parent_directory(path):
     return str(Path(path).parent)
 

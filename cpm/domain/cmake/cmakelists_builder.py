@@ -34,7 +34,7 @@ class CMakeListsBuilder(object):
                 [self.object_library_name(package.path) for package in self.bit_packages_with_sources(target)] +
                 [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)]
             )
-            self.set_target_properties(project.name, 'COMPILE_FLAGS', test.cflags)
+            self.set_target_properties(test.name, 'COMPILE_FLAGS', test.cflags)
             self.target_include_directories(test.name, test.include_directories)
             self.target_link_libraries(test.name, test.libraries)
         if project.tests:

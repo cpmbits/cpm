@@ -63,16 +63,36 @@ class TestInstall(unittest.TestCase):
     def test_test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.add_cflags(['-std=c++11'])
-        self.add_test()
+        self.add_test_cflags(['-std=c++11'])
+        self.add_test('test_case.cpp')
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute([])
+        assert result.status_code == 0
+
+    def test_specifying_test_file(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('test', 'cest', '1.0')
+        self.add_test_cflags(['-std=c++11'])
+        self.add_test('test_case1.cpp')
+        self.add_test('test_case2.cpp')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = test.execute(['tests/test_case1.cpp'])
+        assert result.status_code == 0
+
+    def test_specifying_test_directory(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('test', 'cest', '1.0')
+        self.add_test_cflags(['-std=c++11'])
+        self.add_test('test_case1.cpp')
+        self.add_test('test_case2.cpp')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = test.execute(['tests'])
         assert result.status_code == 0
 
     def test_failing_test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.add_test(fails=True)
+        self.add_test('test_case.cpp', fails=True)
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute([])
         assert result.status_code == 1
@@ -88,18 +108,19 @@ class TestInstall(unittest.TestCase):
         with open(f'project.yaml', 'w') as stream:
             yaml.dump(project_descriptor, stream)
 
-    def add_cflags(self, cflags):
+    def add_test_cflags(self, cflags):
         with open(f'project.yaml') as stream:
             project_descriptor = yaml.safe_load(stream)
-        project_descriptor['build']['cflags'] = cflags
+        project_descriptor['test']['cflags'] = cflags
         with open(f'project.yaml', 'w') as stream:
             yaml.dump(project_descriptor, stream)
 
-    def add_test(self, fails=False):
-        filesystem.create_directory('tests')
+    def add_test(self, file_name, fails=False):
+        if not filesystem.directory_exists('tests'):
+            filesystem.create_directory('tests')
         expect = 'false' if fails else 'true'
         filesystem.create_file(
-            'tests/test_case.cpp',
+            f'tests/{file_name}',
             '#include <cest/cest.h>\n'
             'using namespace cest;\n'
             'describe("Test Case", []() {\n'
