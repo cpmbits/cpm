@@ -51,7 +51,7 @@ def compose_packages(packages, target):
     for package_description in packages:
         package = Package(package_description.path)
         package.sources = filesystem.find(package.path, '*.cpp') + filesystem.find(package.path, '*.c')
-        package.cflags = package_description.cflags
+        package.cflags = package_description.cflags + target.cflags
         target.packages.append(package)
         target.include_directories.add(package_path(package))
 
