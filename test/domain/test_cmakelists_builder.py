@@ -28,7 +28,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
         assert 'cmake_minimum_required (VERSION 3.7)' in cmakelists_content
         assert 'project(Project)' in cmakelists_content
         assert 'add_library(package_object_library OBJECT file.cpp file.c)' in cmakelists_content
-        assert 'set_target_properties(package_object_library PROPERTIES COMPILE_FLAGS "-DHOLA -std=c++11")' in cmakelists_content
+        assert 'set_target_properties(package_object_library PROPERTIES COMPILE_FLAGS "-DHOLA")' in cmakelists_content
         assert 'link_libraries(pthread)' in cmakelists_content
         assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
         assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
