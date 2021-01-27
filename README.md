@@ -1,6 +1,6 @@
 # cpm: A modern project management tool for C/C++ projects  ![CI](https://github.com/jorsanpe/cpm/workflows/CI/badge.svg)
 
-You can find the [documentation](https://cpmbits.com/documentation/getting_started.html) in the [cpmbits website](https://cpmbits.com).
+You can find the [documentation](https://cpmbits.com/documentation/getting-started.html) in the [cpmbits website](https://cpmbits.com).
 
 ## Installation
 `pip3 install cpm-cli`
