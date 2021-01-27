@@ -12,9 +12,9 @@ class CMakeListsBuilder(object):
         self.minimum_required('3.7')
         self.project(project.name)
         for package in self.bit_packages_with_sources(target):
-            self.build_package_recipe(target, package)
+            self.build_package_recipe(package)
         for package in self.target_packages_with_sources(target):
-            self.build_package_recipe(target, package)
+            self.build_package_recipe(package)
         self.link_libraries(target.libraries)
         self.add_executable(
             project.name,
@@ -26,7 +26,7 @@ class CMakeListsBuilder(object):
         self.include_directories(target.include_directories)
         for test in project.tests:
             for package in self.test_packages_with_sources(test):
-                self.build_package_recipe(target, package)
+                self.build_package_recipe(package)
             self.add_executable(
                 test.name,
                 [test.main],
@@ -50,10 +50,10 @@ class CMakeListsBuilder(object):
     def test_packages_with_sources(self, test):
         return [package for package in test.packages if package.sources]
 
-    def build_package_recipe(self, target, package):
+    def build_package_recipe(self, package):
         package_library_name = self.object_library_name(package.path)
         self.add_object_library(package_library_name, package.sources)
-        self.set_target_properties(package_library_name, 'COMPILE_FLAGS', package.cflags + target.cflags)
+        self.set_target_properties(package_library_name, 'COMPILE_FLAGS', package.cflags)
 
     def object_library_name(self, package_path):
         return f'{package_path.replace("/", "_")}_object_library'

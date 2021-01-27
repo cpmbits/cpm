@@ -43,7 +43,7 @@ class TestProjectComposer(unittest.TestCase):
         assert len(project.targets['default'].packages) == 1
         assert project.targets['default'].packages[0].path == 'shaders'
         assert project.targets['default'].packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
-        assert project.targets['default'].packages[0].cflags == ['-DUSE_PORTAL_GUN']
+        assert project.targets['default'].packages[0].cflags == ['-DUSE_PORTAL_GUN', '-Wall']
         assert project.targets['default'].cflags == ['-Wall']
         assert project.targets['default'].ldflags == ['-pg']
         assert project.targets['default'].libraries == ['pthread']
