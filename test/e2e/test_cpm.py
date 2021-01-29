@@ -46,19 +46,22 @@ class TestInstall(unittest.TestCase):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('build', 'test', '1.0')
         install.execute(['-s', 'http://localhost:8000'])
-        build.execute([])
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
 
     def test_build_from_docker_image(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_image('default', 'cpmbits/ubuntu:20.04')
         install.execute(['-s', 'http://localhost:8000'])
-        build.execute([])
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
 
     def test_build_from_dockerfile(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_dockerfile('default', f'../environment')
         install.execute(['-s', 'http://localhost:8000'])
-        build.execute([])
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
 
     def test_test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)

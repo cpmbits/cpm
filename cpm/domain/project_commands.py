@@ -62,7 +62,7 @@ class ProjectCommands(object):
     def __run_command(self, *args, cwd=constants.BUILD_DIRECTORY):
         return subprocess.run([*args], cwd=cwd)
 
-    def __build_using_image(self, project, image_name, goal):
+    def __build_using_image(self, project, image_name, goals):
         client = docker.from_env()
         print(f'pulling {image_name}')
         try:
@@ -71,7 +71,7 @@ class ProjectCommands(object):
             raise DockerImageNotFound(image_name)
         except docker.errors.NotFound:
             raise DockerImageNotFound(image_name)
-        self.__build_inside_container(client, goal, image_name, project)
+        self.__build_inside_container(client, goals, image_name, project)
 
     def __build_using_dockerfile(self, project, dockerfile, goal):
         client = docker.from_env()
@@ -80,10 +80,10 @@ class ProjectCommands(object):
         client.images.build(path=dockerfile, tag=image_name)
         self.__build_inside_container(client, goal, image_name, project)
 
-    def __build_inside_container(self, client, goal, image_name, project):
+    def __build_inside_container(self, client, goals, image_name, project):
         filesystem.create_file(
             f'{constants.BUILD_DIRECTORY}/build.sh',
-            f'{constants.CMAKE_COMMAND} -G Ninja /{project.name} && {constants.NINJA_COMMAND} {goal}'
+            f'{constants.CMAKE_COMMAND} -G Ninja /{project.name} && {constants.NINJA_COMMAND} {" ".join(goals)}'
         )
         container = client.containers.run(
             image_name,
