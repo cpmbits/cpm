@@ -26,7 +26,6 @@ class Target:
     ldflags: list = field(default_factory=list)
     libraries: list = field(default_factory=list)
     bits: list = field(default_factory=list)
-    test_bits: list = field(default_factory=list)
 
 
 @dataclass
@@ -49,6 +48,7 @@ class Test:
     cppflags: list = field(default_factory=list)
     ldflags: list = field(default_factory=list)
     libraries: list = field(default_factory=list)
+    bits: list = field(default_factory=list)
 
 
 @dataclass

@@ -31,6 +31,7 @@ class CMakeListsBuilder(object):
                 [test.main],
                 [self.object_library_name(package.path) for package in self.target_packages_with_sources(project.target)] +
                 [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)] +
+                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.test)] +
                 [self.object_library_name(package.path) for package in self.test_packages_with_sources(project.test)] +
                 [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)]
             )
