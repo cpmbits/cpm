@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from cpm.infrastructure import filesystem
-from cpm.domain.project import Project
+from cpm.domain.project.project import Project
 from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 
@@ -37,7 +37,6 @@ class CreationService:
         return project
 
     def generate_sample_code(self, project):
-        project.build.add_sources(['main.cpp'])
         filesystem.create_file(
             f'{project.name}/main.cpp',
             CPP_HELLO_WORLD
@@ -47,7 +46,7 @@ class CreationService:
         filesystem.create_file(
             f"{options.directory}/project.yaml",
             f"name: '{options.project_name}'\n"
-            f"version: {options.project_name}\n"
+            f"version: 0.1\n"
             f"build:\n"
             f"  packages:\n"
             f"  bits:\n"

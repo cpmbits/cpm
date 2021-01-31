@@ -3,7 +3,7 @@ import mock
 
 from cpm.domain.bit_packager import BitPackager
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project import Project, Package
+from cpm.domain.project.project import Project, Package
 
 
 class TestBitPackager(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestBitPackager(unittest.TestCase):
         filesystem.directory_exists.return_value = True
         packager = BitPackager()
         project = Project('cest')
-        project.build.add_package(Package('fakeit'))
+        project.target.packages.append(Package('fakeit'))
 
         self.assertRaises(PackagingFailure, packager.pack, project, 'dist')
 
@@ -27,8 +27,8 @@ class TestBitPackager(unittest.TestCase):
         filesystem.directory_exists.return_value = False
         packager = BitPackager()
         project = Project('cest')
-        project.build.add_package(Package('api'))
-        project.build.add_package(Package('domain'))
+        project.target.packages.append(Package('api'))
+        project.target.packages.append(Package('domain'))
 
         packager.pack(project, 'dist')
 

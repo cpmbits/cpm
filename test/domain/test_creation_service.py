@@ -1,7 +1,7 @@
 import unittest
 import mock
 
-from cpm.domain.project import Project
+from cpm.domain.project.project import Project
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
@@ -95,5 +95,4 @@ class TestCreationService(unittest.TestCase):
         project = creation_service.create(creation_options)
 
         assert project.name == 'AwesomeProject'
-        assert project.build.sources == ['main.cpp']
 

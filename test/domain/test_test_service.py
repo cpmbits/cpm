@@ -1,7 +1,7 @@
 import unittest
 import mock
 
-from cpm.domain.project import Project
+from cpm.domain.project.project import Project
 from cpm.domain.project.project_descriptor_parser import NotACpmProject
 from cpm.domain.test_service import TestService, NoTestsFound
 
@@ -30,7 +30,7 @@ class TestTestService(unittest.TestCase):
 
     def test_service_generates_the_recipe_then_compiles_and_runs_the_tests(self):
         project = Project('ProjectName')
-        project.tests = ['test']
+        project.test.test_suites = ['test']
         self.project_loader.load.return_value = project
 
         self.test_service.run_tests([], 'default')
@@ -42,7 +42,7 @@ class TestTestService(unittest.TestCase):
 
     def test_service_build_ans_runs_only_specified_tests(self):
         project = Project('ProjectName')
-        project.tests = ['test']
+        project.test.test_suites = ['test']
         self.project_loader.load.return_value = project
 
         self.test_service.run_tests(['tests'], 'default')

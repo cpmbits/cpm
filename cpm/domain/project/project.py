@@ -14,7 +14,7 @@ class Package:
 
 @dataclass
 class Target:
-    name: str
+    name: str = 'default'
     executable: str = ''
     main: str = 'main.cpp'
     image: str = ''
@@ -30,10 +30,19 @@ class Target:
 
 
 @dataclass
-class Test:
+class TestSuite:
     name: str
-    target: Target
     main: str
+    packages: list = field(default_factory=list)
+    include_directories: set = field(default_factory=set)
+    cflags: list = field(default_factory=list)
+    cppflags: list = field(default_factory=list)
+    ldflags: list = field(default_factory=list)
+    libraries: list = field(default_factory=list)
+
+@dataclass
+class Test:
+    test_suites: list = field(default_factory=list)
     packages: list = field(default_factory=list)
     include_directories: set = field(default_factory=set)
     cflags: list = field(default_factory=list)
@@ -45,10 +54,10 @@ class Test:
 @dataclass
 class Project:
     name: str = ''
-    version: str = ''
+    version: str = '0.1'
     description: str = ''
     descriptor: ProjectDescriptor = field(default_factory=ProjectDescriptor)
-    targets: dict = field(default_factory=dict)
-    tests: list = field(default_factory=list)
+    target: Target = field(default_factory=Test)
+    test: Test = field(default_factory=Test)
     declared_bits: list = field(default_factory=list)
     actions: list = field(default_factory=list)
