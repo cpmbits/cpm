@@ -63,7 +63,7 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result == Result(0, 'Build finished')
 
-    def test_test_after_recursive_bit_installation(self):
+    def test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
         self.add_test_cflags(['-std=c++11'])

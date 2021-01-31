@@ -49,6 +49,70 @@ class TestProjectComposer(unittest.TestCase):
         assert project.target.include_directories == {'.'}
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
+    def test_should_compose_project_from_project_description_with_one_target_build_package(self, filesystem):
+        yaml_load = {
+            'name': 'HalfLife3',
+            'targets': {
+                'default': {
+                    'build': {
+                        'packages': {
+                            'shaders': {
+                                'cflags': ['-DUSE_PORTAL_GUN']
+                            }
+                        },
+                        'cflags': ['-Wall'],
+                        'ldflags': ['-pg'],
+                        'libraries': ['pthread']
+                    },
+                }
+            }
+        }
+        filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
+        filesystem.parent_directory.return_value = '.'
+        project_description = project_descriptor_parser.parse_yaml(yaml_load)
+        project = project_composer.compose(project_description)
+        assert len(project.target.packages) == 1
+        assert project.target.packages[0].path == 'shaders'
+        assert project.target.packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
+        assert project.target.packages[0].cflags == ['-DUSE_PORTAL_GUN', '-Wall']
+        assert project.target.cflags == ['-Wall']
+        assert project.target.ldflags == ['-pg']
+        assert project.target.libraries == ['pthread']
+        assert project.target.include_directories == {'.'}
+
+    @mock.patch('cpm.domain.project.project_composer.filesystem')
+    def test_should_compose_project_from_project_description_with_one_target_test_package(self, filesystem):
+        yaml_load = {
+            'name': 'HalfLife3',
+            'targets': {
+                'default': {
+                    'test': {
+                        'packages': {
+                            'shaders': {
+                                'cflags': ['-DUSE_PORTAL_GUN']
+                            }
+                        },
+                        'cflags': ['-Wall'],
+                        'ldflags': ['-pg'],
+                        'libraries': ['pthread']
+                    },
+                }
+            }
+        }
+        filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
+        filesystem.parent_directory.return_value = '.'
+        project_description = project_descriptor_parser.parse_yaml(yaml_load)
+        project = project_composer.compose(project_description)
+        assert len(project.test.packages) == 1
+        assert project.test.packages[0].path == 'shaders'
+        assert project.test.packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
+        assert project.test.packages[0].cflags == ['-DUSE_PORTAL_GUN', '-Wall']
+        assert project.test.cflags == ['-Wall']
+        assert project.test.ldflags == ['-pg']
+        assert project.test.libraries == ['pthread']
+        assert project.test.include_directories == {'.'}
+
+    @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_test(self, filesystem):
         yaml_load = {
             'name': 'HalfLife3',
