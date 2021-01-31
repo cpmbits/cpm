@@ -1,12 +1,11 @@
 import unittest
 from mock import patch
-from mock import MagicMock
 
 from http import HTTPStatus
 
 from cpm.domain.install_service import BitNotFound
 from cpm.domain.bit_download import BitDownload
-from cpm.domain.project import Project
+from cpm.domain.project.project import Project
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure, InvalidCpmHubUrl, PublicationFailure
 from cpm.infrastructure.http_client import HttpResponse

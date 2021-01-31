@@ -12,7 +12,7 @@ class ProjectCommands(object):
     def build(self, project, target_name):
         if not filesystem.directory_exists(constants.BUILD_DIRECTORY):
             filesystem.create_directory(constants.BUILD_DIRECTORY)
-        self.__build(project, target_name, [project.name])
+        self.__build(project, [project.name])
 
     def clean(self, project):
         if filesystem.directory_exists(constants.BUILD_DIRECTORY):
@@ -24,16 +24,16 @@ class ProjectCommands(object):
         if not filesystem.directory_exists(constants.BUILD_DIRECTORY):
             filesystem.create_directory(constants.BUILD_DIRECTORY)
         if not files_or_dirs:
-            self.__build(project, target_name, ['tests'])
+            self.__build(project, ['tests'])
         else:
             tests_to_run = self.tests_from_args(project, target_name, files_or_dirs)
-            self.__build(project, target_name, [test.name for test in tests_to_run])
+            self.__build(project, [test.name for test in tests_to_run])
 
-    def __build(self, project, target_name, goals):
-        if project.targets[target_name].image:
-            self.__build_using_image(project, project.targets[target_name].image, goals)
-        elif project.targets[target_name].dockerfile:
-            self.__build_using_dockerfile(project, project.targets[target_name].dockerfile, goals)
+    def __build(self, project, goals):
+        if project.target.image:
+            self.__build_using_image(project, project.target.image, goals)
+        elif project.target.dockerfile:
+            self.__build_using_dockerfile(project, project.target.dockerfile, goals)
         else:
             self.__build_goal(goals)
 
@@ -45,7 +45,7 @@ class ProjectCommands(object):
             raise BuildError
 
     def run_tests(self, project, target_name, files_or_dirs):
-        tests_to_run = project.tests if not files_or_dirs else self.tests_from_args(project, target_name, files_or_dirs)
+        tests_to_run = project.test.test_suites if not files_or_dirs else self.tests_from_args(project, target_name, files_or_dirs)
         test_results = [self.run_test(test.name) for test in tests_to_run]
         if any(result.returncode != 0 for result in test_results):
             raise TestsFailed('tests failed')
@@ -116,7 +116,7 @@ class ProjectCommands(object):
         return [self.test_from_test_file(project, target_name, test_file) for test_file in filesystem.find(directory, 'test_*.cpp')]
 
     def test_from_test_file(self, project, target_name, test_file):
-        return next(test for test in project.tests if test.main == test_file)
+        return next(test for test in project.test.test_suites if test.main == test_file)
 
 
 def _ignore_exception(call):

@@ -6,7 +6,7 @@ class TestService(object):
 
     def run_tests(self, files_or_dirs, target):
         project = self.project_loader.load('.')
-        if not project.tests:
+        if not project.test.test_suites:
             raise NoTestsFound()
         self.cmakelists_builder.build(project, target)
         self.project_commands.build_tests(project, target, files_or_dirs)

@@ -17,9 +17,8 @@ class TestProjectComposer(unittest.TestCase):
         assert project.name == 'HalfLife3'
         assert project.version == '1.0'
         assert project.description == 'I want to believe'
-        assert len(project.targets) == 1
-        assert project.targets['default'].name == 'default'
-        assert project.targets['default'].main == 'main.cpp'
+        assert project.target.name == 'default'
+        assert project.target.main == 'main.cpp'
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_build_package(self, filesystem):
@@ -40,14 +39,14 @@ class TestProjectComposer(unittest.TestCase):
         filesystem.parent_directory.return_value = '.'
         project_description = project_descriptor_parser.parse_yaml(yaml_load)
         project = project_composer.compose(project_description)
-        assert len(project.targets['default'].packages) == 1
-        assert project.targets['default'].packages[0].path == 'shaders'
-        assert project.targets['default'].packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
-        assert project.targets['default'].packages[0].cflags == ['-DUSE_PORTAL_GUN', '-Wall']
-        assert project.targets['default'].cflags == ['-Wall']
-        assert project.targets['default'].ldflags == ['-pg']
-        assert project.targets['default'].libraries == ['pthread']
-        assert project.targets['default'].include_directories == {'.'}
+        assert len(project.target.packages) == 1
+        assert project.target.packages[0].path == 'shaders'
+        assert project.target.packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
+        assert project.target.packages[0].cflags == ['-DUSE_PORTAL_GUN', '-Wall']
+        assert project.target.cflags == ['-Wall']
+        assert project.target.ldflags == ['-pg']
+        assert project.target.libraries == ['pthread']
+        assert project.target.include_directories == {'.'}
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_test(self, filesystem):
@@ -58,7 +57,6 @@ class TestProjectComposer(unittest.TestCase):
         filesystem.parent_directory.return_value = '.'
         project_description = project_descriptor_parser.parse_yaml(yaml_load)
         project = project_composer.compose(project_description)
-        assert len(project.tests) == 1
-        assert project.tests[0].name == 'test_one'
-        assert project.tests[0].target.name == 'default'
-        assert project.tests[0].main == 'tests/test_one.cpp'
+        assert len(project.test.test_suites) == 1
+        assert project.test.test_suites[0].name == 'test_one'
+        assert project.test.test_suites[0].main == 'tests/test_one.cpp'

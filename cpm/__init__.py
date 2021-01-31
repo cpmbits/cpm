@@ -7,8 +7,6 @@ import pkg_resources
 import datetime
 
 import cpm.api
-from cpm.api.project_actions import discover_project_actions
-from cpm.infrastructure.project_action_runner import ProjectActionRunner
 
 
 def main():
@@ -18,9 +16,6 @@ def main():
         module = importlib.import_module(api_action.name)
         if hasattr(module, "execute"):
             actions[module_name(api_action)] = module
-
-    for project_action in discover_project_actions():
-        actions[project_action.name] = ProjectActionRunner(project_action.name, project_action.command)
 
     top_level_parser = argparse.ArgumentParser(description='cpm Package Manager')
     top_level_parser.add_argument('-v', '--version', action='version', version=f'cpm version {pkg_resources.require("cpm-cli")[0].version}')

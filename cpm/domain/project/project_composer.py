@@ -1,5 +1,5 @@
 from cpm.infrastructure import filesystem
-from cpm.domain.project.project import Project, Target, Package, Test
+from cpm.domain.project.project import Project, Target, Package, Test, TestSuite
 
 
 def compose(project_descriptor):
@@ -10,7 +10,7 @@ def compose(project_descriptor):
         descriptor=project_descriptor
     )
     # TODO: pass target as argument
-    project.targets['default'] = compose_target('default', project_descriptor)
+    project.target = compose_target('default', project_descriptor)
     compose_tests('default', project_descriptor, project)
     return project
 
@@ -33,18 +33,21 @@ def compose_target(target_name, project_descriptor):
 def compose_tests(target_name, project_descriptor, project):
     for bit_description in project_descriptor.test.bits.values():
         adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
+
+    project.test.cflags = project_descriptor.test.cflags
+    project.test.ldflags = project_descriptor.test.ldflags
+    project.test.libraries = project_descriptor.test.libraries
+    compose_packages(project_descriptor.test.packages, project.test)
+
+    for bit_description in project_descriptor.test.bits.values():
+        add_packages_to_target_includes(bit_description.build.packages, project.test)
+        project.target.bits.append(compose_target(target_name, bit_description))
+
     for test_file in filesystem.find('tests', 'test_*.cpp'):
         name = test_file.split('/')[-1].split('.')[0]
-        target = project.targets[target_name]
-        test = Test(name, target, test_file)
-        test.cflags = project_descriptor.test.cflags
-        test.ldflags = project_descriptor.test.ldflags
-        test.libraries = project_descriptor.test.libraries
-        compose_packages(project_descriptor.test.packages, test)
-        for bit_description in project_descriptor.test.bits.values():
-            add_packages_to_target_includes(bit_description.build.packages, test)
-            target.bits.append(compose_target(target_name, bit_description))
-        project.tests.append(test)
+        test = TestSuite(name, test_file)
+
+        project.test.test_suites.append(test)
 
 
 def compose_packages(packages, target):

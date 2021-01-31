@@ -11,7 +11,7 @@ from cpm.api import test
 from cpm.api.result import Result
 
 
-class TestInstall(unittest.TestCase):
+class TestCpm(unittest.TestCase):
     PROJECT_NAME = 'test_project'
     TEST_DIRECTORY = f'{os.path.dirname(os.path.abspath(__file__))}'
     PROJECT_DIRECTORY = f'{TEST_DIRECTORY}/{PROJECT_NAME}'

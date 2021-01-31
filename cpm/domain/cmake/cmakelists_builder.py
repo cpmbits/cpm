@@ -3,42 +3,46 @@ class CMakeListsBuilder(object):
         self.contents = ''
 
     def build(self, project, target_name):
-        self.build_contents(project, target_name)
+        self.build_contents(project)
         with open('CMakeLists.txt', 'w') as cmakelists_file:
             cmakelists_file.write(self.contents)
 
-    def build_contents(self, project, target_name):
-        target = project.targets[target_name]
+    def build_contents(self, project):
         self.minimum_required('3.7')
         self.project(project.name)
-        for package in self.bit_packages_with_sources(target):
+        for package in self.bit_packages_with_sources(project.target):
             self.build_package_recipe(package)
-        for package in self.target_packages_with_sources(target):
+        for package in self.target_packages_with_sources(project.target):
             self.build_package_recipe(package)
-        self.link_libraries(target.libraries)
+        self.link_libraries(project.target.libraries)
         self.add_executable(
             project.name,
-            [target.main],
-            [self.object_library_name(package.path) for package in self.target_packages_with_sources(target)] +
-            [self.object_library_name(package.path) for package in self.bit_packages_with_sources(target)]
+            [project.target.main],
+            [self.object_library_name(package.path) for package in self.target_packages_with_sources(project.target)] +
+            [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)]
         )
-        self.set_target_properties(project.name, 'COMPILE_FLAGS', target.cflags)
-        self.include_directories(target.include_directories)
-        for test in project.tests:
-            for package in self.test_packages_with_sources(test):
-                self.build_package_recipe(package)
+        self.set_target_properties(project.name, 'COMPILE_FLAGS', project.target.cflags)
+        self.include_directories(project.target.include_directories)
+        for package in self.test_packages_with_sources(project.test):
+            self.build_package_recipe(package)
+        for test in project.test.test_suites:
             self.add_executable(
                 test.name,
                 [test.main],
-                [self.object_library_name(package.path) for package in self.target_packages_with_sources(target)] +
-                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(target)] +
+                [self.object_library_name(package.path) for package in self.target_packages_with_sources(project.target)] +
+                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)] +
+                [self.object_library_name(package.path) for package in self.test_packages_with_sources(project.test)] +
                 [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)]
             )
-            self.set_target_properties(test.name, 'COMPILE_FLAGS', test.cflags)
-            self.target_include_directories(test.name, test.include_directories)
-            self.target_link_libraries(test.name, test.libraries)
-        if project.tests:
-            self.add_custom_target('tests', 'echo "> Done', [test.name for test in project.tests])
+            self.set_target_properties(test.name, 'COMPILE_FLAGS', project.test.cflags + test.cflags)
+            self.target_include_directories(
+                test.name,
+                project.test.include_directories
+                    .union(test.include_directories)
+            )
+            self.target_link_libraries(test.name, project.test.libraries + test.libraries)
+        if project.test.test_suites:
+            self.add_custom_target('tests', 'echo "> Done', [test.name for test in project.test.test_suites])
         return self.contents
 
     def target_packages_with_sources(self, target):
