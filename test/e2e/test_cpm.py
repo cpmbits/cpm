@@ -59,7 +59,7 @@ class TestCpm(unittest.TestCase):
     def test_build_from_docker_image_with_post_build(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_image('default', 'cpmbits/ubuntu:20.04')
-        self.set_post_build('default', [f'rm build/{self.PROJECT_NAME}'])
+        self.set_post_build('default', [f'ls', f'rm build/{self.PROJECT_NAME}'])
         install.execute(['-s', 'http://localhost:8000'])
         result = build.execute([])
         assert result == Result(0, 'Build finished')

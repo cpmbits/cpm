@@ -105,8 +105,7 @@ class ProjectCommands(object):
         container.remove()
 
     def __post_build(self, project):
-        nl = "\n"
-        return f'( cd .. && {nl.join(project.target.post_build)} )' if project.target.post_build else ''
+        return '\n'.join([f'( cd .. && {post_build} )' for post_build in project.target.post_build])
 
     def tests_from_args(self, project, target_name, files_or_dirs):
         if not files_or_dirs:
