@@ -56,6 +56,15 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result == Result(0, 'Build finished')
 
+    def test_build_from_docker_image_with_post_build(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.set_target_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_post_build('default', [f'ls', f'rm build/{self.PROJECT_NAME}'])
+        install.execute(['-s', 'http://localhost:8000'])
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
+        assert not filesystem.file_exists(f'build/{self.PROJECT_NAME}')
+
     def test_build_from_dockerfile(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_dockerfile('default', f'../environment')
@@ -137,6 +146,13 @@ class TestCpm(unittest.TestCase):
         with open(f'project.yaml') as stream:
             project_descriptor = yaml.safe_load(stream)
         project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['image'] = image
+        with open(f'project.yaml', 'w') as stream:
+            yaml.dump(project_descriptor, stream)
+
+    def set_post_build(self, target_name, post_build):
+        with open(f'project.yaml') as stream:
+            project_descriptor = yaml.safe_load(stream)
+        project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['post_build'] = post_build
         with open(f'project.yaml', 'w') as stream:
             yaml.dump(project_descriptor, stream)
 

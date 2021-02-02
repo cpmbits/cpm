@@ -103,7 +103,10 @@ class TestProjectDescriptorParser(unittest.TestCase):
                         'packages': {
                             'arduino': {},
                         }
-                    }
+                    },
+                    'post_build': [
+                        './scripts/package.sh'
+                    ]
                 }
             }
         }
@@ -112,6 +115,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
             project_descriptor.PackageDescription('arduino')
         ]
         assert project.targets['arduino'].dockerfile == 'Dockerfile'
+        assert project.targets['arduino'].post_build == ['./scripts/package.sh']
 
     def test_parse_project_descriptor_with_target_test_compilation_plan(self):
         yaml_contents = {
