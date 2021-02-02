@@ -41,6 +41,7 @@ class TargetDescription:
     main: str = 'main.cpp'
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
+    post_build: list = field(default_factory=list)
 
 
 @dataclass

@@ -23,6 +23,7 @@ def compose_target(target_name, project_descriptor):
     target.libraries = project_descriptor.build.libraries + target_description.build.libraries
     target.image = target_description.image
     target.dockerfile = target_description.dockerfile
+    target.post_build = target_description.post_build
     compose_packages(project_descriptor.build.packages, target)
     compose_packages(target_description.build.packages, target)
     for bit_description in project_descriptor.build.bits.values():

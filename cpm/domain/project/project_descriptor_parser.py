@@ -28,7 +28,7 @@ def parse_targets(targets_description):
         'default': TargetDescription('default')
     }
     for target_name in targets_description:
-        targets[target_name] = parse_target(target_name, targets_description[target_name])
+        targets[target_name] = parse_target(target_name, targets_description.get(target_name, {}))
     return targets
 
 
@@ -38,6 +38,7 @@ def parse_target(target_name, target_description):
     target.dockerfile = target_description.get('dockerfile', '')
     target.format = target_description.get('format', 'binary')
     target.main = target_description.get('main', '')
+    target.post_build = target_description.get('post_build', [])
     target.build = parse_compilation_plan(target_description.get('build', {}))
     target.test = parse_compilation_plan(target_description.get('test', {}))
     return target
