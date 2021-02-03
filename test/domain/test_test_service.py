@@ -36,7 +36,7 @@ class TestTestService(unittest.TestCase):
         self.test_service.run_tests([], 'default')
 
         self.project_loader.load.assert_called_once()
-        self.cmakelists_builder.build.assert_called_once_with(project, 'default')
+        self.cmakelists_builder.build.assert_called_once_with(project)
         self.project_commands.build_tests.assert_called_once_with(project, 'default', [])
         self.project_commands.run_tests.assert_called_once_with(project, 'default', [])
 
@@ -48,6 +48,6 @@ class TestTestService(unittest.TestCase):
         self.test_service.run_tests(['tests'], 'default')
 
         self.project_loader.load.assert_called_once()
-        self.cmakelists_builder.build.assert_called_once_with(project, 'default')
+        self.cmakelists_builder.build.assert_called_once_with(project)
         self.project_commands.build_tests.assert_called_once_with(project, 'default', ['tests'])
         self.project_commands.run_tests.assert_called_once_with(project, 'default', ['tests'])

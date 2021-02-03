@@ -2,16 +2,15 @@ from cpm.infrastructure import filesystem
 from cpm.domain.project.project import Project, Target, Package, Test, TestSuite
 
 
-def compose(project_descriptor):
+def compose(project_descriptor, target_name):
     project = Project(
         project_descriptor.name,
         version=project_descriptor.version,
         description=project_descriptor.description,
         descriptor=project_descriptor
     )
-    # TODO: pass target as argument
-    project.target = compose_target('default', project_descriptor)
-    compose_tests('default', project_descriptor, project)
+    project.target = compose_target(target_name, project_descriptor)
+    compose_tests(target_name, project_descriptor, project)
     return project
 
 

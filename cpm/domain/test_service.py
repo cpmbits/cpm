@@ -8,7 +8,7 @@ class TestService(object):
         project = self.project_loader.load('.')
         if not project.test.test_suites:
             raise NoTestsFound()
-        self.cmakelists_builder.build(project, target)
+        self.cmakelists_builder.build(project)
         self.project_commands.build_tests(project, target, files_or_dirs)
         self.project_commands.run_tests(project, target, files_or_dirs)
 

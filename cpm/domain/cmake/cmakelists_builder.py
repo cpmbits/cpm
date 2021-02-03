@@ -2,7 +2,7 @@ class CMakeListsBuilder(object):
     def __init__(self):
         self.contents = ''
 
-    def build(self, project, target_name):
+    def build(self, project):
         self.build_contents(project)
         with open('CMakeLists.txt', 'w') as cmakelists_file:
             cmakelists_file.write(self.contents)

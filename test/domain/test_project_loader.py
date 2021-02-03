@@ -13,10 +13,10 @@ class TestProjectLoader(unittest.TestCase):
         project_descriptor_parser.parse_from.return_value = ProjectDescriptor()
         loader = project_loader.ProjectLoader()
         # When
-        loader.load('.')
+        loader.load('.', 'default')
         # Then
         project_descriptor_parser.parse_from.assert_called_once_with('.')
-        project_composer.compose.assert_called_once_with(project_descriptor_parser.parse_from.return_value)
+        project_composer.compose.assert_called_once_with(project_descriptor_parser.parse_from.return_value, 'default')
 
     @mock.patch('cpm.domain.project.project_loader.project_descriptor_parser')
     @mock.patch('cpm.domain.project.project_loader.project_composer')
@@ -27,11 +27,11 @@ class TestProjectLoader(unittest.TestCase):
         project_descriptor_parser.parse_from.return_value = project_descriptor
         loader = project_loader.ProjectLoader()
         # When
-        loader.load('.')
+        loader.load('.', 'default')
         # Then
         project_descriptor_parser.parse_from.assert_has_calls([
             mock.call('.'),
             mock.call('bits/bit')
         ])
-        project_composer.compose.assert_called_once_with(project_descriptor)
+        project_composer.compose.assert_called_once_with(project_descriptor, 'default')
 

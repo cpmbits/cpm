@@ -11,7 +11,7 @@ from cpm.domain import constants
 
 
 class ProjectCommands(object):
-    def build(self, project, target_name):
+    def build(self, project):
         if not filesystem.directory_exists(constants.BUILD_DIRECTORY):
             filesystem.create_directory(constants.BUILD_DIRECTORY)
         self.__build(project, [project.name], post_build=self.__post_build(project))
