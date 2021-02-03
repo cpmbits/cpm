@@ -28,20 +28,20 @@ class TestCompilationService(unittest.TestCase):
         project = Project('ProjectName')
         self.project_loader.load.return_value = project
 
-        self.compilation_service.build()
+        self.compilation_service.build('target_name')
 
-        self.project_loader.load.assert_called_once()
-        self.cmakelists_builder.build.assert_called_once_with(project, 'default')
-        self.project_builder.build.assert_called_once_with(project, 'default')
+        self.project_loader.load.assert_called_once_with('.', 'target_name')
+        self.cmakelists_builder.build.assert_called_once_with(project)
+        self.project_builder.build.assert_called_once_with(project)
 
     def test_compilation_service_only_generates_compilation_recipe_when_updating(self):
         project = Project('ProjectName')
         self.project_loader.load.return_value = project
 
-        self.compilation_service.update()
+        self.compilation_service.update('target_name')
 
-        self.project_loader.load.assert_called_once()
-        self.cmakelists_builder.build.assert_called_once_with(project, 'default')
+        self.project_loader.load.assert_called_once_with('.', 'target_name')
+        self.cmakelists_builder.build.assert_called_once_with(project)
 
     def test_clean_fails_when_project_loader_fails_to_load_project(self):
         self.project_loader.load.side_effect = NotACpmProject

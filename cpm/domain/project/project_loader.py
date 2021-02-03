@@ -2,7 +2,7 @@ from cpm.domain.project import project_descriptor_parser, project_composer
 
 
 class ProjectLoader(object):
-    def load(self, directory):
+    def load(self, directory, target_name='default'):
         project_descriptor = project_descriptor_parser.parse_from(directory)
         # TODO: Target specific bits
         self.parse_build_bit_descriptors(project_descriptor.build.bits,
@@ -11,7 +11,7 @@ class ProjectLoader(object):
         self.parse_build_bit_descriptors(project_descriptor.test.bits,
                                          project_descriptor.test.declared_bits,
                                          lambda description: description.test.declared_bits)
-        return project_composer.compose(project_descriptor)
+        return project_composer.compose(project_descriptor, target_name)
 
     def parse_build_bit_descriptors(self, bits, declared_bits, next_declared_bits):
         for declared_bit in declared_bits:
