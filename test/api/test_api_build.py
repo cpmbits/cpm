@@ -2,6 +2,7 @@ import unittest
 import mock
 
 from cpm.api.build import build_project
+from cpm.domain.project.project_loader import InvalidTarget
 from cpm.domain.project_commands import DockerImageNotFound, BuildError
 from cpm.domain.project.project_descriptor_parser import NotACpmProject
 
@@ -21,6 +22,16 @@ class TestApiBuild(unittest.TestCase):
         recipe = mock.MagicMock()
         compilation_service = mock.MagicMock()
         compilation_service.build.side_effect = BuildError()
+
+        result = build_project(compilation_service, recipe)
+
+        assert result.status_code == 1
+        compilation_service.build.assert_called_once_with(recipe)
+
+    def test_build_fails_when_target_is_unknown(self):
+        recipe = mock.MagicMock()
+        compilation_service = mock.MagicMock()
+        compilation_service.build.side_effect = InvalidTarget()
 
         result = build_project(compilation_service, recipe)
 
