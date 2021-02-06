@@ -64,7 +64,8 @@ class TestProjectComposer(unittest.TestCase):
                         'ldflags': ['-pg'],
                         'libraries': ['pthread']
                     },
-                    'post_build': ['./post_build.sh']
+                    'post_build': ['./post_build.sh'],
+                    'main': 'main.c'
                 }
             }
         }
@@ -81,6 +82,7 @@ class TestProjectComposer(unittest.TestCase):
         assert project.target.libraries == ['pthread']
         assert project.target.include_directories == {'.'}
         assert project.target.post_build == ['./post_build.sh']
+        assert project.target.main == 'main.c'
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_target_test_package(self, filesystem):

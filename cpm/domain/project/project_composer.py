@@ -20,6 +20,7 @@ def compose_target(target_name, project_descriptor):
     target.cflags = project_descriptor.build.cflags + target_description.build.cflags
     target.ldflags = project_descriptor.build.ldflags + target_description.build.ldflags
     target.libraries = project_descriptor.build.libraries + target_description.build.libraries
+    target.main = target_description.main
     target.image = target_description.image
     target.dockerfile = target_description.dockerfile
     target.post_build = target_description.post_build
