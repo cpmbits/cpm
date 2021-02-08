@@ -31,6 +31,13 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result.status_code == 0
 
+    def test_build_with_user_defined_include(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_includes(['../environment'])
+        self.add_main_with_user_include()
+        result = build.execute([])
+        assert result.status_code == 0
+
     def test_bit_installation_from_command_line_passed_bit(self):
         os.chdir(self.PROJECT_DIRECTORY)
         result = install.execute(['-s', 'http://localhost:8000', 'test:1.0'])
@@ -162,3 +169,19 @@ class TestCpm(unittest.TestCase):
         project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['dockerfile'] = dockerfile
         with open(f'project.yaml', 'w') as stream:
             yaml.dump(project_descriptor, stream)
+
+    def add_includes(self, includes):
+        with open(f'project.yaml') as stream:
+            project_descriptor = yaml.safe_load(stream)
+        project_descriptor['build']['includes'] = includes
+        with open(f'project.yaml', 'w') as stream:
+            yaml.dump(project_descriptor, stream)
+
+    def add_main_with_user_include(self):
+        filesystem.create_file(
+            f'main.cpp',
+            '#include <user_include.h>\n'
+            'int main(int argc, char *argv[]) {\n'
+            '    return 0;\n'
+            '}\n'
+        )
