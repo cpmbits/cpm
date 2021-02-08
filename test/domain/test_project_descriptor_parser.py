@@ -33,7 +33,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
             'build': {
                 'packages': {
                     'cpmhub/bits': {
-                        'cflags': ['-DHOLA']
+                        'cflags': ['-DHOLA'],
                     },
                     'cpmhub/http': None
                 },
@@ -42,7 +42,8 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 },
                 'cflags': ['-std=c++11'],
                 'ldflags': ['-pg'],
-                'libraries': ['pthread']
+                'libraries': ['pthread'],
+                'includes': ['./include']
             }
         }
         project = project_descriptor_parser.parse_yaml(yaml_contents)
@@ -53,6 +54,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
         assert project.build.cflags == ['-std=c++11']
         assert project.build.ldflags == ['-pg']
         assert project.build.libraries == ['pthread']
+        assert project.build.includes == {'./include'}
         assert len(project.build.declared_bits) == 1
         assert project.build.declared_bits[0] == project_descriptor.DeclaredBit('sqlite3', '3.32.3')
 

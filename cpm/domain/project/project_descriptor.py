@@ -23,6 +23,7 @@ class CompilationPlan:
     cppflags: list = field(default_factory=list)
     ldflags: list = field(default_factory=list)
     libraries: list = field(default_factory=list)
+    includes: set = field(default_factory=set)
 
 
 @dataclass

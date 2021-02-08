@@ -50,12 +50,15 @@ def parse_compilation_plan(plan_description):
         declared_bit = DeclaredBit(bit_name, plan_description['bits'][bit_name])
         compilation_plan.declared_bits.append(declared_bit)
     for package_path in get_or_default_to(plan_description, 'packages', {}):
-        package = PackageDescription(package_path,
-                                     cflags=package_cflags(plan_description['packages'][package_path]))
+        package = PackageDescription(
+            package_path,
+            cflags=package_cflags(plan_description['packages'][package_path])
+        )
         compilation_plan.packages.append(package)
     compilation_plan.cflags = get_or_default_to(plan_description, 'cflags', [])
     compilation_plan.ldflags = get_or_default_to(plan_description, 'ldflags', [])
     compilation_plan.libraries = get_or_default_to(plan_description, 'libraries', [])
+    compilation_plan.includes.update(get_or_default_to(plan_description, 'includes', []))
     return compilation_plan
 
 
