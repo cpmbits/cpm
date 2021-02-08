@@ -32,7 +32,8 @@ class TestProjectComposer(unittest.TestCase):
                 },
                 'cflags': ['-Wall'],
                 'ldflags': ['-pg'],
-                'libraries': ['pthread']
+                'libraries': ['pthread'],
+                'includes': ['./include']
             }
         }
         filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
@@ -46,7 +47,7 @@ class TestProjectComposer(unittest.TestCase):
         assert project.target.cflags == ['-Wall']
         assert project.target.ldflags == ['-pg']
         assert project.target.libraries == ['pthread']
-        assert project.target.include_directories == {'.'}
+        assert project.target.include_directories == {'.', './include'}
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_target_build_package(self, filesystem):
@@ -88,6 +89,9 @@ class TestProjectComposer(unittest.TestCase):
     def test_should_compose_project_from_project_description_with_one_target_test_package(self, filesystem):
         yaml_load = {
             'name': 'HalfLife3',
+            'test': {
+                'includes': ['./test/include']
+            },
             'targets': {
                 'default': {
                     'test': {
@@ -114,7 +118,7 @@ class TestProjectComposer(unittest.TestCase):
         assert project.test.cflags == ['-Wall']
         assert project.test.ldflags == ['-pg']
         assert project.test.libraries == ['pthread']
-        assert project.test.include_directories == {'.'}
+        assert project.test.include_directories == {'.', './test/include'}
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_test(self, filesystem):
