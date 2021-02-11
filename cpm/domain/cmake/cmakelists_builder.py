@@ -25,15 +25,17 @@ class CMakeListsBuilder(object):
         self.include_directories(project.target.include_directories)
         for package in self.test_packages_with_sources(project.test):
             self.build_package_recipe(package)
+        for package in self.bit_packages_with_sources(project.test):
+            self.build_package_recipe(package)
         for test in project.test.test_suites:
             self.add_executable(
                 test.name,
                 [test.main],
                 [self.object_library_name(package.path) for package in self.target_packages_with_sources(project.target)] +
-                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)] +
-                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.test)] +
                 [self.object_library_name(package.path) for package in self.test_packages_with_sources(project.test)] +
-                [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)]
+                [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)] +
+                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.test)] +
+                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)]
             )
             self.set_target_properties(test.name, 'COMPILE_FLAGS', project.test.cflags + test.cflags)
             self.target_include_directories(

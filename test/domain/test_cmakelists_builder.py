@@ -11,6 +11,14 @@ def a_project(name):
 class TestCmakelistsBuilder(unittest.TestCase):
     def test_build_cmakelists_from_project(self):
         cmakelists_builder = CMakeListsBuilder()
+        bit = a_project('Bit') \
+            .with_target('default') \
+            .with_package('bit_package', ['bit.cpp', 'bit.c'], ['-DBIT_HELLO']) \
+            .project.target
+        test_bit = a_project('TestBit') \
+            .with_target('default') \
+            .with_package('test_bit_package', ['test_bit.cpp', 'test_bit.c'], ['-DTEST_BIT_HELLO']) \
+            .project.target
         project = a_project('Project') \
             .with_target('default') \
             .with_cflags(['-std=c++11']) \
@@ -18,6 +26,8 @@ class TestCmakelistsBuilder(unittest.TestCase):
             .with_package('package', ['file.cpp', 'file.c'], ['-DHOLA']) \
             .with_package('spdlog', [], []) \
             .with_test('test_case') \
+            .with_bits([bit]) \
+            .with_test_bits([test_bit]) \
             .with_test_package('bits/cest', [], []) \
             .with_test_package('bits/mock', ['bits/mock/mock.cpp'], []) \
             .sort_include_directories() \
@@ -25,16 +35,22 @@ class TestCmakelistsBuilder(unittest.TestCase):
 
         cmakelists_content = cmakelists_builder.build_contents(project)
 
+        print(cmakelists_content)
+
         assert 'cmake_minimum_required (VERSION 3.7)' in cmakelists_content
         assert 'project(Project)' in cmakelists_content
         assert 'add_library(package_object_library OBJECT file.cpp file.c)' in cmakelists_content
+        assert 'add_library(bit_package_object_library OBJECT bit.cpp bit.c)' in cmakelists_content
+        assert 'set_target_properties(bit_package_object_library PROPERTIES COMPILE_FLAGS "-DBIT_HELLO")' in cmakelists_content
         assert 'set_target_properties(package_object_library PROPERTIES COMPILE_FLAGS "-DHOLA")' in cmakelists_content
         assert 'link_libraries(pthread)' in cmakelists_content
-        assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library>)' in cmakelists_content
+        assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bit_package_object_library>)' in cmakelists_content
         assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
         assert 'include_directories(package spdlog)' in cmakelists_content
         assert 'add_library(bits_mock_object_library OBJECT bits/mock/mock.cpp)' in cmakelists_content
-        assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bits_mock_object_library>)' in cmakelists_content
+        assert 'add_library(test_bit_package_object_library OBJECT test_bit.cpp test_bit.c)' in cmakelists_content
+        assert 'set_target_properties(test_bit_package_object_library PROPERTIES COMPILE_FLAGS "-DTEST_BIT_HELLO")' in cmakelists_content
+        assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bits_mock_object_library> $<TARGET_OBJECTS:test_bit_package_object_library> $<TARGET_OBJECTS:bit_package_object_library>)' in cmakelists_content
         assert 'target_include_directories(test_case PUBLIC bits/cest bits/mock)' in cmakelists_content
         assert ('add_custom_target(tests\n'
                '    COMMAND echo "> Done"\n'
@@ -88,4 +104,12 @@ class TestProjectBuilder:
         self.project.test.include_directories = set(sorted(list(self.project.test.include_directories)))
         for test in self.project.test.test_suites:
             test.include_directories = set(sorted(list(test.include_directories)))
+        return self
+
+    def with_bits(self, bits):
+        self.project.target.bits.extend(bits)
+        return self
+
+    def with_test_bits(self, bits):
+        self.project.test.bits.extend(bits)
         return self
