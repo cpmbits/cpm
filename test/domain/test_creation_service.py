@@ -43,7 +43,10 @@ class TestCreationService(unittest.TestCase):
 
         creation_service.create(creation_options)
 
-        filesystem.create_directory.assert_called_once_with('AwesomeProject')
+        filesystem.create_directory.assert_has_calls([
+            mock.call('AwesomeProject'),
+            mock.call('AwesomeProject/tests')
+        ])
         filesystem.create_file.assert_called_once_with(
             'AwesomeProject/project.yaml',
             mock.ANY
