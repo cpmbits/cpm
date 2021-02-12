@@ -1,5 +1,6 @@
 from cpm.infrastructure import filesystem
-from cpm.domain.project.project import Project, Target, Package, Test, TestSuite
+from cpm.domain.project.project_descriptor import TargetDescription
+from cpm.domain.project.project import Project, Target, Package, TestSuite
 
 
 def compose(project_descriptor, target_name):
@@ -9,6 +10,7 @@ def compose(project_descriptor, target_name):
         description=project_descriptor.description,
         descriptor=project_descriptor
     )
+    sanitize_target(project_descriptor, target_name)
     project.target = compose_target(target_name, project_descriptor)
     compose_tests(target_name, project_descriptor, project)
     return project
@@ -48,6 +50,11 @@ def compose_tests(target_name, project_descriptor, project):
         name = test_file.split('/')[-1].split('.')[0]
         test_suite = TestSuite(name, test_file)
         project.test.test_suites.append(test_suite)
+
+
+def sanitize_target(project_descriptor, target_name):
+    if target_name not in project_descriptor.targets:
+        project_descriptor.targets[target_name] = TargetDescription(target_name)
 
 
 def compose_bit(bit_description, target, target_name):
