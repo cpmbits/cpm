@@ -63,6 +63,14 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result == Result(0, 'Build finished')
 
+    def test_build_from_docker_image_with_non_default_target(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.set_target_image('ubuntu', 'cpmbits/ubuntu:20.04')
+        self.set_target_main('ubuntu', 'main.cpp')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
+
     def test_build_from_docker_image_with_post_build(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_image('default', 'cpmbits/ubuntu:20.04')
@@ -127,13 +135,6 @@ class TestCpm(unittest.TestCase):
         with open(f'project.yaml', 'w') as stream:
             yaml.dump(project_descriptor, stream)
 
-    def add_test_cflags(self, cflags):
-        with open(f'project.yaml') as stream:
-            project_descriptor = yaml.safe_load(stream)
-        project_descriptor['test']['cflags'] = cflags
-        with open(f'project.yaml', 'w') as stream:
-            yaml.dump(project_descriptor, stream)
-
     def add_test(self, file_name, fails=False):
         if not filesystem.directory_exists('tests'):
             filesystem.create_directory('tests')
@@ -150,30 +151,39 @@ class TestCpm(unittest.TestCase):
         )
 
     def set_target_image(self, target_name, image):
-        with open(f'project.yaml') as stream:
-            project_descriptor = yaml.safe_load(stream)
-        project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['image'] = image
-        with open(f'project.yaml', 'w') as stream:
-            yaml.dump(project_descriptor, stream)
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'image': image})
+        )
+
+    def set_target_main(self, target_name, main):
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'main': main})
+        )
 
     def set_post_build(self, target_name, post_build):
-        with open(f'project.yaml') as stream:
-            project_descriptor = yaml.safe_load(stream)
-        project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['post_build'] = post_build
-        with open(f'project.yaml', 'w') as stream:
-            yaml.dump(project_descriptor, stream)
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'post_build': post_build})
+        )
 
     def set_target_dockerfile(self, target_name, dockerfile):
-        with open(f'project.yaml') as stream:
-            project_descriptor = yaml.safe_load(stream)
-        project_descriptor.setdefault('targets', {}).setdefault(target_name, {})['dockerfile'] = dockerfile
-        with open(f'project.yaml', 'w') as stream:
-            yaml.dump(project_descriptor, stream)
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'dockerfile': dockerfile})
+        )
 
     def add_includes(self, includes):
+        self.modify_descriptor(
+            lambda descriptor: descriptor['build'].update({'includes': includes})
+        )
+
+    def add_test_cflags(self, cflags):
+        self.modify_descriptor(
+            lambda descriptor: descriptor['test'].update({'cflags': cflags})
+        )
+
+    def modify_descriptor(self, modify):
         with open(f'project.yaml') as stream:
             project_descriptor = yaml.safe_load(stream)
-        project_descriptor['build']['includes'] = includes
+        modify(project_descriptor)
         with open(f'project.yaml', 'w') as stream:
             yaml.dump(project_descriptor, stream)
 

@@ -29,6 +29,7 @@ class CreationService:
         project = Project(options.project_name)
         if not options.init_from_existing_sources:
             self.create_project_directory(options.directory)
+            filesystem.create_directory(f'{options.directory}/tests')
         self.create_project_descriptor_file(options)
 
         if options.generate_sample_code:
@@ -51,6 +52,7 @@ class CreationService:
             f"  packages:\n"
             f"  bits:\n"
             f"test:\n"
+            f"  bits:\n"
             f"targets:\n"
             f"  default:\n"
             f"    main: 'main.cpp'\n"
