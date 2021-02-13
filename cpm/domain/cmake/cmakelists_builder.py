@@ -45,7 +45,7 @@ class CMakeListsBuilder(object):
             )
             self.target_link_libraries(test.name, project.test.libraries + test.libraries)
         if project.test.test_suites:
-            self.add_custom_target('tests', 'echo "> Done', [test.name for test in project.test.test_suites])
+            self.add_custom_target('tests', 'echo ""', [test.name for test in project.test.test_suites])
         return self.contents
 
     def target_packages_with_sources(self, target):
@@ -107,7 +107,7 @@ class CMakeListsBuilder(object):
 
     def add_custom_target(self, target, command, depends):
         self.contents += f'add_custom_target({target}\n' \
-                         f'    COMMAND {command}"\n' \
+                         f'    COMMAND {command}\n' \
                          f'    DEPENDS {" ".join(depends)}\n' \
                          f')\n'
 

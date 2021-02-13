@@ -53,9 +53,9 @@ class TestCmakelistsBuilder(unittest.TestCase):
         assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bits_mock_object_library> $<TARGET_OBJECTS:test_bit_package_object_library> $<TARGET_OBJECTS:bit_package_object_library>)' in cmakelists_content
         assert 'target_include_directories(test_case PUBLIC bits/cest bits/mock)' in cmakelists_content
         assert ('add_custom_target(tests\n'
-               '    COMMAND echo "> Done"\n'
-               '    DEPENDS test_case\n'
-               ')\n') in cmakelists_content
+                '    COMMAND echo ""\n'
+                '    DEPENDS test_case\n'
+                ')\n') in cmakelists_content
 
 
 class TestProjectBuilder:
