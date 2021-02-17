@@ -10,7 +10,6 @@ def compose(project_descriptor, target_name):
         description=project_descriptor.description,
         descriptor=project_descriptor
     )
-    sanitize_target(project_descriptor, target_name)
     project.target = compose_target(target_name, project_descriptor)
     compose_tests(target_name, project_descriptor, project)
     return project
@@ -18,7 +17,7 @@ def compose(project_descriptor, target_name):
 
 def compose_target(target_name, project_descriptor):
     target = Target(target_name)
-    target_description = project_descriptor.targets[target_name]
+    target_description = project_descriptor.targets.get(target_name, TargetDescription(target_name))
     target.cflags = project_descriptor.build.cflags + target_description.build.cflags
     target.ldflags = project_descriptor.build.ldflags + target_description.build.ldflags
     target.libraries = project_descriptor.build.libraries + target_description.build.libraries
@@ -35,7 +34,7 @@ def compose_target(target_name, project_descriptor):
 
 
 def compose_tests(target_name, project_descriptor, project):
-    target_description = project_descriptor.targets[target_name]
+    target_description = project_descriptor.targets.get(target_name, TargetDescription(target_name))
     project.test.cflags = project_descriptor.test.cflags + target_description.test.cflags
     project.test.ldflags = project_descriptor.test.ldflags + target_description.test.ldflags
     project.test.libraries = project_descriptor.test.libraries + target_description.test.libraries
@@ -50,11 +49,6 @@ def compose_tests(target_name, project_descriptor, project):
         name = test_file.split('/')[-1].split('.')[0]
         test_suite = TestSuite(name, test_file)
         project.test.test_suites.append(test_suite)
-
-
-def sanitize_target(project_descriptor, target_name):
-    if target_name not in project_descriptor.targets:
-        project_descriptor.targets[target_name] = TargetDescription(target_name)
 
 
 def compose_bit(bit_description, target, target_name):
