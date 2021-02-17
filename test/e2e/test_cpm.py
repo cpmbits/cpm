@@ -56,6 +56,14 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result == Result(0, 'Build finished')
 
+    def test_build_after_recursive_bit_installation_for_target_not_described_by_bit(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('build', 'test', '1.0')
+        self.set_target_main('rpi4', 'main.cpp')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = build.execute(['rpi4'])
+        assert result == Result(0, 'Build finished')
+
     def test_build_from_docker_image(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_image('default', 'cpmbits/ubuntu:20.04')
