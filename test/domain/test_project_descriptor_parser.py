@@ -116,6 +116,9 @@ class TestProjectDescriptorParser(unittest.TestCase):
         assert project.targets['arduino'].build.packages == [
             project_descriptor.PackageDescription('arduino')
         ]
+        assert project.build_packages() == [
+            project_descriptor.PackageDescription('arduino')
+        ]
         assert project.targets['arduino'].dockerfile == 'Dockerfile'
         assert project.targets['arduino'].post_build == ['./scripts/package.sh']
 
