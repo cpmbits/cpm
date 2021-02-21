@@ -54,3 +54,6 @@ class ProjectDescriptor:
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     targets: dict = field(default_factory=dict)
+
+    def build_packages(self):
+        return self.build.packages + [package for target, description in self.targets.items() for package in description.build.packages]
