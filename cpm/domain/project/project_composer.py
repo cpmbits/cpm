@@ -51,31 +51,33 @@ def compose_tests(target_name, project_descriptor, project):
         project.test.test_suites.append(test_suite)
 
 
-def compose_bit(bit_description, target, target_name):
-    adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
-    add_packages_to_target_includes(bit_description.build.packages, target)
-    target.bits.append(compose_target(target_name, bit_description))
-
-
 def compose_packages(packages, target):
     for package_description in packages:
         package = Package(package_description.path)
         package.sources = filesystem.find(package.path, '*.cpp') + filesystem.find(package.path, '*.c')
         package.cflags = package_description.cflags + target.cflags
         target.packages.append(package)
-        target.include_directories.add(package_path(package))
+        target.include_directories.add(package_include_directory(package_description))
+        package.include_directories = target.include_directories
 
 
-def package_path(package):
-    return filesystem.parent_directory(package.path)
-
-
-def add_packages_to_target_includes(packages, target):
-    for package_description in packages:
-        target.include_directories.add(package_path(package_description))
+def compose_bit(bit_description, target, target_name):
+    adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
+    if target_name in bit_description.targets:
+        adjust_bit_packages_base_path(bit_description, bit_description.targets[target_name].build.packages)
+    add_packages_to_target_includes(bit_description.build.packages, target)
+    target.bits.append(compose_target(target_name, bit_description))
 
 
 def adjust_bit_packages_base_path(bit_description, packages):
     for package_description in packages:
         package_description.path = f'bits/{bit_description.name}/{package_description.path}'
 
+
+def add_packages_to_target_includes(packages, target):
+    for package_description in packages:
+        target.include_directories.add(package_include_directory(package_description))
+
+
+def package_include_directory(package_description):
+    return filesystem.parent_directory(package_description.path)

@@ -61,6 +61,7 @@ class CMakeListsBuilder(object):
         package_library_name = self.object_library_name(package.path)
         self.add_object_library(package_library_name, package.sources)
         self.set_target_properties(package_library_name, 'COMPILE_FLAGS', package.cflags)
+        self.target_include_directories(package_library_name, package.include_directories)
 
     def object_library_name(self, package_path):
         return f'{package_path.replace("/", "_")}_object_library'
