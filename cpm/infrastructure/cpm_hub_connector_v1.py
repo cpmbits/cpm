@@ -37,12 +37,12 @@ class CpmHubConnectorV1(object):
         if response.status_code == HTTPStatus.NOT_FOUND:
             raise InvalidCpmHubUrl()
         if response.status_code == HTTPStatus.BAD_REQUEST:
-            raise PublicationFailure()
+            raise PublicationFailure("bad request")
         if response.status_code == HTTPStatus.CONFLICT:
             raise PublicationFailure(
                 f'bit {project_descriptor.name}:{project_descriptor.version} has already been used and cannot be published again')
         if response.status_code != HTTPStatus.OK:
-            raise PublicationFailure()
+            raise PublicationFailure("cpm-hub returned error")
 
     def download_bit(self, name, version):
         response = http_client.get(self.__bit_url(name, version))
