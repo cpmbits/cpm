@@ -18,7 +18,6 @@ class ProjectCommands(object):
 
     def clean(self, project):
         if filesystem.directory_exists(constants.BUILD_DIRECTORY):
-            self.__run_command(constants.NINJA_COMMAND, 'clean')
             filesystem.remove_directory(constants.BUILD_DIRECTORY)
         _ignore_exception(lambda: filesystem.delete_file(constants.CMAKELISTS))
 
