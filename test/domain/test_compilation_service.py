@@ -7,7 +7,7 @@ import os
 from cpm.domain.compilation_service import CompilationService
 from cpm.domain.project_commands import DockerImageNotFound
 from cpm.domain.project.project import Project, Target
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 
 
 class TestCompilationService(unittest.TestCase):
@@ -18,10 +18,10 @@ class TestCompilationService(unittest.TestCase):
         self.compilation_service = CompilationService(self.project_loader, self.cmakelists_builder, self.project_builder)
 
     def test_compilation_service_fails_when_project_loader_fails_to_load_project(self):
-        self.project_loader.load.side_effect = NotACpmProject
+        self.project_loader.load.side_effect = ProjectDescriptorNotFound
 
-        self.assertRaises(NotACpmProject, self.compilation_service.build)
-        self.assertRaises(NotACpmProject, self.compilation_service.update)
+        self.assertRaises(ProjectDescriptorNotFound, self.compilation_service.build)
+        self.assertRaises(ProjectDescriptorNotFound, self.compilation_service.update)
         self.project_loader.load.assert_called()
 
     def test_compilation_service_generates_compilation_recipe_from_project_sources_and_compiles_project(self):
@@ -44,8 +44,8 @@ class TestCompilationService(unittest.TestCase):
         self.cmakelists_builder.build.assert_called_once_with(project)
 
     def test_clean_fails_when_project_loader_fails_to_load_project(self):
-        self.project_loader.load.side_effect = NotACpmProject
-        self.assertRaises(NotACpmProject, self.compilation_service.clean)
+        self.project_loader.load.side_effect = ProjectDescriptorNotFound
+        self.assertRaises(ProjectDescriptorNotFound, self.compilation_service.clean)
         self.project_loader.load.assert_called_once()
 
     def test_clean_uses_cmake_recipe_to_clean_project(self):

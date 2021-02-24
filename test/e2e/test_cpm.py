@@ -64,6 +64,12 @@ class TestCpm(unittest.TestCase):
         result = build.execute(['rpi4'])
         assert result == Result(0, 'Build finished')
 
+    def test_build_when_declared_bit_is_not_installed(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('build', 'test', '1.0')
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
+
     def test_build_from_docker_image(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_image('default', 'cpmbits/ubuntu:20.04')

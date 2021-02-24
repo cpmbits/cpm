@@ -3,7 +3,7 @@ import mock
 
 from cpm.api.test import run_tests
 from cpm.domain.project_commands import BuildError
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.domain.project_commands import TestsFailed
 from cpm.domain.test_service import NoTestsFound
 
@@ -11,7 +11,7 @@ from cpm.domain.test_service import NoTestsFound
 class TestApiTest(unittest.TestCase):
     def test_run_tests_fails_when_current_directory_is_not_a_chromos_project(self):
         test_service = mock.MagicMock()
-        test_service.run_tests.side_effect = NotACpmProject()
+        test_service.run_tests.side_effect = ProjectDescriptorNotFound()
 
         result = run_tests(test_service)
 

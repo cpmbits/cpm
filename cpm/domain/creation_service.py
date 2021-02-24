@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from cpm.infrastructure import filesystem
 from cpm.domain.project.project import Project
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 
 
@@ -22,7 +22,7 @@ class CreationService:
         try:
             self.project_loader.load(directory)
             return True
-        except NotACpmProject:
+        except ProjectDescriptorNotFound:
             return False
 
     def create(self, options):

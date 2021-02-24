@@ -6,7 +6,7 @@ from cpm.api.result import FAIL
 from cpm.domain.bit_packager import BitPackager
 from cpm.domain.publish_service import PublishService
 from cpm.domain.bit_packager import PackagingFailure
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.infrastructure.cpm_hub_connector_v1 import InvalidCpmHubUrl
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
@@ -17,7 +17,7 @@ from cpm.infrastructure.http_client import HttpConnectionError
 def publish_project(publish_service):
     try:
         publish_service.publish()
-    except NotACpmProject:
+    except ProjectDescriptorNotFound:
         return Result(FAIL, f'error: not a CPM project')
     except PackagingFailure as error:
         return Result(FAIL, f'error: {error.cause}')
