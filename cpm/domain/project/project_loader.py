@@ -1,4 +1,5 @@
 from cpm.domain.project import project_descriptor_parser, project_composer
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 
 
 class ProjectLoader(object):
@@ -18,9 +19,13 @@ class ProjectLoader(object):
     def parse_bit_build_descriptors(self, bits, declared_bits, next_declared_bits):
         for declared_bit in declared_bits:
             if declared_bit.name not in bits:
-                bit_descriptor = project_descriptor_parser.parse_from(f'bits/{declared_bit.name}')
-                bits[declared_bit.name] = bit_descriptor
-                self.parse_bit_build_descriptors(bits, next_declared_bits(bit_descriptor), next_declared_bits)
+                try:
+                    bit_descriptor = project_descriptor_parser.parse_from(f'bits/{declared_bit.name}')
+                    bits[declared_bit.name] = bit_descriptor
+                    self.parse_bit_build_descriptors(bits, next_declared_bits(bit_descriptor), next_declared_bits)
+                except ProjectDescriptorNotFound:
+                    print(f'cpm: warning: bit \'{declared_bit.name}:{declared_bit.version}\' not installed. '
+                          f'Run \'cpm install\' to install missing bits.')
 
 
 def target_is_valid(project_descriptor, target_name):

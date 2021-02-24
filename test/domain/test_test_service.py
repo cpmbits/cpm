@@ -2,7 +2,7 @@ import unittest
 import mock
 
 from cpm.domain.project.project import Project
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.domain.test_service import TestService, NoTestsFound
 
 
@@ -14,9 +14,9 @@ class TestTestService(unittest.TestCase):
         self.test_service = TestService(self.project_loader, self.cmakelists_builder, self.project_commands)
 
     def test_service_fails_when_project_loader_fails_to_load_project(self):
-        self.project_loader.load.side_effect = NotACpmProject
+        self.project_loader.load.side_effect = ProjectDescriptorNotFound
 
-        self.assertRaises(NotACpmProject, self.test_service.run_tests, [], 'default')
+        self.assertRaises(ProjectDescriptorNotFound, self.test_service.run_tests, [], 'default')
 
         self.project_loader.load.assert_called_once()
 

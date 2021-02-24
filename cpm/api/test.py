@@ -5,7 +5,7 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.project.project_loader import ProjectLoader
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.domain.test_service import TestService
 from cpm.domain.test_service import NoTestsFound
 from cpm.domain.project_commands import BuildError
@@ -19,7 +19,7 @@ def run_tests(test_service, files_or_dirs=None, target='default'):
 
     try:
         test_service.run_tests(files_or_dirs, target)
-    except NotACpmProject:
+    except ProjectDescriptorNotFound:
         return Result(FAIL, 'error: not a cpm project')
     except BuildError as e:
         return Result(FAIL, f'error: failed building tests')

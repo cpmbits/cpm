@@ -4,14 +4,14 @@ import mock
 from cpm.api.build import build_project
 from cpm.domain.project.project_loader import InvalidTarget
 from cpm.domain.project_commands import DockerImageNotFound, BuildError
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 
 
 class TestApiBuild(unittest.TestCase):
     def test_build_fails_when_current_directory_is_not_a_chromos_project(self):
         recipe = mock.MagicMock()
         compilation_service = mock.MagicMock()
-        compilation_service.build.side_effect = NotACpmProject()
+        compilation_service.build.side_effect = ProjectDescriptorNotFound()
 
         result = build_project(compilation_service, recipe)
 

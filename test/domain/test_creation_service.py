@@ -5,7 +5,7 @@ from cpm.domain.project.project import Project
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 
 
 class TestCreationService(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestCreationService(unittest.TestCase):
 
     def test_project_does_not_exist_when_loading_the_project_fails(self):
         project_loader = mock.MagicMock()
-        project_loader.load.side_effect = NotACpmProject
+        project_loader.load.side_effect = ProjectDescriptorNotFound
         creation_service = CreationService(project_loader)
         directory = 'project_location'
 

@@ -9,7 +9,7 @@ def parse_from(project_directory):
     try:
         yaml_contents = yaml_handler.load(project_yaml_file(project_directory))
     except FileNotFoundError:
-        raise NotACpmProject
+        raise ProjectDescriptorNotFound
     return parse_yaml(yaml_contents)
 
 
@@ -78,5 +78,5 @@ def package_cflags(package_description):
     return package_description.get('cflags', []) if type(package_description) is dict else []
 
 
-class NotACpmProject(RuntimeError):
+class ProjectDescriptorNotFound(RuntimeError):
     pass

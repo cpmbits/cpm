@@ -3,7 +3,7 @@ import mock
 
 from cpm.domain.project.project_descriptor import ProjectDescriptor
 from cpm.domain.publish_service import PublishService
-from cpm.domain.project.project_descriptor_parser import NotACpmProject
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.domain.bit_packager import PackagingFailure
 from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
 
@@ -11,12 +11,12 @@ from cpm.infrastructure.cpm_hub_connector_v1 import AuthenticationFailure
 class TestPublishService(unittest.TestCase):
     @mock.patch('cpm.domain.publish_service.project_descriptor_parser')
     def test_publish_service_fails_when_loader_fails_to_load_project(self, project_descriptor_parser):
-        project_descriptor_parser.parse_from.side_effect = NotACpmProject
+        project_descriptor_parser.parse_from.side_effect = ProjectDescriptorNotFound
         bit_packager = mock.MagicMock()
         cpm_hub_connector = mock.MagicMock()
         service = PublishService(bit_packager, cpm_hub_connector)
 
-        self.assertRaises(NotACpmProject, service.publish)
+        self.assertRaises(ProjectDescriptorNotFound, service.publish)
 
     @mock.patch('cpm.domain.publish_service.project_descriptor_parser')
     def test_publish_service_fails_when_packing_project_fails(self, project_descriptor_parser):
