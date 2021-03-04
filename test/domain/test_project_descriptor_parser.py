@@ -84,13 +84,19 @@ class TestProjectDescriptorParser(unittest.TestCase):
             'targets': {
                 'default': {
                     'image': 'cpmbits/bender',
-                    'main': 'main.c'
+                    'main': 'main.c',
+                    'test_image': 'cpmbits/bender_test',
                 }
             }
         }
         project = project_descriptor_parser.parse_yaml(yaml_contents)
         assert project.targets == {
-            'default': project_descriptor.TargetDescription('default', image='cpmbits/bender', main='main.c')
+            'default': project_descriptor.TargetDescription(
+                'default',
+                image='cpmbits/bender',
+                main='main.c',
+                test_image='cpmbits/bender_test'
+            )
         }
 
     def test_parse_project_descriptor_with_target_build_compilation_plan(self):

@@ -4,13 +4,13 @@ class TestService(object):
         self.cmakelists_builder = cmakelists_builder
         self.project_commands = project_commands
 
-    def run_tests(self, files_or_dirs, target):
-        project = self.project_loader.load('.')
+    def run_tests(self, files_or_dirs, target_name):
+        project = self.project_loader.load('.', target_name)
         if not project.test.test_suites:
             raise NoTestsFound()
         self.cmakelists_builder.build(project)
-        self.project_commands.build_tests(project, target, files_or_dirs)
-        self.project_commands.run_tests(project, target, files_or_dirs)
+        self.project_commands.build_tests(project, files_or_dirs)
+        self.project_commands.run_tests(project, files_or_dirs)
 
 
 class NoTestsFound(RuntimeError):
