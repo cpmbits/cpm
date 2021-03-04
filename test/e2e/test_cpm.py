@@ -77,6 +77,16 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result == Result(0, 'Build finished')
 
+    def test_run_tests_from_docker_image(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('test', 'cest', '1.0')
+        self.set_target_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_target_test_image('default', 'cpmbits/ubuntu:20.04')
+        self.add_test('test_case.cpp')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = test.execute([])
+        assert result.status_code == 0
+
     def test_build_from_docker_image_with_non_default_target(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_image('ubuntu', 'cpmbits/ubuntu:20.04')
@@ -138,6 +148,16 @@ class TestCpm(unittest.TestCase):
         result = test.execute([])
         assert result.status_code == 1
 
+    def test_failing_test_when_running_inside_docker_image(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('test', 'cest', '1.0')
+        self.add_test('test_case.cpp', fails=True)
+        self.set_target_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_target_test_image('default', 'cpmbits/ubuntu:20.04')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = test.execute([])
+        assert result.status_code == 1
+
     def add_bit(self, plan, name, version):
         with open(f'project.yaml') as stream:
             project_descriptor = yaml.safe_load(stream)
@@ -167,6 +187,11 @@ class TestCpm(unittest.TestCase):
     def set_target_image(self, target_name, image):
         self.modify_descriptor(
             lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'image': image})
+        )
+
+    def set_target_test_image(self, target_name, image):
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'test_image': image})
         )
 
     def set_target_main(self, target_name, main):

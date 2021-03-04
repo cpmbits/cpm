@@ -95,7 +95,9 @@ class TestProjectComposer(unittest.TestCase):
                         'libraries': ['pthread']
                     },
                     'post_build': ['./post_build.sh'],
-                    'main': 'main.c'
+                    'main': 'main.c',
+                    'image': 'cpmbits/docker',
+                    'test_image': 'cpmbits/docker_test'
                 }
             }
         }
@@ -113,6 +115,8 @@ class TestProjectComposer(unittest.TestCase):
         assert project.target.include_directories == {'.'}
         assert project.target.post_build == ['./post_build.sh']
         assert project.target.main == 'main.c'
+        assert project.target.image == 'cpmbits/docker'
+        assert project.target.test_image == 'cpmbits/docker_test'
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_target_test_package(self, filesystem):

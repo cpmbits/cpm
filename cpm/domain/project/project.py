@@ -20,6 +20,7 @@ class Target:
     main: str = 'main.cpp'
     image: str = ''
     dockerfile: str = ''
+    test_image: str = ''
     post_build: list = field(default_factory=list)
     packages: list = field(default_factory=list)
     include_directories: set = field(default_factory=set)
@@ -40,6 +41,7 @@ class TestSuite:
     cppflags: list = field(default_factory=list)
     ldflags: list = field(default_factory=list)
     libraries: list = field(default_factory=list)
+
 
 @dataclass
 class Test:

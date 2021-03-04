@@ -36,13 +36,14 @@ class ProjectInformation:
 @dataclass
 class TargetDescription:
     name: str
-    image: str = ''
-    dockerfile: str = ''
-    format: str = 'binary'
     main: str = 'main.cpp'
+    format: str = 'binary'
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     post_build: list = field(default_factory=list)
+    dockerfile: str = ''
+    image: str = ''
+    test_image: str = ''
 
 
 @dataclass
