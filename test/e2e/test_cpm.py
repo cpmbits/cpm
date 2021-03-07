@@ -77,6 +77,14 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result == Result(0, 'Build finished')
 
+    def test_build_from_docker_image_with_toolchain_prefix(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.set_target_dockerfile('default', f'../environment')
+        self.set_toolchain_prefix('default', 'arm-linux-gnueabihf-')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
+
     def test_run_tests_from_docker_image(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
@@ -187,6 +195,11 @@ class TestCpm(unittest.TestCase):
     def set_target_image(self, target_name, image):
         self.modify_descriptor(
             lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'image': image})
+        )
+
+    def set_toolchain_prefix(self, target_name, toolchain_prefix):
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'toolchain_prefix': toolchain_prefix})
         )
 
     def set_target_test_image(self, target_name, image):

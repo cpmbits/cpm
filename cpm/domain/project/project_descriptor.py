@@ -44,6 +44,7 @@ class TargetDescription:
     dockerfile: str = ''
     image: str = ''
     test_image: str = ''
+    toolchain_prefix: str = ''
 
 
 @dataclass
