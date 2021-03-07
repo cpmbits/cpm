@@ -9,6 +9,8 @@ class CMakeListsBuilder(object):
 
     def build_contents(self, project):
         self.minimum_required('3.7')
+        if project.target.toolchain_prefix:
+            self.set_compilers(project.target.toolchain_prefix)
         self.project(project.name)
         for package in self.bit_packages_with_sources(project.target):
             self.build_package_recipe(package)
@@ -118,3 +120,7 @@ class CMakeListsBuilder(object):
                          f'    {when}\n' \
                          f'    COMMAND COMMAND {command}\n' \
                          f')\n'
+
+    def set_compilers(self, toolchain_prefix):
+        self.contents += f'set(CMAKE_C_COMPILER {toolchain_prefix}gcc)\n'
+        self.contents += f'set(CMAKE_CXX_COMPILER {toolchain_prefix}g++)\n'

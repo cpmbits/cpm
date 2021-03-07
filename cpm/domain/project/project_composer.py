@@ -26,6 +26,7 @@ def compose_target(target_name, project_descriptor):
     target.image = target_description.image
     target.test_image = target_description.test_image
     target.dockerfile = target_description.dockerfile
+    target.toolchain_prefix = target_description.toolchain_prefix
     target.post_build = target_description.post_build
     compose_packages(project_descriptor.build.packages, target)
     compose_packages(target_description.build.packages, target)

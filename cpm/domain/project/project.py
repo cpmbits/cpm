@@ -21,6 +21,7 @@ class Target:
     image: str = ''
     dockerfile: str = ''
     test_image: str = ''
+    toolchain_prefix: str = ''
     post_build: list = field(default_factory=list)
     packages: list = field(default_factory=list)
     include_directories: set = field(default_factory=set)

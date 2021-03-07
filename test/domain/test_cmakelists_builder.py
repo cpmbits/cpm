@@ -30,6 +30,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
             .with_test_bits([test_bit]) \
             .with_test_package('bits/cest', [], []) \
             .with_test_package('bits/mock', ['bits/mock/mock.cpp'], []) \
+            .with_toolchain_prefix('arm-linux-gnueabi-') \
             .sort_include_directories() \
             .project
 
@@ -38,6 +39,8 @@ class TestCmakelistsBuilder(unittest.TestCase):
         print(cmakelists_content)
 
         assert 'cmake_minimum_required (VERSION 3.7)' in cmakelists_content
+        assert 'set(CMAKE_C_COMPILER arm-linux-gnueabi-gcc)' in cmakelists_content
+        assert 'set(CMAKE_CXX_COMPILER arm-linux-gnueabi-g++)' in cmakelists_content
         assert 'project(Project)' in cmakelists_content
         assert 'add_library(package_object_library OBJECT file.cpp file.c)' in cmakelists_content
         assert 'add_library(bit_package_object_library OBJECT bit.cpp bit.c)' in cmakelists_content
@@ -76,6 +79,10 @@ class TestProjectBuilder:
 
     def with_libraries(self, libraries):
         self.project.target.libraries = libraries
+        return self
+
+    def with_toolchain_prefix(self, toolchain_prefix):
+        self.project.target.toolchain_prefix = toolchain_prefix
         return self
 
     def with_package(self, path, sources, cflags):

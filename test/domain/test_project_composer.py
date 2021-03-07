@@ -97,7 +97,8 @@ class TestProjectComposer(unittest.TestCase):
                     'post_build': ['./post_build.sh'],
                     'main': 'main.c',
                     'image': 'cpmbits/docker',
-                    'test_image': 'cpmbits/docker_test'
+                    'test_image': 'cpmbits/docker_test',
+                    'toolchain_prefix': 'arm-linux-gnueabi-'
                 }
             }
         }
@@ -117,6 +118,7 @@ class TestProjectComposer(unittest.TestCase):
         assert project.target.main == 'main.c'
         assert project.target.image == 'cpmbits/docker'
         assert project.target.test_image == 'cpmbits/docker_test'
+        assert project.target.toolchain_prefix == 'arm-linux-gnueabi-'
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
     def test_should_compose_project_from_project_description_with_one_target_test_package(self, filesystem):
