@@ -8,7 +8,7 @@ class CMakeListsBuilder(object):
             cmakelists_file.write(self.contents)
 
     def build_contents(self, project):
-        self.minimum_required('3.7')
+        self.minimum_required('3.13')
         if project.target.toolchain_prefix:
             self.set_compilers(project.target.toolchain_prefix)
         self.project(project.name)
@@ -24,6 +24,7 @@ class CMakeListsBuilder(object):
             [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)]
         )
         self.set_target_properties(project.name, 'COMPILE_FLAGS', project.target.cflags)
+        self.target_link_options(project.name, project.target.ldflags)
         self.include_directories(project.target.include_directories)
         for package in self.test_packages_with_sources(project.test):
             self.build_package_recipe(package)
@@ -40,6 +41,7 @@ class CMakeListsBuilder(object):
                 [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)]
             )
             self.set_target_properties(test.name, 'COMPILE_FLAGS', project.test.cflags + test.cflags)
+            self.target_link_options(test.name, project.test.ldflags)
             self.target_include_directories(
                 test.name,
                 project.test.include_directories
@@ -95,6 +97,10 @@ class CMakeListsBuilder(object):
     def set_target_properties(self, target, property, values):
         if values:
             self.contents += f'set_target_properties({target} PROPERTIES {property} "{" ".join(values)}")\n'
+
+    def target_link_options(self, target, values):
+        if values:
+            self.contents += f'target_link_options({target} PUBLIC "{" ".join(values)}")\n'
 
     def target_link_libraries(self, target, libraries):
         if libraries:

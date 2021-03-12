@@ -33,7 +33,7 @@ class TestCpm(unittest.TestCase):
 
     def test_build_with_user_defined_include(self):
         os.chdir(self.PROJECT_DIRECTORY)
-        self.add_includes(['../environment'])
+        self.set_includes(['../environment'])
         self.add_main_with_user_include()
         result = build.execute([])
         assert result.status_code == 0
@@ -77,6 +77,15 @@ class TestCpm(unittest.TestCase):
         result = build.execute([])
         assert result == Result(0, 'Build finished')
 
+    def test_build_from_docker_image_with_ldflags(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.set_target_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_ldflags(['-Wl,--allow-multiple-definition'])
+        self.set_target_ldflags('default', ['-Wl,-s'])
+        install.execute(['-s', 'http://localhost:8000'])
+        result = build.execute([])
+        assert result == Result(0, 'Build finished')
+
     def test_build_from_docker_image_with_toolchain_prefix(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_dockerfile('default', f'../environment')
@@ -90,6 +99,7 @@ class TestCpm(unittest.TestCase):
         self.add_bit('test', 'cest', '1.0')
         self.set_target_image('default', 'cpmbits/ubuntu:20.04')
         self.set_target_test_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_test_ldflags(['-Wl,-s'])
         self.add_test('test_case.cpp')
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute([])
@@ -122,7 +132,7 @@ class TestCpm(unittest.TestCase):
     def test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.add_test_cflags(['-std=c++11'])
+        self.set_test_cflags(['-std=c++11'])
         self.add_test('test_case.cpp')
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute([])
@@ -131,7 +141,7 @@ class TestCpm(unittest.TestCase):
     def test_specifying_test_file(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.add_test_cflags(['-std=c++11'])
+        self.set_test_cflags(['-std=c++11'])
         self.add_test('test_case1.cpp')
         self.add_test('test_case2.cpp')
         install.execute(['-s', 'http://localhost:8000'])
@@ -141,7 +151,7 @@ class TestCpm(unittest.TestCase):
     def test_specifying_test_directory(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.add_test_cflags(['-std=c++11'])
+        self.set_test_cflags(['-std=c++11'])
         self.add_test('test_case1.cpp')
         self.add_test('test_case2.cpp')
         install.execute(['-s', 'http://localhost:8000'])
@@ -222,14 +232,29 @@ class TestCpm(unittest.TestCase):
             lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'dockerfile': dockerfile})
         )
 
-    def add_includes(self, includes):
+    def set_target_ldflags(self, target_name, ldflags):
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'ldflags': ldflags})
+        )
+
+    def set_includes(self, includes):
         self.modify_descriptor(
             lambda descriptor: descriptor['build'].update({'includes': includes})
         )
 
-    def add_test_cflags(self, cflags):
+    def set_ldflags(self, ldflags):
+        self.modify_descriptor(
+            lambda descriptor: descriptor['build'].update({'ldflags': ldflags})
+        )
+
+    def set_test_cflags(self, cflags):
         self.modify_descriptor(
             lambda descriptor: descriptor['test'].update({'cflags': cflags})
+        )
+
+    def set_test_ldflags(self, ldflags):
+        self.modify_descriptor(
+            lambda descriptor: descriptor['test'].update({'ldflags': ldflags})
         )
 
     def modify_descriptor(self, modify):

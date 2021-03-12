@@ -22,6 +22,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
         project = a_project('Project') \
             .with_target('default') \
             .with_cflags(['-std=c++11']) \
+            .with_ldflags(['-Wl,--wrap=malloc']) \
             .with_libraries(['pthread']) \
             .with_package('package', ['file.cpp', 'file.c'], ['-DHOLA']) \
             .with_package('spdlog', [], []) \
@@ -30,6 +31,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
             .with_test_bits([test_bit]) \
             .with_test_package('bits/cest', [], []) \
             .with_test_package('bits/mock', ['bits/mock/mock.cpp'], []) \
+            .with_test_ldflags(['-Wl,--allow-multiple-definition']) \
             .with_toolchain_prefix('arm-linux-gnueabi-') \
             .sort_include_directories() \
             .project
@@ -38,7 +40,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
 
         print(cmakelists_content)
 
-        assert 'cmake_minimum_required (VERSION 3.7)' in cmakelists_content
+        assert 'cmake_minimum_required (VERSION 3.13)' in cmakelists_content
         assert 'set(CMAKE_C_COMPILER arm-linux-gnueabi-gcc)' in cmakelists_content
         assert 'set(CMAKE_CXX_COMPILER arm-linux-gnueabi-g++)' in cmakelists_content
         assert 'project(Project)' in cmakelists_content
@@ -49,11 +51,13 @@ class TestCmakelistsBuilder(unittest.TestCase):
         assert 'link_libraries(pthread)' in cmakelists_content
         assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bit_package_object_library>)' in cmakelists_content
         assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
+        assert 'target_link_options(Project PUBLIC "-Wl,--wrap=malloc")' in cmakelists_content
         assert 'include_directories(package spdlog)' in cmakelists_content
         assert 'add_library(bits_mock_object_library OBJECT bits/mock/mock.cpp)' in cmakelists_content
         assert 'add_library(test_bit_package_object_library OBJECT test_bit.cpp test_bit.c)' in cmakelists_content
         assert 'set_target_properties(test_bit_package_object_library PROPERTIES COMPILE_FLAGS "-DTEST_BIT_HELLO")' in cmakelists_content
         assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bits_mock_object_library> $<TARGET_OBJECTS:test_bit_package_object_library> $<TARGET_OBJECTS:bit_package_object_library>)' in cmakelists_content
+        assert 'target_link_options(test_case PUBLIC "-Wl,--allow-multiple-definition")' in cmakelists_content
         assert 'target_include_directories(test_case PUBLIC bits/cest bits/mock)' in cmakelists_content
         assert ('add_custom_target(tests\n'
                 '    COMMAND echo ""\n'
@@ -75,6 +79,10 @@ class TestProjectBuilder:
 
     def with_cflags(self, cflags):
         self.project.target.cflags = cflags
+        return self
+
+    def with_ldflags(self, ldflags):
+        self.project.target.ldflags = ldflags
         return self
 
     def with_libraries(self, libraries):
@@ -104,6 +112,10 @@ class TestProjectBuilder:
         package.cflags = cflags
         self.project.test.packages.append(package)
         self.project.test.include_directories.add(path)
+        return self
+
+    def with_test_ldflags(self, ldflags):
+        self.project.test.ldflags = ldflags
         return self
 
     def sort_include_directories(self):
