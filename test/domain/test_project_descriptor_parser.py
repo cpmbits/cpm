@@ -112,7 +112,8 @@ class TestProjectDescriptorParser(unittest.TestCase):
                     'build': {
                         'packages': {
                             'arduino': {},
-                        }
+                        },
+                        'ldflags': ['-Wl,--wrap=malloc']
                     },
                     'post_build': [
                         './scripts/package.sh'
@@ -124,6 +125,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
         assert project.targets['arduino'].build.packages == [
             project_descriptor.PackageDescription('arduino')
         ]
+        assert project.targets['arduino'].build.ldflags == ['-Wl,--wrap=malloc']
         assert project.build_packages() == [
             project_descriptor.PackageDescription('arduino')
         ]
