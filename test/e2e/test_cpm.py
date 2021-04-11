@@ -88,7 +88,7 @@ class TestCpm(unittest.TestCase):
 
     def test_build_from_docker_image_with_toolchain_prefix(self):
         os.chdir(self.PROJECT_DIRECTORY)
-        self.set_target_dockerfile('default', f'../environment')
+        self.set_target_dockerfile('default', f'../environment/Dockerfile')
         self.set_toolchain_prefix('default', 'arm-linux-gnueabihf-')
         install.execute(['-s', 'http://localhost:8000'])
         result = build.execute([])
@@ -124,7 +124,7 @@ class TestCpm(unittest.TestCase):
 
     def test_build_from_dockerfile(self):
         os.chdir(self.PROJECT_DIRECTORY)
-        self.set_target_dockerfile('default', f'../environment')
+        self.set_target_dockerfile('default', f'../environment/Dockerfile')
         install.execute(['-s', 'http://localhost:8000'])
         result = build.execute([])
         assert result == Result(0, 'Build finished')

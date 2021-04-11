@@ -66,7 +66,8 @@ class ProjectCommands(object):
         client = docker.from_env()
         print(f'building image from {dockerfile}')
         image_name = f'{project.name}_cpm_build'
-        client.images.build(path=dockerfile, tag=image_name)
+        with open(dockerfile, 'rb') as fileobj:
+            client.images.build(path='.', fileobj=fileobj, tag=image_name)
         self.__build_inside_container(client, project, image_name, goals, post_build)
 
     def __build_inside_container(self, client, project, image_name, goals, post_build):
