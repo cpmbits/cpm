@@ -20,6 +20,7 @@ def execute(argv):
     create_parser = argparse.ArgumentParser(prog='cpm create', description='Create a new cpm project', add_help=False)
     create_parser.add_argument('project_name')
     create_parser.add_argument('-s', '--no-sample-code', required=False, action='store_true', default=False)
+    create_parser.add_argument('-t', '--template', required=False, action='store')
     args = create_parser.parse_args(argv)
 
     project_loader = ProjectLoader()
@@ -30,6 +31,8 @@ def execute(argv):
         project_name=args.project_name,
         directory=args.project_name,
         init_from_existing_sources=False,
+        init_from_template=True if args.template else False,
+        template_name=args.template
     )
     result = new_project(service, options)
 

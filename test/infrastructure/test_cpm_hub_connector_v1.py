@@ -81,7 +81,7 @@ class TestCpmHubConnectorV1(unittest.TestCase):
 
         bit_download = connector.download_bit('cest', 'latest')
 
-        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest')
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/bits/cest')
         assert bit_download == BitDownload("cpm-hub", "0.1", "Yml0IHBheWxvYWQ=")
 
     @patch('cpm.infrastructure.cpm_hub_connector_v1.filesystem')
@@ -92,7 +92,7 @@ class TestCpmHubConnectorV1(unittest.TestCase):
 
         bit_download = connector.download_bit('cest', '1.0')
 
-        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest/1.0')
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/bits/cest/1.0')
         assert bit_download == BitDownload("cpm-hub", "1.0", "Yml0IHBheWxvYWQ=")
 
     @patch('cpm.infrastructure.cpm_hub_connector_v1.filesystem')
@@ -103,4 +103,4 @@ class TestCpmHubConnectorV1(unittest.TestCase):
 
         self.assertRaises(BitNotFound, connector.download_bit, 'cest', 'latest')
 
-        http_client.get.assert_called_once_with(f'{connector.repository_url}/cest')
+        http_client.get.assert_called_once_with(f'{connector.repository_url}/bits/cest')

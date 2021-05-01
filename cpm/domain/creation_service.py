@@ -1,9 +1,14 @@
 from dataclasses import dataclass
 
+from cpm.domain.template_installer import TemplateInstaller
 from cpm.infrastructure import filesystem
 from cpm.domain.project.project import Project
 from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
+from cpm.domain.project import project_descriptor_editor
+from cpm.domain.project.project_loader import ProjectLoader
+from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.domain.sample_code import CPP_HELLO_WORLD
+from cpm.domain.constants import PROJECT_DESCRIPTOR_FILE, DEFAULT_PROJECT_VERSION
 
 
 @dataclass
@@ -12,11 +17,16 @@ class CreationOptions:
     directory: str = '.'
     generate_sample_code: bool = True
     init_from_existing_sources: bool = False
+    init_from_template: bool = False
+    template_name: str = ''
+    template_version: str = 'latest'
 
 
 class CreationService:
-    def __init__(self, project_loader):
+    def __init__(self, project_loader=ProjectLoader(), cpm_hub_connector=CpmHubConnectorV1(), template_installer=TemplateInstaller()):
+        self.template_installer = template_installer
         self.project_loader = project_loader
+        self.cpm_hub_connector = cpm_hub_connector
 
     def exists(self, directory):
         try:
@@ -26,15 +36,37 @@ class CreationService:
             return False
 
     def create(self, options):
-        project = Project(options.project_name)
-        if not options.init_from_existing_sources:
-            self.create_project_directory(options.directory)
-            filesystem.create_directory(f'{options.directory}/tests')
-        self.create_project_descriptor_file(options)
+        if options.init_from_template:
+            return self.__create_from_template(options)
+        elif options.init_from_existing_sources:
+            return self.__create_from_existing_sources(options)
+        else:
+            return self.__create_from_scratch(options)
 
+    def __create_from_template(self, options):
+        project_template = self.cpm_hub_connector.download_template(options.template_name, options.template_version)
+        self.template_installer.install(project_template, options.directory)
+        project = self.project_loader.load(options.directory)
+        project.name = options.project_name
+        project.version = DEFAULT_PROJECT_VERSION
+        project_descriptor_editor.update(PROJECT_DESCRIPTOR_FILE, project)
+        return project
+
+    def __create_from_existing_sources(self, options):
+        project = Project(options.project_name)
+        self.create_project_descriptor_file(options)
         if options.generate_sample_code:
             self.generate_sample_code(project)
+        return project
 
+    def __create_from_scratch(self, options):
+        project = Project(options.project_name)
+
+        self.create_project_directory(options.directory)
+        filesystem.create_directory(f'{options.directory}/tests')
+        self.create_project_descriptor_file(options)
+        if options.generate_sample_code:
+            self.generate_sample_code(project)
         return project
 
     def generate_sample_code(self, project):
@@ -45,9 +77,9 @@ class CreationService:
 
     def create_project_descriptor_file(self, options):
         filesystem.create_file(
-            f"{options.directory}/project.yaml",
+            f"{options.directory}/{PROJECT_DESCRIPTOR_FILE}",
             f"name: '{options.project_name}'\n"
-            f"version: 0.1\n"
+            f"version: {DEFAULT_PROJECT_VERSION}\n"
             f"build:\n"
             f"  packages:\n"
             f"  bits:\n"

@@ -53,7 +53,10 @@ class CpmHubConnectorV1(object):
         return BitDownload(data['bit_name'], data['version'], data['payload'])
 
     def __bit_url(self, name, version):
-        return f'{self.repository_url}/{name}' if version == "latest" else f'{self.repository_url}/{name}/{version}'
+        return f'{self.repository_url}/bits/{name}' if version == "latest" else f'{self.repository_url}/bits/{name}/{version}'
+
+    def download_template(self, name, version):
+        pass
 
 
 class AuthenticationFailure(RuntimeError):

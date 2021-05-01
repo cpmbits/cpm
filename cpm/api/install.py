@@ -49,7 +49,7 @@ def execute(argv):
     user_configuration = CpmUserConfiguration()
     user_configuration.load()
     repository_url = args.repository_url if args.repository_url else user_configuration["cpm_hub_url"]
-    cpm_hub_connector = CpmHubConnectorV1(repository_url=f'{repository_url}/bits')
+    cpm_hub_connector = CpmHubConnectorV1(repository_url=f'{repository_url}')
     service = InstallService(project_loader, bit_installer, cpm_hub_connector)
     bit_name, bit_version = __bit_to_install(args.bit_name)
 
