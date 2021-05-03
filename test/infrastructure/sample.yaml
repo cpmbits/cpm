@@ -1,0 +1,46 @@
+name: 'cpm-hub'
+description: 'CPM Hub open source server for hosting CPM software'
+build:
+  packages:
+    cpm-hub/http:
+    cpm-hub/infrastructure:
+    cpm-hub/management:
+    cpm-hub/bits:
+    cpm-hub/users:
+    cpm-hub/authentication:
+    cpm-hub/logging:
+    cpm-hub/kpi:
+    cpm-hub/database:
+  cflags:
+    - -std=c++11
+  ldflags: []
+  libraries: [ 'boost_filesystem', 'boost_system', 'boost_program_options', 'pthread', 'ssl', 'crypto' ]
+  bits:
+    mongoose: '6.16'
+    json: '3.7.3'
+    base64: '1.0'
+    blake3: '1.0'
+    inih: '1.0'
+    spdlog: '1.6.1'
+    sqlite3: '3.32.3'
+test:
+  packages:
+    tests/mocks:
+  bits:
+    fakeit: '2.0.5'
+    cest: '1.0'
+  cflags:
+  - -std=c++11
+  'libraries': ['CppUTest', 'CppUTestExt']
+  exclude: ['main.cpp']
+targets:
+  default:
+    dockerfile: 'docker/image'
+    test_image: null
+  rpi4:
+    image: 'cpmbits/raspberrypi4:64'
+    build:
+      packages:
+        cpm-hub/rpi4:
+actions:
+  docker: 'docker run -it -v $(pwd):/project -w /project jorsanpe/cpm'

@@ -1,16 +1,21 @@
 import glob
 
 from cpm.infrastructure import yaml_handler
+from cpm.infrastructure import yaml_parser
 from cpm.domain import constants
 from cpm.domain.project.project_descriptor import ProjectDescriptor, TargetDescription, DeclaredBit, CompilationPlan, PackageDescription
 
 
 def parse_from(project_directory):
     try:
-        yaml_contents = yaml_handler.load(project_yaml_file(project_directory))
+        with open(project_yaml_file(project_directory)) as stream:
+            payload = stream.read()
+        yaml_document = yaml_parser.parse(payload)
     except FileNotFoundError:
         raise ProjectDescriptorNotFound
-    return parse_yaml(yaml_contents)
+    project_descriptor = parse_yaml(yaml_document.as_dict())
+    project_descriptor.yaml_document = yaml_document
+    return project_descriptor
 
 
 def parse_yaml(yaml_contents):

@@ -53,6 +53,7 @@ class ProjectDescriptor:
     version: str = ''
     description: str = ''
     schema: str = '1.0'
+    yaml_document: object = None
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     targets: dict = field(default_factory=dict)
