@@ -49,7 +49,10 @@ def parse_target(target_name, target_description):
 def parse_compilation_plan(plan_description):
     compilation_plan = CompilationPlan()
     for bit_name in get_or_default_to(plan_description, 'bits', {}):
-        declared_bit = DeclaredBit(bit_name, plan_description['bits'][bit_name])
+        if isinstance(plan_description['bits'][bit_name], str):
+            declared_bit = DeclaredBit(bit_name, plan_description['bits'][bit_name])
+        else:
+            declared_bit = declared_bit_with_customized_compilation(bit_name, plan_description['bits'][bit_name])
         compilation_plan.declared_bits.append(declared_bit)
     for package_path in get_or_default_to(plan_description, 'packages', {}):
         package = PackageDescription(
@@ -62,6 +65,15 @@ def parse_compilation_plan(plan_description):
     compilation_plan.libraries = get_or_default_to(plan_description, 'libraries', [])
     compilation_plan.includes.update(get_or_default_to(plan_description, 'includes', []))
     return compilation_plan
+
+
+def declared_bit_with_customized_compilation(bit_name, bit_description):
+    return DeclaredBit(
+        name=bit_name,
+        version=bit_description['version'],
+        cflags=get_or_default_to(bit_description, 'cflags', []),
+        target=get_or_default_to(bit_description, 'target', [])
+    )
 
 
 def get_or_default_to(dictionary, key, default):

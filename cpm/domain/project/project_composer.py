@@ -31,7 +31,9 @@ def compose_target(target_name, project_descriptor):
     compose_packages(project_descriptor.build.packages, target)
     compose_packages(target_description.build.packages, target)
     for bit_description in project_descriptor.build.bits.values():
-        compose_bit(bit_description, target, target_name)
+        compose_bit(bit_description, target)
+    for bit_description in target_description.build.bits.values():
+        compose_bit(bit_description, target)
     return target
 
 
@@ -45,7 +47,7 @@ def compose_tests(target_name, project_descriptor, project):
     compose_packages(target_description.test.packages, project.test)
 
     for bit_description in project_descriptor.test.bits.values():
-        compose_bit(bit_description, project.test, target_name)
+        compose_bit(bit_description, project.test)
 
     for test_file in filesystem.find('tests', 'test_*.cpp'):
         name = test_file.split('/')[-1].split('.')[0]
@@ -63,12 +65,14 @@ def compose_packages(packages, target):
         package.include_directories = target.include_directories
 
 
-def compose_bit(bit_description, target, target_name):
+def compose_bit(bit_description, target):
+    declared_bit_target = bit_description.declared_bit.target
     adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
-    if target_name in bit_description.targets:
-        adjust_bit_packages_base_path(bit_description, bit_description.targets[target_name].build.packages)
     add_packages_to_target_includes(bit_description.build.packages, target)
-    target.bits.append(compose_target(target_name, bit_description))
+    if declared_bit_target in bit_description.targets:
+        adjust_bit_packages_base_path(bit_description, bit_description.targets[declared_bit_target].build.packages)
+        add_packages_to_target_includes(bit_description.targets[declared_bit_target].build.packages, target)
+        target.bits.append(compose_target(declared_bit_target, bit_description))
 
 
 def adjust_bit_packages_base_path(bit_description, packages):

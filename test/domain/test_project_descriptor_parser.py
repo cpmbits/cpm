@@ -152,3 +152,29 @@ class TestProjectDescriptorParser(unittest.TestCase):
         assert project.targets['arduino'].test.packages == [
             project_descriptor.PackageDescription('arduino')
         ]
+
+    def test_parse_project_descriptor_with_customized_bit_compilation(self):
+        yaml_contents = {
+            'name': 'bender bender rodriguez',
+            'version': '1.0',
+            'description': 'kill all humans',
+            'build': {
+                'packages': {
+                    'cpmhub/http': None
+                },
+                'bits': {
+                    'sqlite3': {
+                        'version': '3.32.3',
+                        'cflags': ['-DCUSTOM_BIT_DEFINE'],
+                        'target': 'arduinoNano33'
+                    }
+                }
+            }
+        }
+        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        assert project.build.packages == [
+            project_descriptor.PackageDescription('cpmhub/http')
+        ]
+        assert project.build.declared_bits[0] == project_descriptor.DeclaredBit(
+            name='sqlite3', version='3.32.3', cflags=['-DCUSTOM_BIT_DEFINE'], target='arduinoNano33'
+        )
