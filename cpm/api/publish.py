@@ -38,6 +38,7 @@ def publish_project(publish_service):
 def execute(argv):
     publish_parser = argparse.ArgumentParser(prog='cpm publish', description='cpm Package Manager', add_help=False)
     publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='https://repo.cpmbits.com:8000')
+    publish_parser.add_argument('-t', '--template', action='store_true')
     publish_parser.add_argument('-d', '--dry-run', required=False, action='store_true', default=False)
     args = publish_parser.parse_args(argv)
 

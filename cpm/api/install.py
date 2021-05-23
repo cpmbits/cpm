@@ -3,11 +3,11 @@ import argparse
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
-from cpm.domain.install_service import BitNotFound, InstallService
+from cpm.domain.install_service import InstallService
 from cpm.domain.bit_installer import BitInstaller
 from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.domain.project.project_loader import ProjectLoader
-from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
+from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1, BitNotFound
 from cpm.infrastructure.cpm_user_configuration import CpmUserConfiguration
 from cpm.infrastructure.http_client import HttpConnectionError
 

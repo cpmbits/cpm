@@ -52,6 +52,7 @@ class TestCpm(unittest.TestCase):
     def test_build_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('build', 'test', '1.0')
+        self.set_libraries(['pthread', 'dl'])
         install.execute(['-s', 'http://localhost:8000'])
         result = build.execute([])
         assert result == Result(0, 'Build finished')
@@ -59,6 +60,7 @@ class TestCpm(unittest.TestCase):
     def test_build_after_recursive_bit_installation_for_target_not_described_by_bit(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('build', 'test', '1.0')
+        self.set_libraries(['pthread', 'dl'])
         self.set_target_main('rpi4', 'main.cpp')
         install.execute(['-s', 'http://localhost:8000'])
         result = build.execute(['rpi4'])
@@ -245,6 +247,11 @@ class TestCpm(unittest.TestCase):
     def set_ldflags(self, ldflags):
         self.modify_descriptor(
             lambda descriptor: descriptor['build'].update({'ldflags': ldflags})
+        )
+
+    def set_libraries(self, libraries):
+        self.modify_descriptor(
+            lambda descriptor: descriptor['build'].update({'libraries': libraries})
         )
 
     def set_test_cflags(self, cflags):

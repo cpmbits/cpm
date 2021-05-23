@@ -3,9 +3,9 @@ import base64
 from getpass import getpass
 from http import HTTPStatus
 
+from cpm.domain.template_download import TemplateDownload
 from cpm.infrastructure import http_client
 from cpm.infrastructure import filesystem
-from cpm.domain.install_service import BitNotFound
 from cpm.domain.bit_download import BitDownload
 
 
@@ -56,7 +56,18 @@ class CpmHubConnectorV1(object):
         return f'{self.repository_url}/bits/{name}' if version == "latest" else f'{self.repository_url}/bits/{name}/{version}'
 
     def download_template(self, name, version):
-        pass
+        response = http_client.get(self.__template_url(name, version))
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            raise TemplateNotFound(f'{name}:{version}')
+
+        data = json.loads(response.body)
+        return TemplateDownload(data['template_name'], data['version'], data['payload'])
+
+    def __template_url(self, name, version):
+        if version == "latest":
+            return f'{self.repository_url}/templates/{name}'
+        else:
+            return f'{self.repository_url}/templates/{name}/{version}'
 
 
 class AuthenticationFailure(RuntimeError):
@@ -68,4 +79,12 @@ class InvalidCpmHubUrl(RuntimeError):
 
 
 class PublicationFailure(RuntimeError):
+    pass
+
+
+class BitNotFound(RuntimeError):
+    pass
+
+
+class TemplateNotFound(RuntimeError):
     pass

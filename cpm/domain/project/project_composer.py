@@ -65,9 +65,10 @@ def compose_packages(packages, target):
 
 def compose_bit(bit_description, target, target_name):
     adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
+    add_packages_to_target_includes(bit_description.build.packages, target)
     if target_name in bit_description.targets:
         adjust_bit_packages_base_path(bit_description, bit_description.targets[target_name].build.packages)
-    add_packages_to_target_includes(bit_description.build.packages, target)
+        add_packages_to_target_includes(bit_description.targets[target_name].build.packages, target)
     target.bits.append(compose_target(target_name, bit_description))
 
 

@@ -5,7 +5,7 @@ from cpm.api.install import install_bit
 from cpm.api.install import install_project_bits
 from cpm.api.result import OK
 from cpm.api.result import FAIL
-from cpm.domain.install_service import BitNotFound
+from cpm.infrastructure.cpm_hub_connector_v1 import BitNotFound
 from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.infrastructure.http_client import HttpConnectionError
 

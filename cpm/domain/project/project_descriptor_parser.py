@@ -1,7 +1,6 @@
 import glob
 
-from cpm.infrastructure import yaml_handler
-from cpm.infrastructure import yaml_parser
+from ruamel.yaml import YAML
 from cpm.domain import constants
 from cpm.domain.project.project_descriptor import ProjectDescriptor, TargetDescription, DeclaredBit, CompilationPlan, PackageDescription
 
@@ -10,10 +9,11 @@ def parse_from(project_directory):
     try:
         with open(project_yaml_file(project_directory)) as stream:
             payload = stream.read()
-        yaml_document = yaml_parser.parse(payload)
+        yaml = YAML()
+        yaml_document = yaml.load(payload)
     except FileNotFoundError:
         raise ProjectDescriptorNotFound
-    project_descriptor = parse_yaml(yaml_document.as_dict())
+    project_descriptor = parse_yaml(yaml_document)
     project_descriptor.yaml_document = yaml_document
     return project_descriptor
 
@@ -69,10 +69,6 @@ def parse_compilation_plan(plan_description):
     return compilation_plan
 
 
-def get_or_default_to(dictionary, key, default):
-    return dictionary.get(key, default) or default
-
-
 def project_yaml_file(project_directory):
     return f'{project_directory}/{constants.PROJECT_DESCRIPTOR_FILE}'
 
@@ -82,7 +78,13 @@ def all_bit_yaml_files(project_descriptor):
 
 
 def package_cflags(package_description):
-    return package_description.get('cflags', []) if type(package_description) is dict else []
+    return get_or_default_to(package_description, 'cflags', [])
+
+
+def get_or_default_to(dictionary, key, default):
+    if not dictionary:
+        return default
+    return dictionary.get(key, default) or default
 
 
 class ProjectDescriptorNotFound(RuntimeError):

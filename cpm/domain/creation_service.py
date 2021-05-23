@@ -44,12 +44,16 @@ class CreationService:
             return self.__create_from_scratch(options)
 
     def __create_from_template(self, options):
-        project_template = self.cpm_hub_connector.download_template(options.template_name, options.template_version)
-        self.template_installer.install(project_template, options.directory)
+        template_download = self.cpm_hub_connector.download_template(options.template_name, options.template_version)
+        self.template_installer.install(template_download, options.directory)
         project = self.project_loader.load(options.directory)
-        project.name = options.project_name
-        project.version = DEFAULT_PROJECT_VERSION
-        project_descriptor_editor.update(PROJECT_DESCRIPTOR_FILE, project)
+        project_descriptor_editor.update(
+            project,
+            {
+                'name': options.project_name,
+                'version': DEFAULT_PROJECT_VERSION,
+            }
+        )
         return project
 
     def __create_from_existing_sources(self, options):
