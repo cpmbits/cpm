@@ -1,4 +1,5 @@
 import unittest
+import mock
 import os
 import shutil
 import yaml
@@ -7,24 +8,29 @@ from cpm.infrastructure import filesystem
 from cpm.api import create
 from cpm.api import install
 from cpm.api import build
+from cpm.api import publish
 from cpm.api import test
 from cpm.api.result import Result
 
 
 class TestCpm(unittest.TestCase):
     PROJECT_NAME = 'test_project'
+    PROJECT_NAME_FROM_TEMPLATE = 'templated_project'
     TEST_DIRECTORY = f'{os.path.dirname(os.path.abspath(__file__))}'
     PROJECT_DIRECTORY = f'{TEST_DIRECTORY}/{PROJECT_NAME}'
+    PROJECT_FROM_TEMPLATE_DIRECTORY = f'{TEST_DIRECTORY}/{PROJECT_NAME_FROM_TEMPLATE}'
 
     def setUp(self):
         self.cwd = os.getcwd()
         shutil.rmtree(self.PROJECT_DIRECTORY, ignore_errors=True)
+        shutil.rmtree(self.PROJECT_FROM_TEMPLATE_DIRECTORY, ignore_errors=True)
         os.chdir(self.TEST_DIRECTORY)
         create.execute([self.PROJECT_NAME])
 
     def tearDown(self):
         os.chdir(self.cwd)
-        shutil.rmtree(self.PROJECT_DIRECTORY)
+        shutil.rmtree(self.PROJECT_DIRECTORY, ignore_errors=True)
+        shutil.rmtree(self.PROJECT_FROM_TEMPLATE_DIRECTORY, ignore_errors=True)
 
     def test_build(self):
         os.chdir(self.PROJECT_DIRECTORY)
@@ -177,6 +183,34 @@ class TestCpm(unittest.TestCase):
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute([])
         assert result.status_code == 1
+
+    @mock.patch('cpm.infrastructure.cpm_hub_connector_v1.getpass')
+    @mock.patch('builtins.input')
+    def test_publishing_template(self, user_input, getpass):
+        user_input.return_value = 'user'
+        getpass.return_value = 'password'
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.set_target_dockerfile('default', f'../environment/Dockerfile')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = publish.execute(['-t', '-s', 'http://localhost:8000'])
+        assert result == Result(0, 'Project published')
+
+    @mock.patch('cpm.infrastructure.cpm_hub_connector_v1.getpass')
+    @mock.patch('builtins.input')
+    def test_creating_project_from_template(self, user_input, getpass):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('test', 'cest', '1.0')
+        self.add_test('test_case.cpp', fails=True)
+        self.set_target_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_target_test_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_target_dockerfile('default', f'../environment/Dockerfile')
+        user_input.return_value = 'user'
+        getpass.return_value = 'password'
+        publish.execute(['-t', '-s', 'http://localhost:8000'])
+        os.chdir('..')
+        shutil.rmtree(self.PROJECT_DIRECTORY, ignore_errors=True)
+        result = create.execute(['-s', 'http://localhost:8000', '-t', f'{self.PROJECT_NAME}:0.0.1', self.PROJECT_NAME_FROM_TEMPLATE])
+        assert result == Result(0, f'Created project {self.PROJECT_NAME_FROM_TEMPLATE}')
 
     def add_bit(self, plan, name, version):
         with open(f'project.yaml') as stream:

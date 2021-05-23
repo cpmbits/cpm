@@ -44,6 +44,36 @@ class CpmHubConnectorV1(object):
         if response.status_code != HTTPStatus.OK:
             raise PublicationFailure("cpm-hub returned error")
 
+    def publish_template(self, project_descriptor, file_name):
+        payload = base64.b64encode(filesystem.read_file(file_name, 'rb')).decode('utf-8')
+        username = input('username: ')
+        password = getpass(prompt='password: ', stream=None)
+        body = {
+            'template_name': project_descriptor.name,
+            'version': project_descriptor.version,
+            'payload': payload,
+            'username': username,
+            'password': password,
+        }
+
+        if self.dry_run:
+            print(f'publishing to {self.repository_url}')
+            print(json.dumps(body))
+            return
+
+        response = http_client.post(f'{self.repository_url}/templates', data=json.dumps(body))
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise AuthenticationFailure()
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            raise InvalidCpmHubUrl()
+        if response.status_code == HTTPStatus.BAD_REQUEST:
+            raise PublicationFailure("bad request")
+        if response.status_code == HTTPStatus.CONFLICT:
+            raise PublicationFailure(
+                f'bit {project_descriptor.name}:{project_descriptor.version} has already been used and cannot be published again')
+        if response.status_code != HTTPStatus.OK:
+            raise PublicationFailure("cpm-hub returned error")
+
     def download_bit(self, name, version):
         response = http_client.get(self.__bit_url(name, version))
         if response.status_code == HTTPStatus.NOT_FOUND:

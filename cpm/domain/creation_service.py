@@ -15,8 +15,9 @@ from cpm.domain.constants import PROJECT_DESCRIPTOR_FILE, DEFAULT_PROJECT_VERSIO
 class CreationOptions:
     project_name: str = 'ProjectName'
     directory: str = '.'
-    generate_sample_code: bool = True
+    repository_url: str = 'https://repo.cpmbits.com:8000'
     init_from_existing_sources: bool = False
+    generate_sample_code: bool = True
     init_from_template: bool = False
     template_name: str = ''
     template_version: str = 'latest'
@@ -48,7 +49,7 @@ class CreationService:
         self.template_installer.install(template_download, options.directory)
         project = self.project_loader.load(options.directory)
         project_descriptor_editor.update(
-            project,
+            project.descriptor,
             {
                 'name': options.project_name,
                 'version': DEFAULT_PROJECT_VERSION,

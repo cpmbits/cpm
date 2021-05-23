@@ -41,6 +41,10 @@ def copy_directory(origin, destination):
     copy_tree(origin, destination)
 
 
+def path_to(filename):
+    return os.path.dirname(filename)
+
+
 def directory_exists(name):
     return os.path.exists(name) and os.path.isdir(name)
 

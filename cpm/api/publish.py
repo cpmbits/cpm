@@ -14,9 +14,12 @@ from cpm.infrastructure.cpm_hub_connector_v1 import PublicationFailure
 from cpm.infrastructure.http_client import HttpConnectionError
 
 
-def publish_project(publish_service):
+def publish_project(publish_service, publish_as_template=False):
     try:
-        publish_service.publish()
+        if publish_as_template:
+            publish_service.publish_template()
+        else:
+            publish_service.publish()
     except ProjectDescriptorNotFound:
         return Result(FAIL, f'error: not a CPM project')
     except PackagingFailure as error:
@@ -38,14 +41,13 @@ def publish_project(publish_service):
 def execute(argv):
     publish_parser = argparse.ArgumentParser(prog='cpm publish', description='cpm Package Manager', add_help=False)
     publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='https://repo.cpmbits.com:8000')
-    publish_parser.add_argument('-t', '--template', action='store_true')
+    publish_parser.add_argument('-t', '--template', required=False, action='store_true', default=False)
     publish_parser.add_argument('-d', '--dry-run', required=False, action='store_true', default=False)
     args = publish_parser.parse_args(argv)
 
-    packager = BitPackager()
     cpm_hub_connector = CpmHubConnectorV1(repository_url=args.repository_url, dry_run=args.dry_run)
-    service = PublishService(packager, cpm_hub_connector)
+    service = PublishService(cpm_hub_connector)
 
-    result = publish_project(service)
+    result = publish_project(service, publish_as_template=args.template)
 
     return result
