@@ -1,7 +1,9 @@
 import unittest
 import mock
 
+from cpm.domain.constants import DEFAULT_PROJECT_VERSION, PROJECT_DESCRIPTOR_FILE
 from cpm.domain.project.project import Project
+from cpm.domain.project.project_template import ProjectTemplate
 from cpm.domain.sample_code import CPP_HELLO_WORLD
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
@@ -98,4 +100,30 @@ class TestCreationService(unittest.TestCase):
         project = creation_service.create(creation_options)
 
         assert project.name == 'AwesomeProject'
+
+    @mock.patch('cpm.domain.creation_service.project_descriptor_editor')
+    def test_creation_service_uses_cpm_hub_connector_to_download_template(self, project_descriptor_editor):
+        project_loader = mock.MagicMock()
+        cpm_hub_connector = mock.MagicMock()
+        template_installer = mock.MagicMock()
+        creation_service = CreationService(project_loader, cpm_hub_connector, template_installer)
+        options = CreationOptions(
+            project_name='AwesomeProject',
+            init_from_template=True,
+            template_name='arduino-uno',
+        )
+        template_project = Project(name=options.project_name, version=DEFAULT_PROJECT_VERSION)
+        project_loader.load.return_value = template_project
+        project_template = ProjectTemplate(
+            name='arduino-uno',
+            version='1.0.0',
+            payload='payload'
+        )
+        cpm_hub_connector.download_template.return_value = project_template
+
+        project = creation_service.create(options)
+
+        assert project.name == 'AwesomeProject'
+        template_installer.install.assert_called_once_with(project_template, options.directory)
+        project_descriptor_editor.update.assert_called_once()
 

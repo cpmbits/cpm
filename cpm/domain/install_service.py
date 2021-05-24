@@ -41,7 +41,3 @@ class InstallService(object):
         for declared_bit in project_descriptor.build.declared_bits:
             self.install(declared_bit.name, declared_bit.version)
             self.__install_recursively(f'bits/{declared_bit.name}')
-
-
-class BitNotFound(RuntimeError):
-    pass
