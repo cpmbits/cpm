@@ -49,6 +49,7 @@ class CreationService:
         self.template_installer.install(template_download, options.directory)
         project = self.project_loader.load(options.directory)
         project_descriptor_editor.update(
+            options.directory,
             project.descriptor,
             {
                 'name': options.project_name,
