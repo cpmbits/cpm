@@ -26,9 +26,9 @@ targets:
         project_descriptor = project_descriptor_parser.parse_yaml(yaml_document)
         project_descriptor.yaml_document = yaml_document
 
-        project_descriptor_editor.update(project_descriptor, {'name': 'pepito', 'version': '1.0.0'})
+        project_descriptor_editor.update('.', project_descriptor, {'name': 'pepito', 'version': '1.0.0'})
 
-        filesystem.write_file.assert_called_with(PROJECT_DESCRIPTOR_FILE, '''name: pepito
+        filesystem.write_file.assert_called_with(f'./{PROJECT_DESCRIPTOR_FILE}', '''name: pepito
 version: 1.0.0
 description: kill all humans
 build:
