@@ -1,7 +1,7 @@
 import unittest
 import mock
 
-from cpm.domain.bit import Bit
+from cpm.domain.project.project import Project
 from cpm.domain.bit_download import BitDownload
 from cpm.domain.bit_installer import BitInstaller
 
@@ -12,7 +12,7 @@ class TestBitInstaller(unittest.TestCase):
         project_loader = mock.MagicMock()
         installer = BitInstaller(project_loader)
         bit_download = BitDownload("cest", "1.0", "Yml0IHBheWxvYWQ=")
-        project_loader.load.return_value = Bit("cest")
+        project_loader.load.return_value = Project("cest")
         filesystem.directory_exists.return_value = False
 
         installer.install(bit_download)
@@ -25,7 +25,7 @@ class TestBitInstaller(unittest.TestCase):
         project_loader = mock.MagicMock()
         installer = BitInstaller(project_loader)
         bit_download = BitDownload("cest", "1.0", "Yml0IHBheWxvYWQ=")
-        project_loader.load.return_value = Bit("cest")
+        project_loader.load.return_value = Project("cest")
         filesystem.directory_exists.return_value = True
 
         installer.install(bit_download)

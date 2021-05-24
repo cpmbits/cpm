@@ -11,6 +11,11 @@ def create_file(file_name, contents=''):
         f.write(contents)
 
 
+def write_file(file_name, contents=''):
+    with open(file_name, 'w') as f:
+        f.write(contents)
+
+
 def read_file(file_name, mode='r'):
     with open(file_name, mode) as file_stream:
         return file_stream.read()
@@ -34,6 +39,10 @@ def create_directory(path):
 
 def copy_directory(origin, destination):
     copy_tree(origin, destination)
+
+
+def path_to(filename):
+    return os.path.dirname(filename)
 
 
 def directory_exists(name):

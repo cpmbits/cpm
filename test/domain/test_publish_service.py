@@ -14,7 +14,7 @@ class TestPublishService(unittest.TestCase):
         project_descriptor_parser.parse_from.side_effect = ProjectDescriptorNotFound
         bit_packager = mock.MagicMock()
         cpm_hub_connector = mock.MagicMock()
-        service = PublishService(bit_packager, cpm_hub_connector)
+        service = PublishService(cpm_hub_connector, bit_packager=bit_packager)
 
         self.assertRaises(ProjectDescriptorNotFound, service.publish)
 
@@ -25,7 +25,7 @@ class TestPublishService(unittest.TestCase):
         bit_packager = mock.MagicMock()
         bit_packager.pack.side_effect = PackagingFailure
         cpm_hub_connector = mock.MagicMock()
-        service = PublishService(bit_packager, cpm_hub_connector)
+        service = PublishService(cpm_hub_connector, bit_packager=bit_packager)
 
         self.assertRaises(PackagingFailure, service.publish)
 
@@ -39,7 +39,7 @@ class TestPublishService(unittest.TestCase):
         bit_packager.pack.return_value = 'packaged_file.zip'
         cpm_hub_connector = mock.MagicMock()
         cpm_hub_connector.publish_bit.side_effect = AuthenticationFailure
-        service = PublishService(bit_packager, cpm_hub_connector)
+        service = PublishService(cpm_hub_connector, bit_packager=bit_packager)
 
         self.assertRaises(AuthenticationFailure, service.publish)
 
@@ -52,7 +52,7 @@ class TestPublishService(unittest.TestCase):
         bit_packager = mock.MagicMock()
         bit_packager.pack.return_value = 'packaged_file.zip'
         cpm_hub_connector = mock.MagicMock()
-        service = PublishService(bit_packager, cpm_hub_connector)
+        service = PublishService(cpm_hub_connector, bit_packager=bit_packager)
 
         service.publish()
 

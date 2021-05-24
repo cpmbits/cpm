@@ -55,6 +55,7 @@ class ProjectDescriptor:
     version: str = ''
     description: str = ''
     schema: str = '1.0'
+    yaml_document: object = None
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
     declared_bit: DeclaredBit = None
