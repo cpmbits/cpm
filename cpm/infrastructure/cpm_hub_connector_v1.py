@@ -31,7 +31,7 @@ class CpmHubConnectorV1(object):
             print(json.dumps(body))
             return
 
-        response = http_client.post(self.repository_url, data=json.dumps(body))
+        response = http_client.post(f'{self.repository_url}/bits', data=json.dumps(body))
         if response.status_code == HTTPStatus.UNAUTHORIZED:
             raise AuthenticationFailure()
         if response.status_code == HTTPStatus.NOT_FOUND:
@@ -83,7 +83,10 @@ class CpmHubConnectorV1(object):
         return BitDownload(data['bit_name'], data['version'], data['payload'])
 
     def __bit_url(self, name, version):
-        return f'{self.repository_url}/bits/{name}' if version == "latest" else f'{self.repository_url}/bits/{name}/{version}'
+        if version == "latest":
+            return f'{self.repository_url}/bits/{name}'
+        else:
+            return f'{self.repository_url}/bits/{name}/{version}'
 
     def download_template(self, name, version):
         response = http_client.get(self.__template_url(name, version))

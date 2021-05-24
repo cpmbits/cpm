@@ -3,6 +3,7 @@ import mock
 
 from cpm.domain.project import project_composer
 from cpm.domain.project import project_descriptor_parser
+from cpm.domain.project.project_descriptor import ProjectDescriptor, TargetDescription, CompilationPlan, PackageDescription
 
 
 class TestProjectComposer(unittest.TestCase):
@@ -167,3 +168,38 @@ class TestProjectComposer(unittest.TestCase):
         assert len(project.test.test_suites) == 1
         assert project.test.test_suites[0].name == 'test_one'
         assert project.test.test_suites[0].main == 'tests/test_one.cpp'
+
+    @mock.patch('cpm.domain.project.project_composer.filesystem')
+    def test_compose_from_description_with_customized_bit_compilation(self, filesystem):
+        yaml_load = {
+            'name': 'HalfLife3',
+            'build': {
+                'bits': {
+                    'arduino': {
+                        'version': '1.0.0',
+                        'target': 'nano33',
+                        'cflags': ['-DBIT_FLAG']
+                    }
+                }
+            }
+        }
+        filesystem.find.side_effect = [['tests/test_one.cpp'], ['nano33/nano33.cpp'], []]
+        filesystem.parent_directory.return_value = '.'
+        project_description = project_descriptor_parser.parse_yaml(yaml_load)
+        arduino_bit = ProjectDescriptor(
+            name='arduino',
+            targets={
+                'nano33': TargetDescription(
+                    name='nano33',
+                    build=CompilationPlan(
+                        cflags=['-mcpu=atmel'],
+                        packages=[PackageDescription(path='nano33')]
+                    )
+                )
+            },
+            declared_bit=project_description.build.declared_bits[0]
+        )
+        project_description.build.bits['arduino'] = arduino_bit
+        project = project_composer.compose(project_description, 'default')
+        assert project.target.bits[0].packages[0].path == 'bits/arduino/nano33'
+        assert project.target.bits[0].packages[0].cflags == ['-mcpu=atmel', '-DBIT_FLAG']

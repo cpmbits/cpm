@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 class DeclaredBit:
     name: str
     version: str
+    target: str = ''
+    cflags: list = field(default_factory=list)
 
 
 @dataclass
@@ -56,6 +58,7 @@ class ProjectDescriptor:
     yaml_document: object = None
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
+    declared_bit: DeclaredBit = None
     targets: dict = field(default_factory=dict)
 
     def build_packages(self):
