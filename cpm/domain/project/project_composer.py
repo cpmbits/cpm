@@ -1,3 +1,4 @@
+from cpm.domain.constants import DEFAULT_TARGET
 from cpm.infrastructure import filesystem
 from cpm.domain.project.project_descriptor import TargetDescription
 from cpm.domain.project.project import Project, Target, Package, TestSuite
@@ -66,14 +67,21 @@ def compose_packages(packages, target):
 
 
 def compose_bit(bit_description, target):
-    declared_bit_target = bit_description.declared_bit.target
     adjust_bit_packages_base_path(bit_description, bit_description.build.packages)
     add_packages_to_target_includes(bit_description.build.packages, target)
-        add_packages_to_target_includes(bit_description.targets[target_name].build.packages, target)
-    if declared_bit_target in bit_description.targets:
-        adjust_bit_packages_base_path(bit_description, bit_description.targets[declared_bit_target].build.packages)
-        add_packages_to_target_includes(bit_description.targets[declared_bit_target].build.packages, target)
-        target.bits.append(compose_target(declared_bit_target, bit_description))
+    bit_target_name = get_bit_target_name(bit_description)
+    adjust_bit_packages_base_path(bit_description, bit_description.targets[bit_target_name].build.packages)
+    add_packages_to_target_includes(bit_description.targets[bit_target_name].build.packages, target)
+    bit_target = compose_target(bit_target_name, bit_description)
+    target.bits.append(bit_target)
+    add_cflags_to_bit_packages(bit_target, bit_description.declared_bit.cflags)
+
+
+def get_bit_target_name(bit_description):
+    if bit_description.declared_bit.target in bit_description.targets:
+        return bit_description.declared_bit.target
+    else:
+        return DEFAULT_TARGET
 
 
 def adjust_bit_packages_base_path(bit_description, packages):
@@ -88,3 +96,8 @@ def add_packages_to_target_includes(packages, target):
 
 def package_include_directory(package_description):
     return filesystem.parent_directory(package_description.path)
+
+
+def add_cflags_to_bit_packages(bit_target, cflags):
+    for package in bit_target.packages:
+        package.cflags.extend(cflags)

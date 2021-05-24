@@ -77,7 +77,7 @@ def declared_bit_with_customized_compilation(bit_name, bit_description):
         name=bit_name,
         version=bit_description['version'],
         cflags=get_or_default_to(bit_description, 'cflags', []),
-        target=get_or_default_to(bit_description, 'target', [])
+        target=get_or_default_to(bit_description, 'target', '')
     )
 
 

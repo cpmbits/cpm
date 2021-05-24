@@ -27,7 +27,7 @@ class TestCpmHubConnectorV1(unittest.TestCase):
         connector.publish_bit(project, 'cpm-hub.zip')
 
         http_client.post.assert_called_once_with(
-            connector.repository_url,
+            f'{connector.repository_url}/bits',
             data='{"bit_name": "cpm-hub", "version": "0.1", "payload": "Yml0IHBheWxvYWQ=", "username": "username", "password": "password"}'
         )
 
@@ -73,9 +73,8 @@ class TestCpmHubConnectorV1(unittest.TestCase):
 
         self.assertRaises(PublicationFailure, connector.publish_bit, project, 'cpm-hub.zip')
 
-    @patch('cpm.infrastructure.cpm_hub_connector_v1.filesystem')
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
-    def test_download_bit_gets_bit_with_base64_encoded_payload(self, http_client, filesystem):
+    def test_download_bit_gets_bit_with_base64_encoded_payload(self, http_client):
         connector = CpmHubConnectorV1()
         http_client.get.return_value = HttpResponse(HTTPStatus.OK, '{"bit_name": "cpm-hub", "version": "0.1", "payload": "Yml0IHBheWxvYWQ="}')
 
@@ -84,9 +83,8 @@ class TestCpmHubConnectorV1(unittest.TestCase):
         http_client.get.assert_called_once_with(f'{connector.repository_url}/bits/cest')
         assert bit_download == BitDownload("cpm-hub", "0.1", "Yml0IHBheWxvYWQ=")
 
-    @patch('cpm.infrastructure.cpm_hub_connector_v1.filesystem')
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
-    def test_download_bit_gets_bit_with_specific_version(self, http_client, filesystem):
+    def test_download_bit_gets_bit_with_specific_version(self, http_client):
         connector = CpmHubConnectorV1()
         http_client.get.return_value = HttpResponse(HTTPStatus.OK, '{"bit_name": "cpm-hub", "version": "1.0", "payload": "Yml0IHBheWxvYWQ="}')
 
@@ -95,9 +93,8 @@ class TestCpmHubConnectorV1(unittest.TestCase):
         http_client.get.assert_called_once_with(f'{connector.repository_url}/bits/cest/1.0')
         assert bit_download == BitDownload("cpm-hub", "1.0", "Yml0IHBheWxvYWQ=")
 
-    @patch('cpm.infrastructure.cpm_hub_connector_v1.filesystem')
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
-    def test_download_bit_raises_exception_when_bit_is_not_found(self, http_client, filesystem):
+    def test_download_bit_raises_exception_when_bit_is_not_found(self, http_client):
         connector = CpmHubConnectorV1()
         http_client.get.return_value = HttpResponse(HTTPStatus.NOT_FOUND, '')
 
@@ -105,9 +102,8 @@ class TestCpmHubConnectorV1(unittest.TestCase):
 
         http_client.get.assert_called_once_with(f'{connector.repository_url}/bits/cest')
 
-    @patch('cpm.infrastructure.cpm_hub_connector_v1.filesystem')
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
-    def test_download_template_gets_bit_with_base64_encoded_payload(self, http_client, filesystem):
+    def test_download_template_gets_bit_with_base64_encoded_payload(self, http_client):
         connector = CpmHubConnectorV1()
         http_client.get.return_value = HttpResponse(HTTPStatus.OK, '{"template_name": "arduino", "version": "1.0.0", "payload": "Yml0IHBheWxvYWQ="}')
 
@@ -116,9 +112,8 @@ class TestCpmHubConnectorV1(unittest.TestCase):
         http_client.get.assert_called_once_with(f'{connector.repository_url}/templates/arduino')
         assert template_download == TemplateDownload("arduino", "1.0.0", "Yml0IHBheWxvYWQ=")
 
-    @patch('cpm.infrastructure.cpm_hub_connector_v1.filesystem')
     @patch('cpm.infrastructure.cpm_hub_connector_v1.http_client')
-    def test_download_template_raises_exception_when_template_is_not_found(self, http_client, filesystem):
+    def test_download_template_raises_exception_when_template_is_not_found(self, http_client):
         connector = CpmHubConnectorV1()
         http_client.get.return_value = HttpResponse(HTTPStatus.NOT_FOUND, '')
 
