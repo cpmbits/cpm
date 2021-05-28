@@ -6,14 +6,16 @@ from cpm.api.result import FAIL
 from cpm.domain.creation_service import CreationService
 from cpm.domain.creation_service import CreationOptions
 from cpm.domain.project.project_loader import ProjectLoader
-from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
+from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1, TemplateNotFound
 
 
 def new_project(creation_service, options=CreationOptions()):
-    if creation_service.exists(options.directory):
-        return Result(FAIL, f'error: directory {options.directory} already exists')
-
-    creation_service.create(options)
+    try:
+        if creation_service.exists(options.directory):
+            return Result(FAIL, f'error: directory {options.directory} already exists')
+        creation_service.create(options)
+    except TemplateNotFound:
+        return Result(FAIL, f'error: template {options.template_name}:{options.template_version} not found')
     return Result(OK, f'Created project {options.project_name}')
 
 
