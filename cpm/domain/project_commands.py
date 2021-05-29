@@ -82,6 +82,7 @@ class ProjectCommands(object):
             working_dir=f'/{project.name}/build',
             volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
             user=f'{os.getuid()}:{os.getgid()}',
+            environment=[f'PROJECT_NAME={project.name}', f'PROJECT_VERSION={project.version}'],
             detach=True
         )
         print(f'building inside {container.short_id}')
