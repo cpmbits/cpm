@@ -1,5 +1,4 @@
 import os
-import shlex
 
 import docker
 import subprocess
@@ -53,7 +52,7 @@ class ProjectCommands(object):
 
     def __build_using_image(self, project, image_name, goals, post_build):
         client = docker.from_env()
-        print(f'pulling {image_name}')
+        print(f'using Docker image {image_name}')
         try:
             client.images.pull(image_name)
         except docker.errors.ImageNotFound:
@@ -93,24 +92,24 @@ class ProjectCommands(object):
             raise BuildError
         container.remove()
 
-    def run_tests(self, project, files_or_dirs):
+    def run_tests(self, project, files_or_dirs, test_args=()):
         tests_to_run = project.test.test_suites if not files_or_dirs else self.tests_from_args(project, files_or_dirs)
         if project.target.test_image:
-            test_results = self.__run_tests_inside_container(project, tests_to_run)
+            test_results = self.__run_tests_inside_container(project, tests_to_run, test_args)
         else:
-            test_results = [self.run_test(test.name) for test in tests_to_run]
+            test_results = [self.run_test(test.name, test_args) for test in tests_to_run]
         if any(result != 0 for result in test_results):
             raise TestsFailed('tests failed')
 
-    def run_test(self, executable):
+    def run_test(self, executable, test_args):
         result = subprocess.run(
-            [f'./{constants.BUILD_DIRECTORY}/{executable}']
+            [f'./{constants.BUILD_DIRECTORY}/{executable}'] + test_args
         )
         if result.returncode < 0:
             print(f'{executable} failed with {result.returncode} ({signal.Signals(-result.returncode).name})')
         return result.returncode
 
-    def __run_tests_inside_container(self, project, tests_to_run):
+    def __run_tests_inside_container(self, project, tests_to_run, test_args):
         client = docker.from_env()
         image_name = project.target.test_image
         try:
@@ -119,12 +118,12 @@ class ProjectCommands(object):
             raise DockerImageNotFound(image_name)
         except docker.errors.NotFound:
             raise DockerImageNotFound(image_name)
-        return [self.__run_test_inside_container(project, client, image_name, test.name) for test in tests_to_run]
+        return [self.__run_test_inside_container(project, client, image_name, test.name, test_args) for test in tests_to_run]
 
-    def __run_test_inside_container(self, project, client, image_name, executable):
+    def __run_test_inside_container(self, project, client, image_name, executable, test_args):
         container = client.containers.run(
             image_name,
-            command=f'./{constants.BUILD_DIRECTORY}/{executable}',
+            command=f'./{constants.BUILD_DIRECTORY}/{executable} {" ".join(test_args)}',
             working_dir=f'/{project.name}',
             volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
             user=f'{os.getuid()}:{os.getgid()}',
@@ -166,6 +165,14 @@ def _ignore_exception(call):
         call()
     except:
         pass
+
+
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
 class TestsFailed(RuntimeError):

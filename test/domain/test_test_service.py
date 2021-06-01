@@ -38,9 +38,9 @@ class TestTestService(unittest.TestCase):
         self.project_loader.load.assert_called_once()
         self.cmakelists_builder.build.assert_called_once_with(project)
         self.project_commands.build_tests.assert_called_once_with(project, [])
-        self.project_commands.run_tests.assert_called_once_with(project, [])
+        self.project_commands.run_tests.assert_called_once_with(project, [], ())
 
-    def test_service_build_ans_runs_only_specified_tests(self):
+    def test_service_build_and_runs_only_specified_tests(self):
         project = Project('ProjectName')
         project.test.test_suites = ['test']
         self.project_loader.load.return_value = project
@@ -50,4 +50,16 @@ class TestTestService(unittest.TestCase):
         self.project_loader.load.assert_called_once()
         self.cmakelists_builder.build.assert_called_once_with(project)
         self.project_commands.build_tests.assert_called_once_with(project, ['tests'])
-        self.project_commands.run_tests.assert_called_once_with(project, ['tests'])
+        self.project_commands.run_tests.assert_called_once_with(project, ['tests'], ())
+
+    def test_service_passes_test_args_to_run_command(self):
+        project = Project('ProjectName')
+        project.test.test_suites = ['test']
+        self.project_loader.load.return_value = project
+
+        self.test_service.run_tests(['tests'], 'default', test_args=['arg1'])
+
+        self.project_loader.load.assert_called_once()
+        self.cmakelists_builder.build.assert_called_once_with(project)
+        self.project_commands.build_tests.assert_called_once_with(project, ['tests'])
+        self.project_commands.run_tests.assert_called_once_with(project, ['tests'], ['arg1'])
