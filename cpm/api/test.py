@@ -13,12 +13,9 @@ from cpm.domain.project_commands import TestsFailed
 from cpm.domain.project_commands import ProjectCommands
 
 
-def run_tests(test_service, files_or_dirs=None, target='default'):
-    if files_or_dirs is None:
-        files_or_dirs = []
-
+def run_tests(test_service, files_or_dirs=(), test_args=(), target='default'):
     try:
-        test_service.run_tests(files_or_dirs, target)
+        test_service.run_tests(files_or_dirs, target, test_args)
     except ProjectDescriptorNotFound:
         return Result(FAIL, 'error: not a cpm project')
     except BuildError as e:
@@ -33,14 +30,26 @@ def run_tests(test_service, files_or_dirs=None, target='default'):
 
 def execute(argv):
     add_target_parser = argparse.ArgumentParser(prog='cpm test', description='cpm, modern C/C++ system', add_help=False)
-    add_target_parser.add_argument('files_or_dirs', nargs=argparse.REMAINDER)
+    add_target_parser.add_argument('rest', nargs=argparse.REMAINDER)
     args = add_target_parser.parse_args(argv)
 
     project_loader = ProjectLoader()
     cmakelists_builder = CMakeListsBuilder()
     project_commands = ProjectCommands()
     service = TestService(project_loader, cmakelists_builder, project_commands)
+    files_or_dirs, test_args = __parse_rest(args.rest)
 
-    result = run_tests(service, args.files_or_dirs)
+    result = run_tests(service, files_or_dirs, test_args)
 
     return result
+
+
+def __parse_rest(rest):
+    try:
+        delimiter_index = rest.index('--')
+        files_or_dirs = rest[:delimiter_index]
+        test_args = rest[delimiter_index+1:]
+    except ValueError:
+        files_or_dirs = rest
+        test_args = []
+    return files_or_dirs, test_args
