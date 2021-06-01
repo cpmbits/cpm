@@ -1,5 +1,4 @@
 import os
-import shlex
 
 import docker
 import subprocess
@@ -53,8 +52,7 @@ class ProjectCommands(object):
 
     def __build_using_image(self, project, image_name, goals, post_build):
         client = docker.from_env()
-        image_metadata = client.images.get(image_name)
-        print(f'using {image_name} ({sizeof_fmt(image_metadata.attrs["Size"])})')
+        print(f'using Docker image {image_name}')
         try:
             client.images.pull(image_name)
         except docker.errors.ImageNotFound:

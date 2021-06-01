@@ -1,7 +1,0 @@
-urllib3
-mock
-pyyaml
-requests
-docker
-ninja
-cmake
