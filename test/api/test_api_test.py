@@ -16,7 +16,7 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service)
 
         assert result.status_code == 1
-        test_service.run_tests.assert_called_once_with([], 'default', [])
+        test_service.run_tests.assert_called_once_with((), 'default', ())
 
     def test_run_tests_fails_when_no_tests_are_found(self):
         test_service = mock.MagicMock()
@@ -25,7 +25,7 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service)
 
         assert result.status_code == 0
-        test_service.run_tests.assert_called_once_with([], 'default', [])
+        test_service.run_tests.assert_called_once_with((), 'default', ())
 
     def test_run_tests_fails_when_compilation_fails(self):
         test_service = mock.MagicMock()
@@ -34,7 +34,7 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service)
 
         assert result.status_code == 1
-        test_service.run_tests.assert_called_once_with([], 'default', [])
+        test_service.run_tests.assert_called_once_with((), 'default', ())
 
     def test_run_tests_fails_when_tests_fail(self):
         test_service = mock.MagicMock()
@@ -43,7 +43,7 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service)
 
         assert result.status_code == 1
-        test_service.run_tests.assert_called_once_with([], 'default', [])
+        test_service.run_tests.assert_called_once_with((), 'default', ())
 
     def test_run_project_tests(self):
         test_service = mock.MagicMock()
@@ -51,7 +51,7 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service)
 
         assert result.status_code == 0
-        test_service.run_tests.assert_called_once_with([], 'default', [])
+        test_service.run_tests.assert_called_once_with((), 'default', ())
 
     def test_run_project_tests_with_patterns(self):
         test_service = mock.MagicMock()
@@ -59,7 +59,7 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service, files_or_dirs=['tests'])
 
         assert result.status_code == 0
-        test_service.run_tests.assert_called_once_with(['tests'], 'default', [])
+        test_service.run_tests.assert_called_once_with(['tests'], 'default', ())
 
     def test_run_project_tests_with_target_other_than_default(self):
         test_service = mock.MagicMock()
@@ -67,7 +67,7 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service, target='rpi4')
 
         assert result.status_code == 0
-        test_service.run_tests.assert_called_once_with([], 'rpi4', [])
+        test_service.run_tests.assert_called_once_with((), 'rpi4', ())
 
     def test_run_project_tests_with_test_args(self):
         test_service = mock.MagicMock()
@@ -75,4 +75,4 @@ class TestApiTest(unittest.TestCase):
         result = run_tests(test_service, test_args=['arg1'])
 
         assert result.status_code == 0
-        test_service.run_tests.assert_called_once_with([], 'default', ['arg1'])
+        test_service.run_tests.assert_called_once_with((), 'default', ['arg1'])

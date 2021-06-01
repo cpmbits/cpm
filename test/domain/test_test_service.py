@@ -38,7 +38,7 @@ class TestTestService(unittest.TestCase):
         self.project_loader.load.assert_called_once()
         self.cmakelists_builder.build.assert_called_once_with(project)
         self.project_commands.build_tests.assert_called_once_with(project, [])
-        self.project_commands.run_tests.assert_called_once_with(project, [], [])
+        self.project_commands.run_tests.assert_called_once_with(project, [], ())
 
     def test_service_build_and_runs_only_specified_tests(self):
         project = Project('ProjectName')
@@ -50,7 +50,7 @@ class TestTestService(unittest.TestCase):
         self.project_loader.load.assert_called_once()
         self.cmakelists_builder.build.assert_called_once_with(project)
         self.project_commands.build_tests.assert_called_once_with(project, ['tests'])
-        self.project_commands.run_tests.assert_called_once_with(project, ['tests'], [])
+        self.project_commands.run_tests.assert_called_once_with(project, ['tests'], ())
 
     def test_service_passes_test_args_to_run_command(self):
         project = Project('ProjectName')
