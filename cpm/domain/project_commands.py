@@ -53,7 +53,8 @@ class ProjectCommands(object):
 
     def __build_using_image(self, project, image_name, goals, post_build):
         client = docker.from_env()
-        print(f'pulling {image_name}')
+        image_metadata = client.images.get(image_name)
+        print(f'using {image_name} ({sizeof_fmt(image_metadata.attrs["Size"])})')
         try:
             client.images.pull(image_name)
         except docker.errors.ImageNotFound:
@@ -166,6 +167,14 @@ def _ignore_exception(call):
         call()
     except:
         pass
+
+
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
 class TestsFailed(RuntimeError):
