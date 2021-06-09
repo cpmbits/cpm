@@ -86,6 +86,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                     'image': 'cpmbits/bender',
                     'main': 'main.c',
                     'test_image': 'cpmbits/bender_test',
+                    'test_dockerfile': 'test.Dockerfile',
                     'toolchain_prefix': 'arm-linux-gnueabi-'
                 }
             }
@@ -97,6 +98,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 image='cpmbits/bender',
                 main='main.c',
                 test_image='cpmbits/bender_test',
+                test_dockerfile='test.Dockerfile',
                 toolchain_prefix='arm-linux-gnueabi-'
             )
         }

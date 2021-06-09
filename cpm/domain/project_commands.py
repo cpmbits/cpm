@@ -30,16 +30,44 @@ class ProjectCommands(object):
             self.__build_tests(project, [test.name for test in tests_to_run])
 
     def __build_tests(self, project, goals, post_build=''):
+        if project.target.test_image and project.target.test_dockerfile:
+            print('warning: both "test_image" and "test_dockerfile" options are specified, will use "test_image"')
         if project.target.test_image:
-            self.__build_using_image(project, project.target.test_image, goals, post_build)
+            self.__build_using_image(
+                project,
+                project.target.test_image,
+                goals,
+                post_build
+            )
+        elif project.target.test_dockerfile:
+            self.__build_using_dockerfile(
+                project,
+                project.target.test_dockerfile,
+                self.__test_image_name(project),
+                goals,
+                post_build
+            )
         else:
             self.__build_goal(goals)
 
     def __build(self, project, goals, post_build=''):
+        if project.target.image and project.target.dockerfile:
+            print('warning: both "image" and "dockerfile" options are specified, will use "image"')
         if project.target.image:
-            self.__build_using_image(project, project.target.image, goals, post_build)
+            self.__build_using_image(
+                project,
+                project.target.image,
+                goals,
+                post_build
+            )
         elif project.target.dockerfile:
-            self.__build_using_dockerfile(project, project.target.dockerfile, goals, post_build)
+            self.__build_using_dockerfile(
+                project,
+                project.target.dockerfile,
+                self.__build_image_name(project),
+                goals,
+                post_build
+            )
         else:
             self.__build_goal(goals)
 
@@ -61,10 +89,9 @@ class ProjectCommands(object):
             raise DockerImageNotFound(image_name)
         self.__build_inside_container(client, project, image_name, goals, post_build)
 
-    def __build_using_dockerfile(self, project, dockerfile, goals, post_build):
+    def __build_using_dockerfile(self, project, dockerfile, image_name, goals, post_build):
         client = docker.from_env()
         print(f'building image from {dockerfile}')
-        image_name = f'{project.name}_cpm_build'
         with open(dockerfile, 'rb') as fileobj:
             client.images.build(path='.', fileobj=fileobj, tag=image_name)
         self.__build_inside_container(client, project, image_name, goals, post_build)
@@ -92,10 +119,28 @@ class ProjectCommands(object):
             raise BuildError
         container.remove()
 
+    def __build_image_name(self, project):
+        return f'{project.name}_cpm_build'
+
+    def __test_image_name(self, project):
+        return f'{project.name}_cpm_test'
+
     def run_tests(self, project, files_or_dirs, test_args=()):
         tests_to_run = project.test.test_suites if not files_or_dirs else self.tests_from_args(project, files_or_dirs)
         if project.target.test_image:
-            test_results = self.__run_tests_inside_container(project, tests_to_run, test_args)
+            test_results = self.__run_tests_using_image(
+                project,
+                project.target.test_image,
+                tests_to_run,
+                test_args
+            )
+        elif project.target.test_dockerfile:
+            test_results = self.__run_tests_using_dockerfile(
+                project,
+                self.__test_image_name(project),
+                tests_to_run,
+                test_args
+            )
         else:
             test_results = [self.run_test(test.name, test_args) for test in tests_to_run]
         if any(result != 0 for result in test_results):
@@ -109,15 +154,18 @@ class ProjectCommands(object):
             print(f'{executable} failed with {result.returncode} ({signal.Signals(-result.returncode).name})')
         return result.returncode
 
-    def __run_tests_inside_container(self, project, tests_to_run, test_args):
+    def __run_tests_using_image(self, project, image_name, tests_to_run, test_args):
         client = docker.from_env()
-        image_name = project.target.test_image
         try:
             client.images.pull(image_name)
         except docker.errors.ImageNotFound:
             raise DockerImageNotFound(image_name)
         except docker.errors.NotFound:
             raise DockerImageNotFound(image_name)
+        return [self.__run_test_inside_container(project, client, image_name, test.name, test_args) for test in tests_to_run]
+
+    def __run_tests_using_dockerfile(self, project, image_name, tests_to_run, test_args):
+        client = docker.from_env()
         return [self.__run_test_inside_container(project, client, image_name, test.name, test_args) for test in tests_to_run]
 
     def __run_test_inside_container(self, project, client, image_name, executable, test_args):
@@ -129,6 +177,8 @@ class ProjectCommands(object):
             user=f'{os.getuid()}:{os.getgid()}',
             detach=True
         )
+        for log in container.logs(stream=True):
+            sys.stdout.write(log.decode())
         exit_code = container.wait()
         result = exit_code['StatusCode']
         container.remove()
