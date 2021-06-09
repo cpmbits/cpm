@@ -113,6 +113,17 @@ class TestCpm(unittest.TestCase):
         result = test.execute([])
         assert result.status_code == 0
 
+    def test_run_tests_using_dockerfile(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        self.add_bit('test', 'cest', '1.0')
+        self.set_target_image('default', 'cpmbits/ubuntu:20.04')
+        self.set_target_test_dockerfile('default', f'../environment/Dockerfile')
+        self.set_test_ldflags(['-Wl,-s'])
+        self.add_test('test_case.cpp')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = test.execute([])
+        assert result.status_code == 0
+
     def test_build_from_docker_image_with_non_default_target(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.set_target_image('ubuntu', 'cpmbits/ubuntu:20.04')
@@ -266,6 +277,11 @@ class TestCpm(unittest.TestCase):
     def set_target_dockerfile(self, target_name, dockerfile):
         self.modify_descriptor(
             lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'dockerfile': dockerfile})
+        )
+
+    def set_target_test_dockerfile(self, target_name, dockerfile):
+        self.modify_descriptor(
+            lambda descriptor: descriptor.setdefault('targets', {}).setdefault(target_name, {}).update({'test_dockerfile': dockerfile})
         )
 
     def set_target_ldflags(self, target_name, ldflags):

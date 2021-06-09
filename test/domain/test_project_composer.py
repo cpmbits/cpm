@@ -99,6 +99,7 @@ class TestProjectComposer(unittest.TestCase):
                     'main': 'main.c',
                     'image': 'cpmbits/docker',
                     'test_image': 'cpmbits/docker_test',
+                    'test_dockerfile': 'test.Dockerfile',
                     'toolchain_prefix': 'arm-linux-gnueabi-'
                 }
             }
@@ -119,6 +120,7 @@ class TestProjectComposer(unittest.TestCase):
         assert project.target.main == 'main.c'
         assert project.target.image == 'cpmbits/docker'
         assert project.target.test_image == 'cpmbits/docker_test'
+        assert project.target.test_dockerfile == 'test.Dockerfile'
         assert project.target.toolchain_prefix == 'arm-linux-gnueabi-'
 
     @mock.patch('cpm.domain.project.project_composer.filesystem')
