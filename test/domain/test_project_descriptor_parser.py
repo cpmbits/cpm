@@ -34,13 +34,15 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 'packages': {
                     'cpmhub/bits': {
                         'cflags': ['-DHOLA'],
+                        'cppflags': ['-DHOLA_CPP'],
                     },
                     'cpmhub/http': None
                 },
                 'bits': {
                     'sqlite3': '3.32.3'
                 },
-                'cflags': ['-std=c++11'],
+                'cflags': ['-std=c99'],
+                'cppflags': ['-std=c++11'],
                 'ldflags': ['-pg'],
                 'libraries': ['pthread'],
                 'includes': ['./include']
@@ -48,10 +50,11 @@ class TestProjectDescriptorParser(unittest.TestCase):
         }
         project = project_descriptor_parser.parse_yaml(yaml_contents)
         assert project.build.packages == [
-            project_descriptor.PackageDescription('cpmhub/bits', cflags=['-DHOLA']),
+            project_descriptor.PackageDescription('cpmhub/bits', cflags=['-DHOLA'], cppflags=['-DHOLA_CPP']),
             project_descriptor.PackageDescription('cpmhub/http')
         ]
-        assert project.build.cflags == ['-std=c++11']
+        assert project.build.cflags == ['-std=c99']
+        assert project.build.cppflags == ['-std=c++11']
         assert project.build.ldflags == ['-pg']
         assert project.build.libraries == ['pthread']
         assert project.build.includes == {'./include'}

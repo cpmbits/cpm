@@ -24,7 +24,7 @@ class CMakeListsBuilder(object):
             [project.target.main],
             self.object_libraries
         )
-        self.set_target_properties(project.name, 'COMPILE_FLAGS', project.target.cppflags)
+        self.set_target_properties(project.name, 'COMPILE_FLAGS', self.main_compile_flags(project, project.target.main))
         self.target_link_options(project.name, project.target.ldflags)
         self.include_directories(project.target.include_directories)
         for package in self.test_packages_with_sources(project.test):
@@ -37,7 +37,7 @@ class CMakeListsBuilder(object):
                 [test.main],
                 self.object_libraries + self.test_object_libraries
             )
-            self.set_target_properties(test.name, 'COMPILE_FLAGS', project.test.cflags + test.cflags)
+            self.set_target_properties(test.name, 'COMPILE_FLAGS', self.test_main_compile_flags(project, test.main))
             self.target_link_options(test.name, project.test.ldflags)
             self.target_include_directories(
                 test.name,
@@ -99,6 +99,20 @@ class CMakeListsBuilder(object):
         for library in object_libraries:
             self.contents += f' {library}'
         self.contents += ')\n'
+
+    def main_compile_flags(self, project, main_filename):
+        if main_filename.endswith('.c'):
+            return project.target.cflags
+        elif main_filename.endswith('.cpp'):
+            return project.target.cppflags
+        return []
+
+    def test_main_compile_flags(self, project, main_filename):
+        if main_filename.endswith('.c'):
+            return project.target.cflags + project.test.cflags
+        elif main_filename.endswith('.cpp'):
+            return project.target.cppflags + project.test.cppflags
+        return []
 
     def set_target_properties(self, target, property, values):
         if values:
