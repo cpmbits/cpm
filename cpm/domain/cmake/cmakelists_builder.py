@@ -1,6 +1,8 @@
 class CMakeListsBuilder(object):
     def __init__(self):
         self.contents = ''
+        self.object_libraries = []
+        self.test_object_libraries = []
 
     def build(self, project):
         self.build_contents(project)
@@ -13,32 +15,27 @@ class CMakeListsBuilder(object):
             self.set_compilers(project.target.toolchain_prefix)
         self.project(project.name)
         for package in self.bit_packages_with_sources(project.target):
-            self.build_package_recipe(package)
+            self.object_libraries += self.build_package_recipe(package)
         for package in self.target_packages_with_sources(project.target):
-            self.build_package_recipe(package)
+            self.object_libraries += self.build_package_recipe(package)
         self.link_libraries(project.target.libraries)
         self.add_executable(
             project.name,
             [project.target.main],
-            [self.object_library_name(package.path) for package in self.target_packages_with_sources(project.target)] +
-            [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)]
+            self.object_libraries
         )
-        self.set_target_properties(project.name, 'COMPILE_FLAGS', project.target.cflags)
+        self.set_target_properties(project.name, 'COMPILE_FLAGS', project.target.cppflags)
         self.target_link_options(project.name, project.target.ldflags)
         self.include_directories(project.target.include_directories)
         for package in self.test_packages_with_sources(project.test):
-            self.build_package_recipe(package)
+            self.test_object_libraries += self.build_package_recipe(package)
         for package in self.bit_packages_with_sources(project.test):
-            self.build_package_recipe(package)
+            self.test_object_libraries += self.build_package_recipe(package)
         for test in project.test.test_suites:
             self.add_executable(
                 test.name,
                 [test.main],
-                [self.object_library_name(package.path) for package in self.target_packages_with_sources(project.target)] +
-                [self.object_library_name(package.path) for package in self.test_packages_with_sources(project.test)] +
-                [self.object_library_name(package.path) for package in self.test_packages_with_sources(test)] +
-                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.test)] +
-                [self.object_library_name(package.path) for package in self.bit_packages_with_sources(project.target)]
+                self.object_libraries + self.test_object_libraries
             )
             self.set_target_properties(test.name, 'COMPILE_FLAGS', project.test.cflags + test.cflags)
             self.target_link_options(test.name, project.test.ldflags)
@@ -62,10 +59,19 @@ class CMakeListsBuilder(object):
         return [package for package in test.packages if package.sources]
 
     def build_package_recipe(self, package):
-        package_library_name = self.object_library_name(package.path)
-        self.add_object_library(package_library_name, package.sources)
-        self.set_target_properties(package_library_name, 'COMPILE_FLAGS', package.cflags)
+        package_c_library_name = self.object_library_name(package.path + '_c')
+        package_cpp_library_name = self.object_library_name(package.path + '_cpp')
+        return self.build_package_library_recipe(package, package_c_library_name, package.cflags, '.c') + \
+               self.build_package_library_recipe(package, package_cpp_library_name, package.cppflags, '.cpp')
+
+    def build_package_library_recipe(self, package, package_library_name, compile_flags, extension):
+        sources = list(filter(lambda s: s.endswith(extension), package.sources))
+        if not sources:
+            return []
+        self.add_object_library(package_library_name, sources)
+        self.set_target_properties(package_library_name, 'COMPILE_FLAGS', compile_flags)
         self.target_include_directories(package_library_name, package.include_directories)
+        return [f'$<TARGET_OBJECTS:{package_library_name}>']
 
     def object_library_name(self, package_path):
         return f'{package_path.replace("/", "_")}_object_library'
@@ -91,7 +97,7 @@ class CMakeListsBuilder(object):
     def add_executable(self, name, sources, object_libraries=[]):
         self.contents += f'add_executable({name} {" ".join(sources)}'
         for library in object_libraries:
-            self.contents += f' $<TARGET_OBJECTS:{library}>'
+            self.contents += f' {library}'
         self.contents += ')\n'
 
     def set_target_properties(self, target, property, values):

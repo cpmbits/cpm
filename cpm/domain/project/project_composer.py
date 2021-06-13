@@ -20,6 +20,7 @@ def compose_target(target_name, project_descriptor):
     target = Target(target_name)
     target_description = project_descriptor.targets.get(target_name, TargetDescription(target_name))
     target.cflags = project_descriptor.build.cflags + target_description.build.cflags
+    target.cppflags = project_descriptor.build.cppflags + target_description.build.cppflags
     target.ldflags = project_descriptor.build.ldflags + target_description.build.ldflags
     target.libraries = project_descriptor.build.libraries + target_description.build.libraries
     target.include_directories.update(project_descriptor.build.includes)
@@ -42,6 +43,7 @@ def compose_target(target_name, project_descriptor):
 def compose_tests(target_name, project_descriptor, project):
     target_description = project_descriptor.targets.get(target_name, TargetDescription(target_name))
     project.test.cflags = project_descriptor.test.cflags + target_description.test.cflags
+    project.test.cppflags = project_descriptor.test.cppflags + target_description.test.cppflags
     project.test.ldflags = project_descriptor.test.ldflags + target_description.test.ldflags
     project.test.libraries = project_descriptor.test.libraries + target_description.test.libraries
     project.test.include_directories.update(project_descriptor.test.includes)
@@ -62,6 +64,7 @@ def compose_packages(packages, target):
         package = Package(package_description.path)
         package.sources = filesystem.find(package.path, '*.cpp') + filesystem.find(package.path, '*.c')
         package.cflags = package_description.cflags + target.cflags
+        package.cppflags = package_description.cppflags + target.cppflags
         target.packages.append(package)
         target.include_directories.add(package_include_directory(package_description))
         package.include_directories = target.include_directories
@@ -76,6 +79,7 @@ def compose_bit(bit_description, target):
     bit_target = compose_target(bit_target_name, bit_description)
     target.bits.append(bit_target)
     add_cflags_to_bit_packages(bit_target, bit_description.declared_bit.cflags)
+    add_cppflags_to_bit_packages(bit_target, bit_description.declared_bit.cppflags)
 
 
 def get_bit_target_name(bit_description):
@@ -102,3 +106,8 @@ def package_include_directory(package_description):
 def add_cflags_to_bit_packages(bit_target, cflags):
     for package in bit_target.packages:
         package.cflags.extend(cflags)
+
+
+def add_cppflags_to_bit_packages(bit_target, cppflags):
+    for package in bit_target.packages:
+        package.cppflags.extend(cppflags)

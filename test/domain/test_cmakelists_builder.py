@@ -40,23 +40,24 @@ class TestCmakelistsBuilder(unittest.TestCase):
 
         print(cmakelists_content)
 
-        assert 'cmake_minimum_required (VERSION 3.13)' in cmakelists_content
         assert 'set(CMAKE_C_COMPILER arm-linux-gnueabi-gcc)' in cmakelists_content
         assert 'set(CMAKE_CXX_COMPILER arm-linux-gnueabi-g++)' in cmakelists_content
         assert 'project(Project)' in cmakelists_content
-        assert 'add_library(package_object_library OBJECT file.cpp file.c)' in cmakelists_content
-        assert 'add_library(bit_package_object_library OBJECT bit.cpp bit.c)' in cmakelists_content
-        assert 'set_target_properties(bit_package_object_library PROPERTIES COMPILE_FLAGS "-DBIT_HELLO")' in cmakelists_content
-        assert 'set_target_properties(package_object_library PROPERTIES COMPILE_FLAGS "-DHOLA")' in cmakelists_content
+        assert 'add_library(bit_package_c_object_library OBJECT bit.c)' in cmakelists_content
+        assert 'set_target_properties(bit_package_c_object_library PROPERTIES COMPILE_FLAGS "-DBIT_HELLO")' in cmakelists_content
+        assert 'add_library(bit_package_cpp_object_library OBJECT bit.cpp)' in cmakelists_content
+        assert 'add_library(package_c_object_library OBJECT file.c)' in cmakelists_content
+        assert 'set_target_properties(package_c_object_library PROPERTIES COMPILE_FLAGS "-DHOLA")' in cmakelists_content
+        assert 'add_library(package_cpp_object_library OBJECT file.cpp)' in cmakelists_content
         assert 'link_libraries(pthread)' in cmakelists_content
-        assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bit_package_object_library>)' in cmakelists_content
-        assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
+        assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:bit_package_c_object_library> $<TARGET_OBJECTS:bit_package_cpp_object_library> $<TARGET_OBJECTS:package_c_object_library> $<TARGET_OBJECTS:package_cpp_object_library>)' in cmakelists_content
         assert 'target_link_options(Project PUBLIC "-Wl,--wrap=malloc")' in cmakelists_content
         assert 'include_directories(package spdlog)' in cmakelists_content
-        assert 'add_library(bits_mock_object_library OBJECT bits/mock/mock.cpp)' in cmakelists_content
-        assert 'add_library(test_bit_package_object_library OBJECT test_bit.cpp test_bit.c)' in cmakelists_content
-        assert 'set_target_properties(test_bit_package_object_library PROPERTIES COMPILE_FLAGS "-DTEST_BIT_HELLO")' in cmakelists_content
-        assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:package_object_library> $<TARGET_OBJECTS:bits_mock_object_library> $<TARGET_OBJECTS:test_bit_package_object_library> $<TARGET_OBJECTS:bit_package_object_library>)' in cmakelists_content
+        assert 'add_library(bits_mock_cpp_object_library OBJECT bits/mock/mock.cpp)' in cmakelists_content
+        assert 'add_library(test_bit_package_c_object_library OBJECT test_bit.c)' in cmakelists_content
+        assert 'set_target_properties(test_bit_package_c_object_library PROPERTIES COMPILE_FLAGS "-DTEST_BIT_HELLO")' in cmakelists_content
+        assert 'add_library(test_bit_package_cpp_object_library OBJECT test_bit.cpp)' in cmakelists_content
+        assert 'add_executable(test_case test_case.cpp $<TARGET_OBJECTS:bit_package_c_object_library> $<TARGET_OBJECTS:bit_package_cpp_object_library> $<TARGET_OBJECTS:package_c_object_library> $<TARGET_OBJECTS:package_cpp_object_library> $<TARGET_OBJECTS:bits_mock_cpp_object_library> $<TARGET_OBJECTS:test_bit_package_c_object_library> $<TARGET_OBJECTS:test_bit_package_cpp_object_library>)' in cmakelists_content
         assert 'target_link_options(test_case PUBLIC "-Wl,--allow-multiple-definition")' in cmakelists_content
         assert 'target_include_directories(test_case PUBLIC bits/cest bits/mock)' in cmakelists_content
         assert ('add_custom_target(tests\n'
