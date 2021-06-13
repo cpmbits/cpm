@@ -11,6 +11,7 @@ from cpm.domain.project_commands import ProjectCommands, BuildError
 
 def build_project(compilation_service, target='default'):
     try:
+        print(f'cpm: building target {target}')
         compilation_service.build(target)
     except ProjectDescriptorNotFound:
         return Result(FAIL, f'error: not a cpm project')

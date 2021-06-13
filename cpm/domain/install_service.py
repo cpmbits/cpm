@@ -9,7 +9,7 @@ class InstallService(object):
 
     def install(self, name, version):
         if self.__bit_already_installed(name, version):
-            print(f'bit already installed: {name}:{version}')
+            print(f'cpm: bit already installed: {name}:{version}')
             return
         project_description = project_descriptor_parser.parse_from('.')
         self._log_install_or_upgrade(project_description, name, version)
@@ -26,9 +26,9 @@ class InstallService(object):
     def _log_install_or_upgrade(self, project_description, name, version):
         installed_bit = next((bit for bit in project_description.build.bits if bit.name == name), None)
         if installed_bit:
-            print(f'{"upgrading" if installed_bit.version < version else "downgrading"} {name}:{installed_bit.version} -> {version}')
+            print(f'cpm: {"upgrading" if installed_bit.version < version else "downgrading"} {name}:{installed_bit.version} -> {version}')
         else:
-            print(f'installing {name}:{version}')
+            print(f'cpm: installing {name}:{version}')
 
     def install_all(self, directory='.'):
         self.__install_recursively(directory)

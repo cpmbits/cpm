@@ -21,7 +21,8 @@ class TestCmakelistsBuilder(unittest.TestCase):
             .project.target
         project = a_project('Project') \
             .with_target('default') \
-            .with_cflags(['-std=c++11']) \
+            .with_cflags(['-std=c99']) \
+            .with_cppflags(['-std=c++11']) \
             .with_ldflags(['-Wl,--wrap=malloc']) \
             .with_libraries(['pthread']) \
             .with_package('package', ['file.cpp', 'file.c'], ['-DHOLA']) \
@@ -51,6 +52,7 @@ class TestCmakelistsBuilder(unittest.TestCase):
         assert 'add_library(package_cpp_object_library OBJECT file.cpp)' in cmakelists_content
         assert 'link_libraries(pthread)' in cmakelists_content
         assert 'add_executable(Project main.cpp $<TARGET_OBJECTS:bit_package_c_object_library> $<TARGET_OBJECTS:bit_package_cpp_object_library> $<TARGET_OBJECTS:package_c_object_library> $<TARGET_OBJECTS:package_cpp_object_library>)' in cmakelists_content
+        assert 'set_target_properties(Project PROPERTIES COMPILE_FLAGS "-std=c++11")' in cmakelists_content
         assert 'target_link_options(Project PUBLIC "-Wl,--wrap=malloc")' in cmakelists_content
         assert 'include_directories(package spdlog)' in cmakelists_content
         assert 'add_library(bits_mock_cpp_object_library OBJECT bits/mock/mock.cpp)' in cmakelists_content
@@ -80,6 +82,10 @@ class TestProjectBuilder:
 
     def with_cflags(self, cflags):
         self.project.target.cflags = cflags
+        return self
+
+    def with_cppflags(self, cppflags):
+        self.project.target.cppflags = cppflags
         return self
 
     def with_ldflags(self, ldflags):

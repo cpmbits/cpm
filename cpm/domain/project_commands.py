@@ -31,7 +31,7 @@ class ProjectCommands(object):
 
     def __build_tests(self, project, goals, post_build=''):
         if project.target.test_image and project.target.test_dockerfile:
-            print('warning: both "test_image" and "test_dockerfile" options are specified, will use "test_image"')
+            print('cpm: warning: both "test_image" and "test_dockerfile" options are specified, will use "test_image"')
         if project.target.test_image:
             self.__build_using_image(
                 project,
@@ -52,7 +52,7 @@ class ProjectCommands(object):
 
     def __build(self, project, goals, post_build=''):
         if project.target.image and project.target.dockerfile:
-            print('warning: both "image" and "dockerfile" options are specified, will use "image"')
+            print('cpm: warning: both "image" and "dockerfile" options are specified, will use "image"')
         if project.target.image:
             self.__build_using_image(
                 project,
@@ -80,7 +80,7 @@ class ProjectCommands(object):
 
     def __build_using_image(self, project, image_name, goals, post_build):
         client = docker.from_env()
-        print(f'using Docker image {image_name}')
+        print(f'cpm: using Docker image {image_name}')
         try:
             client.images.pull(image_name)
         except docker.errors.ImageNotFound:
@@ -91,7 +91,7 @@ class ProjectCommands(object):
 
     def __build_using_dockerfile(self, project, dockerfile, image_name, goals, post_build):
         client = docker.from_env()
-        print(f'building image from {dockerfile}')
+        print(f'cpm: building image from {dockerfile}')
         with open(dockerfile, 'rb') as fileobj:
             client.images.build(path='.', fileobj=fileobj, tag=image_name)
         self.__build_inside_container(client, project, image_name, goals, post_build)
@@ -111,7 +111,7 @@ class ProjectCommands(object):
             environment=[f'PROJECT_NAME={project.name}', f'PROJECT_VERSION={project.version}'],
             detach=True
         )
-        print(f'building inside {container.short_id}')
+        print(f'cpm: building inside {container.short_id}')
         for log in container.logs(stream=True):
             sys.stdout.write(log.decode())
         exit_code = container.wait()
@@ -151,7 +151,7 @@ class ProjectCommands(object):
             [f'./{constants.BUILD_DIRECTORY}/{executable}'] + test_args
         )
         if result.returncode < 0:
-            print(f'{executable} failed with {result.returncode} ({signal.Signals(-result.returncode).name})')
+            print(f'cpm: {executable} failed with {result.returncode} ({signal.Signals(-result.returncode).name})')
         return result.returncode
 
     def __run_tests_using_image(self, project, image_name, tests_to_run, test_args):
@@ -183,7 +183,7 @@ class ProjectCommands(object):
         result = exit_code['StatusCode']
         container.remove()
         if result < 0:
-            print(f'{executable} failed with {result} ({signal.Signals(-result).name})')
+            print(f'cpm: {executable} failed with {result} ({signal.Signals(-result).name})')
         return result
 
     def __run_command(self, *args, cwd=constants.BUILD_DIRECTORY):

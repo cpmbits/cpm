@@ -27,7 +27,7 @@ class CpmHubConnectorV1(object):
         }
 
         if self.dry_run:
-            print(f'publishing to {self.repository_url}')
+            print(f'cpm: publishing to {self.repository_url}')
             print(json.dumps(body))
             return
 
@@ -57,7 +57,7 @@ class CpmHubConnectorV1(object):
         }
 
         if self.dry_run:
-            print(f'publishing to {self.repository_url}')
+            print(f'cpm: publishing to {self.repository_url}')
             print(json.dumps(body))
             return
 

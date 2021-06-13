@@ -63,10 +63,12 @@ def parse_compilation_plan(plan_description):
     for package_path in get_or_default_to(plan_description, 'packages', {}):
         package = PackageDescription(
             package_path,
-            cflags=package_cflags(plan_description['packages'][package_path])
+            cflags=get_or_default_to(plan_description['packages'][package_path], 'cflags', []),
+            cppflags=get_or_default_to(plan_description['packages'][package_path], 'cppflags', [])
         )
         compilation_plan.packages.append(package)
     compilation_plan.cflags = get_or_default_to(plan_description, 'cflags', [])
+    compilation_plan.cppflags = get_or_default_to(plan_description, 'cppflags', [])
     compilation_plan.ldflags = get_or_default_to(plan_description, 'ldflags', [])
     compilation_plan.libraries = get_or_default_to(plan_description, 'libraries', [])
     compilation_plan.includes.update(get_or_default_to(plan_description, 'includes', []))
@@ -78,6 +80,7 @@ def declared_bit_with_customized_compilation(bit_name, bit_description):
         name=bit_name,
         version=bit_description['version'],
         cflags=get_or_default_to(bit_description, 'cflags', []),
+        cppflags=get_or_default_to(bit_description, 'cppflags', []),
         target=get_or_default_to(bit_description, 'target', '')
     )
 
@@ -90,8 +93,8 @@ def all_bit_yaml_files(project_descriptor):
     return glob.glob(f'{project_descriptor}/bits/*/*.yaml')
 
 
-def package_cflags(package_description):
-    return get_or_default_to(package_description, 'cflags', [])
+def package_compilation_flags(package_description, field):
+    return get_or_default_to(package_description, field, [])
 
 
 def get_or_default_to(dictionary, key, default):
