@@ -7,12 +7,14 @@ class DeclaredBit:
     version: str
     target: str = ''
     cflags: list = field(default_factory=list)
+    cppflags: list = field(default_factory=list)
 
 
 @dataclass
 class PackageDescription:
     path: str
     cflags: list = field(default_factory=list)
+    cppflags: list = field(default_factory=list)
     sources: list = field(default_factory=list)
 
 
