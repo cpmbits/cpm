@@ -8,7 +8,7 @@ from cpm.domain.project import project_descriptor_editor
 from cpm.domain.project.project_loader import ProjectLoader
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1
 from cpm.domain.sample_code import CPP_HELLO_WORLD
-from cpm.domain.constants import PROJECT_DESCRIPTOR_FILE, DEFAULT_PROJECT_VERSION
+from cpm.domain.constants import PROJECT_DESCRIPTOR_FILE, INITIAL_PROJECT_VERSION
 
 
 @dataclass
@@ -53,7 +53,7 @@ class CreationService:
             project.descriptor,
             {
                 'name': options.project_name,
-                'version': DEFAULT_PROJECT_VERSION,
+                'version': INITIAL_PROJECT_VERSION,
             }
         )
         return project
@@ -85,7 +85,7 @@ class CreationService:
         filesystem.create_file(
             f"{options.directory}/{PROJECT_DESCRIPTOR_FILE}",
             f"name: '{options.project_name}'\n"
-            f"version: {DEFAULT_PROJECT_VERSION}\n"
+            f"version: {INITIAL_PROJECT_VERSION}\n"
             f"build:\n"
             f"  packages:\n"
             f"  bits:\n"

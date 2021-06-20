@@ -93,7 +93,8 @@ class TestProjectComposer(unittest.TestCase):
                         },
                         'cflags': ['-Wall'],
                         'ldflags': ['-pg'],
-                        'libraries': ['pthread']
+                        'libraries': ['pthread'],
+                        'includes': ['./include']
                     },
                     'post_build': ['./post_build.sh'],
                     'main': 'main.c',
@@ -115,7 +116,7 @@ class TestProjectComposer(unittest.TestCase):
         assert project.target.cflags == ['-Wall']
         assert project.target.ldflags == ['-pg']
         assert project.target.libraries == ['pthread']
-        assert project.target.include_directories == {'.'}
+        assert project.target.include_directories == {'.', './include'}
         assert project.target.post_build == ['./post_build.sh']
         assert project.target.main == 'main.c'
         assert project.target.image == 'cpmbits/docker'

@@ -24,6 +24,7 @@ def compose_target(target_name, project_descriptor):
     target.ldflags = project_descriptor.build.ldflags + target_description.build.ldflags
     target.libraries = project_descriptor.build.libraries + target_description.build.libraries
     target.include_directories.update(project_descriptor.build.includes)
+    target.include_directories.update(target_description.build.includes)
     target.main = target_description.main
     target.image = target_description.image
     target.dockerfile = target_description.dockerfile
@@ -47,6 +48,7 @@ def compose_tests(target_name, project_descriptor, project):
     project.test.ldflags = project_descriptor.test.ldflags + target_description.test.ldflags
     project.test.libraries = project_descriptor.test.libraries + target_description.test.libraries
     project.test.include_directories.update(project_descriptor.test.includes)
+    project.test.include_directories.update(target_description.test.includes)
     compose_packages(project_descriptor.test.packages, project.test)
     compose_packages(target_description.test.packages, project.test)
 
