@@ -79,8 +79,8 @@ class ProjectCommands(object):
             raise BuildError
 
     def __build_using_image(self, project, image_name, goals, post_build):
-        client = docker.from_env()
         print(f'cpm: using Docker image {image_name}')
+        client = docker.from_env()
         try:
             client.images.pull(image_name)
         except docker.errors.ImageNotFound:
@@ -90,8 +90,8 @@ class ProjectCommands(object):
         self.__build_inside_container(client, project, image_name, goals, post_build)
 
     def __build_using_dockerfile(self, project, dockerfile, image_name, goals, post_build):
-        client = docker.from_env()
         print(f'cpm: building image from {dockerfile}')
+        client = docker.from_env()
         with open(dockerfile, 'rb') as fileobj:
             client.images.build(path='.', fileobj=fileobj, tag=image_name)
         self.__build_inside_container(client, project, image_name, goals, post_build)

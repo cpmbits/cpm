@@ -1,7 +1,7 @@
 import unittest
 import mock
 
-from cpm.domain.constants import DEFAULT_PROJECT_VERSION, PROJECT_DESCRIPTOR_FILE
+from cpm.domain.constants import INITIAL_PROJECT_VERSION, PROJECT_DESCRIPTOR_FILE
 from cpm.domain.project.project import Project
 from cpm.domain.project.project_template import ProjectTemplate
 from cpm.domain.sample_code import CPP_HELLO_WORLD
@@ -112,7 +112,7 @@ class TestCreationService(unittest.TestCase):
             init_from_template=True,
             template_name='arduino-uno',
         )
-        template_project = Project(name=options.project_name, version=DEFAULT_PROJECT_VERSION)
+        template_project = Project(name=options.project_name, version=INITIAL_PROJECT_VERSION)
         project_loader.load.return_value = template_project
         project_template = ProjectTemplate(
             name='arduino-uno',
