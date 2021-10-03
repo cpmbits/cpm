@@ -120,7 +120,7 @@ class ProjectCommands(object):
         container.remove()
 
     def __build_image_name(self, project):
-        return f'{project.name}_cpm_build'
+        return f'{project.name}_cpm_build'.lower()
 
     def __test_image_name(self, project):
         return f'{project.name}_cpm_test'

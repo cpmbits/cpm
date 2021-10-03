@@ -5,6 +5,8 @@ from cpm.domain.project.project import Project, Target, Package, TestSuite
 
 
 def compose(project_descriptor, target_name):
+    if target_name not in project_descriptor.targets:
+        raise TargetNotDescribed()
     project = Project(
         project_descriptor.name,
         version=project_descriptor.version,
@@ -24,7 +26,7 @@ def compose_target(target_name, project_descriptor):
     target.ldflags = project_descriptor.build.ldflags + target_description.build.ldflags
     target.libraries = project_descriptor.build.libraries + target_description.build.libraries
     target.include_directories.update(project_descriptor.build.includes)
-    target.include_directories.update(target_description.build.includes)
+    target.include_directories.update(project_descriptor.targets[target_name].build.includes)
     target.main = target_description.main
     target.image = target_description.image
     target.dockerfile = target_description.dockerfile
@@ -113,3 +115,7 @@ def add_cflags_to_bit_packages(bit_target, cflags):
 def add_cppflags_to_bit_packages(bit_target, cppflags):
     for package in bit_target.packages:
         package.cppflags.extend(cppflags)
+
+
+class TargetNotDescribed(RuntimeError):
+    pass
