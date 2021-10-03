@@ -29,8 +29,8 @@ class TestCpm(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.cwd)
-        shutil.rmtree(self.PROJECT_DIRECTORY, ignore_errors=True)
-        shutil.rmtree(self.PROJECT_FROM_TEMPLATE_DIRECTORY, ignore_errors=True)
+        # shutil.rmtree(self.PROJECT_DIRECTORY, ignore_errors=True)
+        # shutil.rmtree(self.PROJECT_FROM_TEMPLATE_DIRECTORY, ignore_errors=True)
 
     def test_build(self):
         os.chdir(self.PROJECT_DIRECTORY)
