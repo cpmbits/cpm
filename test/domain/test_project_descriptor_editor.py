@@ -17,7 +17,7 @@ description: 'kill all humans'
 build:
     packages:
     bits:
-    cflags:
+    cflags: !include file.yaml
 test:
 targets:
 '''
@@ -34,7 +34,7 @@ description: kill all humans
 build:
   packages:
   bits:
-  cflags:
+  cflags: !include file.yaml
 test:
 targets:
 ''')

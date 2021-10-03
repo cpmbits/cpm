@@ -3,6 +3,7 @@ import mock
 import os
 import shutil
 import yaml
+import re
 
 from cpm.infrastructure import filesystem
 from cpm.api import create
@@ -173,6 +174,29 @@ class TestCpm(unittest.TestCase):
         self.set_test_cflags(['-std=c++11'])
         self.add_test('test_case1.cpp')
         self.add_test('test_case2.cpp')
+        install.execute(['-s', 'http://localhost:8000'])
+        result = test.execute(['tests'])
+        assert result.status_code == 0
+
+    def test_using_reference_to_external_file_in_cflags(self):
+        os.chdir(self.PROJECT_DIRECTORY)
+        project_yaml = '''build:
+  bits:
+  packages:
+name: test_project
+targets:
+  default:
+    main: main.cpp
+test:
+  bits:
+    cest: '1.0'
+  cflags: !include test_cflags.yaml
+version: 0.0.1
+'''
+        with open('project.yaml', 'w') as stream:
+            stream.write(project_yaml)
+        with open('test_cflags.yaml', 'w') as stream:
+            yaml.dump(['-std=c++11'], stream)
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute(['tests'])
         assert result.status_code == 0
