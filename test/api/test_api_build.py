@@ -59,7 +59,6 @@ class TestApiBuild(unittest.TestCase):
 
     def test_build_project_for_target(self):
         compilation_service = mock.MagicMock()
-        recipe = mock.MagicMock()
 
         result = build_project(compilation_service, target='raspberrypi4:64')
 
