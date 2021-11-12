@@ -39,7 +39,7 @@ def install_project_bits(install_service):
 
 
 def execute(argv):
-    install_bit_arg_parser = argparse.ArgumentParser(prog='cpm install', description='cpm Package Manager', add_help=False)
+    install_bit_arg_parser = argparse.ArgumentParser(prog='cpm install', description='cpm install', add_help=False)
     install_bit_arg_parser.add_argument('-s', '--repository-url', required=False, action='store', default='https://repo.cpmbits.com:8000')
     install_bit_arg_parser.add_argument('bit_name', nargs='?')
     args = install_bit_arg_parser.parse_args(argv)

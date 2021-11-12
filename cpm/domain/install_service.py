@@ -12,17 +12,13 @@ class InstallService(object):
     def install(self, name, version):
         try:
             if not self.__bit_already_installed(name, version):
-                project_description = project_descriptor_parser.parse_from('.')
-                self._log_install_or_upgrade(project_description, name, version)
                 bit_download = self.cpm_hub_connector.download_bit(name, version)
                 self.bit_installer.install(bit_download)
-            print(f'  {f"{name}:{version}": <20} {"✔": >20}')
+                print(f'  {f"{name}:{version}": <20} {"✔": >20}')
         except BitNotFound:
             print(f'  {f"{name}:{version}": <20} {f"✖ bit {name} not found in bits repository": >20}')
         except HttpConnectionError as error:
             print(f'  {f"{name}:{version}": <20} {f"✖ failed to connect to bits repository: {error}": >20}')
-            # return Result(FAIL, f'error: failed to connect to CPM Hub at {error}')
-        # '✖'
 
     def __bit_already_installed(self, name, version):
         try:
@@ -35,15 +31,14 @@ class InstallService(object):
         installed_bit = next((bit for bit in project_description.build.bits if bit.name == name), None)
         if installed_bit:
             print(f'  {"upgrading" if installed_bit.version < version else "downgrading"} {name}:{installed_bit.version} -> {version}')
-        # else:
-        #     print(f'  installing {name}:{version}')
 
     def install_all(self, directory='.'):
-        print(f'cpm: installing all declared bits')
+        print(f'cpm: updating dependencies')
         self.__install_recursively(directory)
         project_descriptor = project_descriptor_parser.parse_from(directory)
         for declared_bit in project_descriptor.test.declared_bits:
             self.install(declared_bit.name, declared_bit.version)
+        print(f'cpm: everything up to date')
 
     def __install_recursively(self, directory='.'):
         project_descriptor = project_descriptor_parser.parse_from(directory)

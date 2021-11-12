@@ -7,6 +7,7 @@ from cpm.domain.project_commands import DockerImageNotFound
 from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.domain.project.project_loader import ProjectLoader, InvalidTarget
 from cpm.domain.project_commands import ProjectCommands, BuildError
+from cpm.api import install
 
 
 def build_project(compilation_service, target='default'):
@@ -26,6 +27,8 @@ def build_project(compilation_service, target='default'):
 
 
 def execute(argv):
+    install.execute([])
+
     create_parser = argparse.ArgumentParser(prog='cpm build', description='cpm build', add_help=False)
     create_parser.add_argument('target', nargs='?', default='default')
     args = create_parser.parse_args(argv)
