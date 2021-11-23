@@ -1,6 +1,7 @@
 import base64
 
 from cpm.infrastructure import filesystem
+from cpm.domain.constants import bit_directory
 
 
 class BitInstaller(object):
@@ -8,8 +9,8 @@ class BitInstaller(object):
         self.project_loader = project_loader
 
     def install(self, bit_download):
-        bit_directory = f'bits/{bit_download.bit_name}'
-        if filesystem.directory_exists(bit_directory):
-            filesystem.remove_directory(bit_directory)
-        filesystem.create_directory(bit_directory)
-        filesystem.unzips(base64.b64decode(bit_download.payload), bit_directory)
+        directory = bit_directory(bit_download.bit_name, bit_download.version)
+        if filesystem.directory_exists(directory):
+            filesystem.remove_directory(directory)
+        filesystem.create_directory(directory)
+        filesystem.unzips(base64.b64decode(bit_download.payload), directory)

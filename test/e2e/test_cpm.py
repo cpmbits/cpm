@@ -152,7 +152,7 @@ class TestCpm(unittest.TestCase):
     def test_after_recursive_bit_installation(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.set_test_cflags(['-std=c++11'])
+        self.set_test_cppflags(['-std=c++11'])
         self.add_test('test_case.cpp')
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute([])
@@ -161,7 +161,7 @@ class TestCpm(unittest.TestCase):
     def test_specifying_test_file(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.set_test_cflags(['-std=c++11'])
+        self.set_test_cppflags(['-std=c++11'])
         self.add_test('test_case1.cpp')
         self.add_test('test_case2.cpp')
         install.execute(['-s', 'http://localhost:8000'])
@@ -171,7 +171,7 @@ class TestCpm(unittest.TestCase):
     def test_specifying_test_directory(self):
         os.chdir(self.PROJECT_DIRECTORY)
         self.add_bit('test', 'cest', '1.0')
-        self.set_test_cflags(['-std=c++11'])
+        self.set_test_cppflags(['-std=c++11'])
         self.add_test('test_case1.cpp')
         self.add_test('test_case2.cpp')
         install.execute(['-s', 'http://localhost:8000'])
@@ -331,6 +331,11 @@ version: 0.0.1
     def set_test_cflags(self, cflags):
         self.modify_descriptor(
             lambda descriptor: descriptor['test'].update({'cflags': cflags})
+        )
+
+    def set_test_cppflags(self, cppflags):
+        self.modify_descriptor(
+            lambda descriptor: descriptor['test'].update({'cppflags': cppflags})
         )
 
     def set_test_ldflags(self, ldflags):

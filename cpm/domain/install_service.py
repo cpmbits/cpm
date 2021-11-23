@@ -1,6 +1,7 @@
 from cpm.domain.project import project_descriptor_parser
 from cpm.infrastructure.cpm_hub_connector_v1 import BitNotFound
 from cpm.infrastructure.http_client import HttpConnectionError
+from cpm.domain.constants import bit_directory
 
 
 class InstallService(object):
@@ -22,7 +23,7 @@ class InstallService(object):
 
     def __bit_already_installed(self, name, version):
         try:
-            bit_description = project_descriptor_parser.parse_from(f'bits/{name}')
+            bit_description = project_descriptor_parser.parse_from(bit_directory(name, version))
             return bit_description.version == version
         except:
             return False
@@ -44,4 +45,4 @@ class InstallService(object):
         project_descriptor = project_descriptor_parser.parse_from(directory)
         for declared_bit in project_descriptor.build.declared_bits:
             self.install(declared_bit.name, declared_bit.version)
-            self.__install_recursively(f'bits/{declared_bit.name}')
+            self.__install_recursively(bit_directory(declared_bit.name, declared_bit.version))

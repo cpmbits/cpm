@@ -177,6 +177,7 @@ class TestProjectComposer(unittest.TestCase):
         project_description = project_descriptor_parser.parse_yaml(yaml_load)
         arduino_bit = ProjectDescriptor(
             name='arduino',
+            version='1.0.0',
             targets={
                 'nano33': TargetDescription(
                     name='nano33',
@@ -190,5 +191,5 @@ class TestProjectComposer(unittest.TestCase):
         )
         project_description.build.bits['arduino'] = arduino_bit
         project = project_composer.compose(project_description, 'default')
-        assert project.target.bits[0].packages[0].path == 'bits/arduino/nano33'
+        assert project.target.bits[0].packages[0].path == 'bits/arduino/1.0.0/nano33'
         assert project.target.bits[0].packages[0].cflags == ['-mcpu=atmel', '-DBIT_FLAG']
