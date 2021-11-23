@@ -16,6 +16,3 @@ class CompilationService(object):
     def clean(self):
         project = self.project_loader.load('.')
         self.project_commands.clean(project)
-
-
-

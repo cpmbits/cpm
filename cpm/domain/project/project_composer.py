@@ -1,4 +1,5 @@
 from cpm.domain.constants import DEFAULT_TARGET
+from cpm.domain.constants import bit_directory
 from cpm.infrastructure import filesystem
 from cpm.domain.project.project_descriptor import TargetDescription
 from cpm.domain.project.project import Project, Target, Package, TestSuite
@@ -95,7 +96,7 @@ def get_bit_target_name(bit_description):
 
 def adjust_bit_packages_base_path(bit_description, packages):
     for package_description in packages:
-        package_description.path = f'bits/{bit_description.name}/{package_description.path}'
+        package_description.path = f'{bit_directory(bit_description.name, bit_description.version)}/{package_description.path}'
 
 
 def add_packages_to_target_includes(packages, target):

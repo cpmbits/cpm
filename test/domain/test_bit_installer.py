@@ -17,8 +17,8 @@ class TestBitInstaller(unittest.TestCase):
 
         installer.install(bit_download)
 
-        filesystem.create_directory.assert_called_once_with('bits/cest')
-        filesystem.unzips.assert_called_once_with(b'bit payload', 'bits/cest')
+        filesystem.create_directory.assert_called_once_with('bits/cest/1.0')
+        filesystem.unzips.assert_called_once_with(b'bit payload', 'bits/cest/1.0')
 
     @mock.patch('cpm.domain.bit_installer.filesystem')
     def test_bit_installation_when_bit_was_installed_before(self, filesystem):
@@ -30,6 +30,6 @@ class TestBitInstaller(unittest.TestCase):
 
         installer.install(bit_download)
 
-        filesystem.remove_directory.assert_called_once_with('bits/cest')
-        filesystem.create_directory.assert_called_once_with('bits/cest')
-        filesystem.unzips.assert_called_once_with(b'bit payload', 'bits/cest')
+        filesystem.remove_directory.assert_called_once_with('bits/cest/1.0')
+        filesystem.create_directory.assert_called_once_with('bits/cest/1.0')
+        filesystem.unzips.assert_called_once_with(b'bit payload', 'bits/cest/1.0')

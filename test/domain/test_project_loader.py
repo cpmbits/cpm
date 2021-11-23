@@ -32,7 +32,7 @@ class TestProjectLoader(unittest.TestCase):
         # Then
         project_descriptor_parser.parse_from.assert_has_calls([
             mock.call('.'),
-            mock.call('bits/bit')
+            mock.call('bits/bit/2.2')
         ])
         project_composer.compose.assert_called_once_with(project_descriptor, 'default')
 
@@ -49,7 +49,7 @@ class TestProjectLoader(unittest.TestCase):
         # Then
         project_descriptor_parser.parse_from.assert_has_calls([
             mock.call('.'),
-            mock.call('bits/bit')
+            mock.call('bits/bit/2.2')
         ])
         project_composer.compose.assert_called_once_with(project_descriptor, 'default')
 
