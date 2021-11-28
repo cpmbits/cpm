@@ -1,5 +1,4 @@
-import argparse
-
+from cpm.argument_parser import ArgumentParser
 from cpm.api.result import Result, OK, FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.compilation_service import CompilationService
@@ -29,8 +28,7 @@ def build_project(compilation_service, target='default'):
 def execute(argv):
     install.execute([])
 
-    create_parser = argparse.ArgumentParser(prog='cpm build', description='cpm build', add_help=False)
-    create_parser.add_argument('target', nargs='?', default='default')
+    create_parser = argument_parser()
     args = create_parser.parse_args(argv)
 
     project_loader = ProjectLoader()
@@ -41,3 +39,20 @@ def execute(argv):
     result = build_project(service, args.target)
 
     return result
+
+
+def argument_parser():
+    create_parser = ArgumentParser(prog='cpm build', description=description())
+    create_parser.add_argument('target',
+                               help='target to build',
+                               nargs='?',
+                               default='default')
+    return create_parser
+
+
+def print_help():
+    return argument_parser().print_help()
+
+
+def description():
+    return 'build the project for the given target (use \'default\' if none is given)'

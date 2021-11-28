@@ -1,5 +1,6 @@
 import argparse
 
+from cpm.argument_parser import ArgumentParser
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
@@ -29,8 +30,7 @@ def run_tests(test_service, files_or_dirs=(), test_args=(), target='default'):
 
 
 def execute(argv):
-    add_target_parser = argparse.ArgumentParser(prog='cpm test', description='cpm, modern C/C++ system', add_help=False)
-    add_target_parser.add_argument('rest', nargs=argparse.REMAINDER)
+    add_target_parser = argument_parser()
     args = add_target_parser.parse_args(argv)
 
     project_loader = ProjectLoader()
@@ -42,6 +42,31 @@ def execute(argv):
     result = run_tests(service, files_or_dirs, test_args)
 
     return result
+
+
+def argument_parser():
+    add_target_parser = ArgumentParser(prog='cpm test',
+                                       usage='cpm test [<files or dirs>] [-- test_args]',
+                                       description=description())
+    add_target_parser.add_argument('rest',
+                                   help='rest of the arguments will be passed as command line arguments in the tests',
+                                   nargs=argparse.REMAINDER)
+    return add_target_parser
+
+
+def print_help():
+    parser = argument_parser()
+    parser.print_usage()
+    print()
+    print(parser.description)
+    print()
+    print('positional arguments:')
+    print('  <files or dirs>\ta list of files or directories to test')
+    print('  -- <test_args>\tanything after the -- will be passed as command line arguments to the tests')
+
+
+def description():
+    return 'build and run the project tests'
 
 
 def __parse_rest(rest):

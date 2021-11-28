@@ -18,9 +18,7 @@ def init_project(creation_service, options=CreationOptions(init_from_existing_so
 
 
 def execute(argv):
-    create_parser = argparse.ArgumentParser(prog='cpm init', description='Initialize a project from existing sources', add_help=False)
-    create_parser.add_argument('project_name')
-    args = create_parser.parse_args(argv)
+    args = argument_parser().parse_args(argv)
 
     project_loader = ProjectLoader()
     service = CreationService(project_loader)
@@ -34,3 +32,18 @@ def execute(argv):
     result = init_project(service, options)
 
     return result
+
+
+def argument_parser():
+    create_parser = argparse.ArgumentParser(prog='cpm init', description=description())
+    create_parser.add_argument('project_name',
+                               help='name of the project to create')
+    return create_parser
+
+
+def print_help():
+    return argument_parser().print_help()
+
+
+def description():
+    return 'initialize the current directory as a cpm project'

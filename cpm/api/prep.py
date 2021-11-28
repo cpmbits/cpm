@@ -1,5 +1,4 @@
-import argparse
-
+from cpm.argument_parser import ArgumentParser
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
@@ -20,8 +19,7 @@ def prep_project(compilation_service, target='default'):
 
 
 def execute(argv):
-    create_parser = argparse.ArgumentParser(prog='cpm prep', description='cpm prep', add_help=False)
-    create_parser.add_argument('target', nargs='?', default='default')
+    create_parser = argument_parser()
     args = create_parser.parse_args(argv)
 
     project_loader = ProjectLoader()
@@ -32,3 +30,20 @@ def execute(argv):
     result = prep_project(service, args.target)
 
     return result
+
+
+def argument_parser():
+    create_parser = ArgumentParser(prog='cpm prep', description=description())
+    create_parser.add_argument('target',
+                               nargs='?',
+                               help='target to to use when generating the CMakeLists.txt file',
+                               default='default')
+    return create_parser
+
+
+def print_help():
+    return argument_parser().print_help()
+
+
+def description():
+    return 'generate the CMakeLists.txt file for the given target (use \'default\' if none is given)'

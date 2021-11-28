@@ -1,5 +1,4 @@
-import argparse
-
+from cpm.argument_parser import ArgumentParser
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
@@ -38,10 +37,7 @@ def publish_project(publish_service, publish_as_template=False):
 
 
 def execute(argv):
-    publish_parser = argparse.ArgumentParser(prog='cpm publish', description='cpm Package Manager', add_help=False)
-    publish_parser.add_argument('-s', '--repository-url', required=True, action='store', default='https://repo.cpmbits.com:8000')
-    publish_parser.add_argument('-t', '--template', required=False, action='store_true', default=False)
-    publish_parser.add_argument('-d', '--dry-run', required=False, action='store_true', default=False)
+    publish_parser = argument_parser()
     args = publish_parser.parse_args(argv)
 
     cpm_hub_connector = CpmHubConnectorV1(repository_url=args.repository_url, dry_run=args.dry_run)
@@ -50,3 +46,31 @@ def execute(argv):
     result = publish_project(service, publish_as_template=args.template)
 
     return result
+
+
+def argument_parser():
+    publish_parser = ArgumentParser(prog='cpm publish', description=description())
+    publish_parser.add_argument('-s', '--repository-url',
+                                required=True,
+                                action='store',
+                                help='URL of the cpm repository (default https://repo.cpmbits.com:8000)',
+                                default='https://repo.cpmbits.com:8000')
+    publish_parser.add_argument('-t', '--template',
+                                required=False,
+                                action='store_true',
+                                help='publish the project as a template',
+                                default=False)
+    publish_parser.add_argument('-d', '--dry-run',
+                                required=False,
+                                action='store_true',
+                                help='package the project and try login but do not publish it yet',
+                                default=False)
+    return publish_parser
+
+
+def print_help():
+    return argument_parser().print_help()
+
+
+def description():
+    return 'publish the project'
