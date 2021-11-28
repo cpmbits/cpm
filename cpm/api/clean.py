@@ -1,3 +1,4 @@
+from cpm.argument_parser import ArgumentParser
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
@@ -26,3 +27,15 @@ def execute(argv):
     result = clean_project(service)
 
     return result
+
+
+def argument_parser():
+    return ArgumentParser(prog='cpm clean', description=description())
+
+
+def print_help():
+    return argument_parser().print_help()
+
+
+def description():
+    return 'clean all build files'

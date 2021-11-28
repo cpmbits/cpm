@@ -150,3 +150,4 @@ class CMakeListsBuilder(object):
     def set_compilers(self, toolchain_prefix):
         self.contents += f'set(CMAKE_C_COMPILER {toolchain_prefix}gcc)\n'
         self.contents += f'set(CMAKE_CXX_COMPILER {toolchain_prefix}g++)\n'
+        self.contents += f'set(CMAKE_AR {toolchain_prefix}ar)\n'

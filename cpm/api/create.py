@@ -1,5 +1,4 @@
-import argparse
-
+from cpm.argument_parser import ArgumentParser
 from cpm.api.result import Result
 from cpm.api.result import OK
 from cpm.api.result import FAIL
@@ -20,10 +19,7 @@ def new_project(creation_service, options=CreationOptions()):
 
 
 def execute(argv):
-    create_parser = argparse.ArgumentParser(prog='cpm create', description='Create a new cpm project', add_help=False)
-    create_parser.add_argument('project_name')
-    create_parser.add_argument('-s', '--repository-url', required=False, action='store', default='https://repo.cpmbits.com:8000')
-    create_parser.add_argument('-t', '--template', required=False, action='store')
+    create_parser = argument_parser()
     args = create_parser.parse_args(argv)
 
     project_loader = ProjectLoader()
@@ -42,6 +38,32 @@ def execute(argv):
     result = new_project(service, options)
 
     return result
+
+
+def argument_parser():
+    create_parser = ArgumentParser(prog='cpm create', description='Create a new cpm project')
+    create_parser.add_argument('project_name',
+                               help='name of the project to create')
+    create_parser.add_argument('-s', '--repository-url',
+                               required=False,
+                               action='store',
+                               arg_format='<repository_url>',
+                               help='URL of the cpm repository, used when creating project from template (default https://repo.cpmbits.com:8000)',
+                               default='https://repo.cpmbits.com:8000')
+    create_parser.add_argument('-t', '--template',
+                               arg_format='<template>:<version>',
+                               required=False,
+                               help='template name and version to use when creating project from template',
+                               action='store')
+    return create_parser
+
+
+def print_help():
+    return argument_parser().print_help()
+
+
+def description():
+    return 'create a new cpm project'
 
 
 def __template_to_use(bit_argument):
