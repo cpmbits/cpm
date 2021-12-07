@@ -3,7 +3,7 @@ import mock
 import os
 import shutil
 import yaml
-import re
+import zipfile
 
 from cpm.infrastructure import filesystem
 from cpm.api import create
@@ -246,6 +246,35 @@ version: 0.0.1
         shutil.rmtree(self.PROJECT_DIRECTORY, ignore_errors=True)
         result = create.execute(['-s', 'http://localhost:8000', '-t', f'{self.PROJECT_NAME}:0.0.1', self.PROJECT_NAME_FROM_TEMPLATE])
         assert result == Result(0, f'Created project {self.PROJECT_NAME_FROM_TEMPLATE}')
+
+    def test_packaging_including_external_files(self):
+        from cpm.domain.project_packager import ProjectPackager
+        from cpm.domain.project import project_descriptor_parser
+        os.chdir(self.PROJECT_DIRECTORY)
+        project_yaml = '''build:
+  bits:
+  packages:
+    empty_package:
+name: test_project
+targets:
+  default:
+    main: main.cpp
+test:
+  bits:
+    cest: '1.0'
+  cflags: !include test_cflags.yaml
+version: 0.0.1
+'''
+        with open('project.yaml', 'w') as stream:
+            stream.write(project_yaml)
+        with open('test_cflags.yaml', 'w') as stream:
+            yaml.dump(['-std=c++11'], stream)
+        os.mkdir('empty_package')
+        project_descriptor = project_descriptor_parser.parse_from('.')
+        pack = ProjectPackager().pack(project_descriptor, 'dist')
+        zip = zipfile.ZipFile(pack)
+        files_in_zip = zip.namelist()
+        assert 'test_cflags.yaml' in files_in_zip
 
     def add_bit(self, plan, name, version):
         with open(f'project.yaml') as stream:

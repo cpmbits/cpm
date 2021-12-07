@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 
-from cpm.domain.bit_packager import PackagingFailure
+from cpm.domain.project_packager import PackagingFailure
 from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
 from cpm.infrastructure.http_client import HttpConnectionError
 from cpm.api.publish import publish_project

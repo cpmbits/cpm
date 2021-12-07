@@ -18,7 +18,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
             'test': None,
             'targets': None
         }
-        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        project = project_descriptor_parser.digest_yaml(yaml_contents)
         assert project == project_descriptor.ProjectDescriptor(
             name='bender bender rodriguez',
             version='1.0',
@@ -48,7 +48,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 'includes': ['./include']
             }
         }
-        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        project = project_descriptor_parser.digest_yaml(yaml_contents)
         assert project.build.packages == [
             project_descriptor.PackageDescription('cpmhub/bits', cflags=['-DHOLA'], cppflags=['-DHOLA_CPP']),
             project_descriptor.PackageDescription('cpmhub/http')
@@ -73,7 +73,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        project = project_descriptor_parser.digest_yaml(yaml_contents)
         assert project.test.packages == [
             project_descriptor.PackageDescription('cpmhub/bits'),
             project_descriptor.PackageDescription('cpmhub/http')
@@ -94,7 +94,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        project = project_descriptor_parser.digest_yaml(yaml_contents)
         assert project.targets == {
             'default': project_descriptor.TargetDescription(
                 'default',
@@ -126,7 +126,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        project = project_descriptor_parser.digest_yaml(yaml_contents)
         assert project.targets['arduino'].build.packages == [
             project_descriptor.PackageDescription('arduino')
         ]
@@ -153,7 +153,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        project = project_descriptor_parser.digest_yaml(yaml_contents)
         assert project.targets['arduino'].test.packages == [
             project_descriptor.PackageDescription('arduino')
         ]
@@ -176,7 +176,7 @@ class TestProjectDescriptorParser(unittest.TestCase):
                 }
             }
         }
-        project = project_descriptor_parser.parse_yaml(yaml_contents)
+        project = project_descriptor_parser.digest_yaml(yaml_contents)
         assert project.build.packages == [
             project_descriptor.PackageDescription('cpmhub/http')
         ]
