@@ -1,41 +1,25 @@
 import glob
-from pathlib import Path
 
-from ruamel.yaml import YAML
+from cpm.infrastructure.yaml_parser import YamlParser
 from cpm.domain import constants
 from cpm.domain.project.project_descriptor import ProjectDescriptor, TargetDescription, DeclaredBit, CompilationPlan, PackageDescription
-
-
-def __compose_document(self):
-    self.parser.get_event()
-    node = self.compose_node(None, None)
-    self.parser.get_event()
-    return node
-
-
-def __yaml_include(loader, node):
-    y = loader.loader
-    yaml = YAML(typ=y.typ, pure=y.pure)
-    yaml.composer.anchors = loader.composer.anchors
-    return yaml.load(Path(node.value))
 
 
 def parse_from(project_directory):
     try:
         with open(project_yaml_file(project_directory)) as stream:
             payload = stream.read()
-        yaml = YAML(typ='safe', pure=True)
-        yaml.Composer.compose_document = __compose_document
-        yaml.Constructor.add_constructor("!include", __yaml_include)
-        yaml_document = yaml.load(payload)
+        parser = YamlParser(pure=True)
+        yaml_document = parser.load(payload)
     except FileNotFoundError:
         raise ProjectDescriptorNotFound
-    project_descriptor = parse_yaml(yaml_document)
+    project_descriptor = digest_yaml(yaml_document)
     project_descriptor.yaml_document = yaml_document
+    project_descriptor.parser = parser
     return project_descriptor
 
 
-def parse_yaml(yaml_contents):
+def digest_yaml(yaml_contents):
     project_description = ProjectDescriptor(yaml_contents['name'])
     project_description.version = yaml_contents.get('version', '')
     project_description.description = yaml_contents.get('description', '')

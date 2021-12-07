@@ -58,6 +58,7 @@ class ProjectDescriptor:
     version: str = ''
     description: str = ''
     schema: str = '1.0'
+    parser: object = None
     yaml_document: object = None
     build: CompilationPlan = field(default_factory=CompilationPlan)
     test: CompilationPlan = field(default_factory=CompilationPlan)
@@ -66,3 +67,6 @@ class ProjectDescriptor:
 
     def build_packages(self):
         return self.build.packages + [package for target, description in self.targets.items() for package in description.build.packages]
+
+    def included_files(self):
+        return [] if self.parser is None else self.parser.included_files()
