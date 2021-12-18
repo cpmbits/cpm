@@ -50,3 +50,8 @@ class YamlParser(YAML):
 def load(path):
     yaml = YamlParser()
     return yaml.load_from(Path(path))
+
+
+def dump(data, path):
+    yaml = YamlParser(typ='rt')
+    yaml.dump(data, Path(path))
