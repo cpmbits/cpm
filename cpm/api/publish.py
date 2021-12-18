@@ -33,7 +33,7 @@ def publish_project(publish_service, publish_as_template=False):
     except KeyboardInterrupt:
         return Result(FAIL, f'interrupted')
     except ParseError as e:
-        return Result(FAIL, e.message)
+        return Result(FAIL, f'error: {e.message}')
 
     return Result(OK, f'Project published')
 

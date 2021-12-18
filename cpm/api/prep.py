@@ -15,7 +15,7 @@ def prep_project(compilation_service, target='default'):
     except ProjectDescriptorNotFound:
         return Result(FAIL, f'error: not a cpm project')
     except ParseError as e:
-        return Result(FAIL, e.message)
+        return Result(FAIL, f'error: {e.message}')
 
     return Result(OK, f'CMakeLists.txt ready')
 

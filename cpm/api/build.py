@@ -22,7 +22,7 @@ def build_project(compilation_service, target='default'):
     except DockerImageNotFound as e:
         return Result(FAIL, f'error: docker image {e.image_name} not found for target {target}')
     except ParseError as e:
-        return Result(FAIL, e.message)
+        return Result(FAIL, f'error: {e.message}')
 
     return Result(OK, f'Build finished')
 

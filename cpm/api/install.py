@@ -4,7 +4,7 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.install_service import InstallService
 from cpm.domain.bit_installer import BitInstaller
-from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound, ParseError
 from cpm.domain.project.project_loader import ProjectLoader
 from cpm.infrastructure.cpm_hub_connector_v1 import CpmHubConnectorV1, BitNotFound
 from cpm.infrastructure.cpm_user_configuration import CpmUserConfiguration
@@ -20,6 +20,8 @@ def install_bit(install_service, name, version='latest'):
         return Result(FAIL, f'error: bit {name} not found in CPM Hub')
     except HttpConnectionError as error:
         return Result(FAIL, f'error: failed to connect to CPM Hub at {error}')
+    except ParseError as e:
+        return Result(FAIL, f'error: {e.message}')
 
     return Result(OK, f'installed bit {name}:{version}')
 
@@ -33,6 +35,8 @@ def install_project_bits(install_service):
         return Result(FAIL, f'error: bit {e} not found in CPM Hub')
     except HttpConnectionError as error:
         return Result(FAIL, f'error: failed to connect to CPM Hub at {error}')
+    except ParseError as e:
+        return Result(FAIL, f'error: {e.message}')
 
     return Result(OK, f'installed bits')
 

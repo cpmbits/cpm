@@ -26,7 +26,7 @@ def run_tests(test_service, files_or_dirs=(), test_args=(), target='default'):
     except NoTestsFound:
         return Result(OK, 'no tests to run')
     except ParseError as e:
-        return Result(FAIL, e.message)
+        return Result(FAIL, f'error: {e.message}')
 
     return Result(OK, '✔ PASS')
 
