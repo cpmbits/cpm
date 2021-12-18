@@ -11,7 +11,7 @@ from cpm.infrastructure.http_client import HttpConnectionError
 
 
 class TestApiInstall(unittest.TestCase):
-    def test_bit_install_fails_when_current_directory_is_not_a_chromos_project(self):
+    def test_bit_install_fails_when_current_directory_is_not_a_cpm_project(self):
         install_service = mock.MagicMock()
         install_service.install.side_effect = ProjectDescriptorNotFound
 
@@ -62,7 +62,7 @@ class TestApiInstall(unittest.TestCase):
         assert result.status_code == OK
         install_service.install_all.assert_called_once()
 
-    def test_bit_install_of_all_bits_in_project_fails_when_current_directory_is_not_a_chromos_project(self):
+    def test_bit_install_of_all_bits_in_project_fails_when_current_directory_is_not_a_cpm_project(self):
         install_service = mock.MagicMock()
         install_service.install_all.side_effect = ProjectDescriptorNotFound
 

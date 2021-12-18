@@ -6,7 +6,7 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.project.project_loader import ProjectLoader
-from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound, ParseError
 from cpm.domain.test_service import TestService
 from cpm.domain.test_service import NoTestsFound
 from cpm.domain.project_commands import BuildError
@@ -25,6 +25,8 @@ def run_tests(test_service, files_or_dirs=(), test_args=(), target='default'):
         return Result(FAIL, '✖ FAIL')
     except NoTestsFound:
         return Result(OK, 'no tests to run')
+    except ParseError as e:
+        return Result(FAIL, e.message)
 
     return Result(OK, '✔ PASS')
 

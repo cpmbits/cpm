@@ -3,7 +3,7 @@ from cpm.api.result import Result, OK, FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.compilation_service import CompilationService
 from cpm.domain.project_commands import DockerImageNotFound
-from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound, ParseError
 from cpm.domain.project.project_loader import ProjectLoader, InvalidTarget
 from cpm.domain.project_commands import ProjectCommands, BuildError
 from cpm.api import install
@@ -21,6 +21,8 @@ def build_project(compilation_service, target='default'):
         return Result(FAIL, f'error: unknown target {target}')
     except DockerImageNotFound as e:
         return Result(FAIL, f'error: docker image {e.image_name} not found for target {target}')
+    except ParseError as e:
+        return Result(FAIL, e.message)
 
     return Result(OK, f'Build finished')
 

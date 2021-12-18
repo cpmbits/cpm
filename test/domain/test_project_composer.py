@@ -23,8 +23,10 @@ class TestProjectComposer(unittest.TestCase):
             'version': '1.0',
             'description': 'I want to believe'
         })
+
         project_description = project_descriptor_parser.parse_from('.')
         project = project_composer.compose(project_description, 'default')
+
         assert project.name == 'HalfLife3'
         assert project.version == '1.0'
         assert project.description == 'I want to believe'
@@ -49,8 +51,10 @@ class TestProjectComposer(unittest.TestCase):
         })
         filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
         filesystem.parent_directory.return_value = '.'
+
         project_description = project_descriptor_parser.parse_from('.')
         project = project_composer.compose(project_description, 'default')
+
         assert len(project.target.packages) == 1
         assert project.target.packages[0].path == 'shaders'
         assert project.target.packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
@@ -72,6 +76,7 @@ class TestProjectComposer(unittest.TestCase):
                 },
             }
         })
+
         project_description = project_descriptor_parser.parse_from('.')
         self.assertRaises(project_composer.TargetNotDescribed, project_composer.compose, project_description, 'non-described-target')
 
@@ -103,8 +108,10 @@ class TestProjectComposer(unittest.TestCase):
         })
         filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
         filesystem.parent_directory.return_value = '.'
+
         project_description = project_descriptor_parser.parse_from('.')
         project = project_composer.compose(project_description, 'default')
+
         assert len(project.target.packages) == 1
         assert project.target.packages[0].path == 'shaders'
         assert project.target.packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
@@ -144,8 +151,10 @@ class TestProjectComposer(unittest.TestCase):
         })
         filesystem.find.side_effect = [['shaders/shader.cpp'], ['shaders/water.c'], []]
         filesystem.parent_directory.return_value = '.'
+
         project_description = project_descriptor_parser.parse_from('.')
         project = project_composer.compose(project_description, 'default')
+
         assert len(project.test.packages) == 1
         assert project.test.packages[0].path == 'shaders'
         assert project.test.packages[0].sources == ['shaders/shader.cpp', 'shaders/water.c']
@@ -162,8 +171,10 @@ class TestProjectComposer(unittest.TestCase):
         })
         filesystem.find.side_effect = [['tests/test_one.cpp']]
         filesystem.parent_directory.return_value = '.'
+
         project_description = project_descriptor_parser.parse_from('.')
         project = project_composer.compose(project_description, 'default')
+
         assert len(project.test.test_suites) == 1
         assert project.test.test_suites[0].name == 'test_one'
         assert project.test.test_suites[0].main == 'tests/test_one.cpp'
@@ -184,6 +195,7 @@ class TestProjectComposer(unittest.TestCase):
         })
         filesystem.find.side_effect = [['tests/test_one.cpp'], ['nano33/nano33.cpp'], []]
         filesystem.parent_directory.return_value = '.'
+
         project_description = project_descriptor_parser.parse_from('.')
         arduino_bit = ProjectDescriptor(
             name='arduino',
@@ -201,6 +213,7 @@ class TestProjectComposer(unittest.TestCase):
         )
         project_description.build.bits['arduino'] = arduino_bit
         project = project_composer.compose(project_description, 'default')
+
         assert project.target.bits[0].packages[0].path == 'bits/arduino/1.0.0/nano33'
         assert project.target.bits[0].packages[0].cflags == ['-mcpu=atmel', '-DBIT_FLAG']
 
