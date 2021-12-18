@@ -45,3 +45,8 @@ class YamlParser(YAML):
 
     def included_files(self):
         return self.constructor.included_files()
+
+
+def load(path):
+    yaml = YamlParser()
+    return yaml.load_from(Path(path))
