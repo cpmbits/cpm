@@ -1,4 +1,7 @@
 import glob
+from pathlib import Path
+
+import semver
 
 from cpm.infrastructure.yaml_parser import YamlParser
 from cpm.domain import constants
@@ -7,10 +10,8 @@ from cpm.domain.project.project_descriptor import ProjectDescriptor, TargetDescr
 
 def parse_from(project_directory):
     try:
-        with open(project_yaml_file(project_directory)) as stream:
-            payload = stream.read()
         parser = YamlParser(pure=True)
-        yaml_document = parser.load(payload)
+        yaml_document = parser.load_from(Path(project_yaml_file(project_directory)))
     except FileNotFoundError:
         raise ProjectDescriptorNotFound
     project_descriptor = digest_yaml(yaml_document)
@@ -20,11 +21,14 @@ def parse_from(project_directory):
 
 
 def digest_yaml(yaml_contents):
-    project_description = ProjectDescriptor(yaml_contents['name'])
-    project_description.version = yaml_contents.get('version', '')
-    project_description.description = yaml_contents.get('description', '')
-    project_description.build = parse_compilation_plan(get_or_default_to(yaml_contents, 'build', {}))
-    project_description.test = parse_compilation_plan(get_or_default_to(yaml_contents, 'test', {}))
+    project_description = ProjectDescriptor()
+    project_description.name = required(yaml_contents, 'name', String)
+    project_description.version = optional(yaml_contents, 'version', String, '')
+    project_description.description = optional(yaml_contents, 'description', String, '')
+    build = optional(yaml_contents, 'build', Mapping, default={})
+    project_description.build = parse_compilation_plan(build)
+    test = optional(yaml_contents, 'test', Mapping, default={})
+    project_description.test = parse_compilation_plan(test)
     project_description.targets = parse_targets(get_or_default_to(yaml_contents, 'targets', {}))
     return project_description
 
@@ -55,34 +59,38 @@ def parse_target(target_name, target_description):
 
 def parse_compilation_plan(plan_description):
     compilation_plan = CompilationPlan()
-    for bit_name in get_or_default_to(plan_description, 'bits', {}):
-        if isinstance(plan_description['bits'][bit_name], str):
-            declared_bit = DeclaredBit(bit_name, plan_description['bits'][bit_name])
+    bits = optional(plan_description, 'bits', Mapping, default={})
+    for bit_name in bits:
+        bit_description = required(bits, bit_name, BitDescription)
+        if isinstance(bit_description, str):
+            declared_bit = DeclaredBit(bit_name, bits[bit_name])
         else:
-            declared_bit = declared_bit_with_customized_compilation(bit_name, plan_description['bits'][bit_name])
+            declared_bit = declared_bit_with_customized_compilation(bit_name, bit_description)
         compilation_plan.declared_bits.append(declared_bit)
-    for package_path in get_or_default_to(plan_description, 'packages', {}):
+    packages = optional(plan_description, 'packages', Mapping, default={})
+    for package_path in packages:
+        package_description = optional(packages, package_path, Mapping, {})
         package = PackageDescription(
             package_path,
-            cflags=get_or_default_to(plan_description['packages'][package_path], 'cflags', []),
-            cppflags=get_or_default_to(plan_description['packages'][package_path], 'cppflags', [])
+            cflags=optional(package_description, 'cflags', sequence_of(String), []),
+            cppflags=optional(package_description, 'cppflags', sequence_of(String), []),
         )
         compilation_plan.packages.append(package)
-    compilation_plan.cflags = get_or_default_to(plan_description, 'cflags', [])
-    compilation_plan.cppflags = get_or_default_to(plan_description, 'cppflags', [])
-    compilation_plan.ldflags = get_or_default_to(plan_description, 'ldflags', [])
-    compilation_plan.libraries = get_or_default_to(plan_description, 'libraries', [])
-    compilation_plan.includes.update(get_or_default_to(plan_description, 'includes', []))
+    compilation_plan.cflags = optional(plan_description, 'cflags', sequence_of(String), [])
+    compilation_plan.cppflags = optional(plan_description, 'cppflags', sequence_of(String), [])
+    compilation_plan.ldflags = optional(plan_description, 'ldflags', sequence_of(String), [])
+    compilation_plan.libraries = optional(plan_description, 'libraries', sequence_of(String), [])
+    compilation_plan.includes.update(optional(plan_description, 'includes', sequence_of(String), []))
     return compilation_plan
 
 
 def declared_bit_with_customized_compilation(bit_name, bit_description):
     return DeclaredBit(
         name=bit_name,
-        version=bit_description['version'],
-        cflags=get_or_default_to(bit_description, 'cflags', []),
-        cppflags=get_or_default_to(bit_description, 'cppflags', []),
-        target=get_or_default_to(bit_description, 'target', '')
+        version=required(bit_description, 'version', String),
+        cflags=optional(bit_description, 'cflags', Sequence, []),
+        cppflags=optional(bit_description, 'cppflags', Sequence, []),
+        target=optional(bit_description, 'target', String, '')
     )
 
 
@@ -104,5 +112,109 @@ def get_or_default_to(dictionary, key, default):
     return dictionary.get(key, default) or default
 
 
+def required(d, key, typ):
+    if key not in d:
+        raise MissingRequiredField(key)
+    typ.validate(d, key)
+    return d[key]
+
+
+def optional(d, key, typ, default=None):
+    if key not in d or not d[key]:
+        return default
+    typ.validate(d, key)
+    return d[key]
+
+
+class String:
+    name = 'string'
+
+    @staticmethod
+    def validate(d, key):
+        value = d[key]
+        if not isinstance(value, str):
+            raise ParseError(*_location(d, key), f'{key} must be a string')
+
+
+class Semver(String):
+    name = 'semver'
+
+    @staticmethod
+    def validate(d, key):
+        String.validate(d, key)
+        value = d[key]
+        if not semver.VersionInfo.isvalid(value):
+            raise ParseError(*_location(d, key), f'{key} must be a valid semver string')
+
+
+class BitDescription:
+    name = 'bit_description'
+
+    @staticmethod
+    def validate(d, key):
+        value = d[key]
+        if not isinstance(value, dict) and not isinstance(value, str):
+            raise ParseError(*_location(d, key), f'{key} must be a string or a mapping')
+
+
+class Mapping:
+    name = 'mapping'
+
+    @staticmethod
+    def validate(d, key):
+        value = d[key]
+        if not isinstance(value, dict):
+            raise ParseError(*_location(d, key), f'{key} must be a mapping')
+
+
+class Sequence:
+    name = 'sequence'
+
+    @staticmethod
+    def validate(d, key):
+        sequence = d[key]
+        if not isinstance(sequence, list):
+            raise ParseError(*_location(d, key), f'{key} must be a sequence')
+
+
+def sequence_of(typ):
+    class SequenceOf(Sequence):
+        name = f'sequence_of_{typ.name}'
+
+        @staticmethod
+        def validate(d, key):
+            try:
+                Sequence.validate(d, key)
+                sequence = d[key]
+                for i in range(len(sequence)):
+                    typ.validate(sequence, i)
+            except ParseError as parse_error:
+                raise ParseError(
+                    parse_error.parsing_file,
+                    parse_error.line,
+                    parse_error.col,
+                    f'{key} must be a sequence of {typ.name}')
+
+    return SequenceOf
+
+
 class ProjectDescriptorNotFound(RuntimeError):
     pass
+
+
+def _location(d, key):
+    return d.parsing_file, d.lc.data[key][0], d.lc.data[key][1]
+
+
+class ParseError(RuntimeError):
+    def __init__(self, parsing_file, line, col, message):
+        self.parsing_file = parsing_file
+        self.line = line
+        self.col = col
+        self.message = f'{parsing_file}:{line+1}:{col+1}: {message}'
+
+
+class MissingRequiredField(ParseError):
+    def __init__(self, field):
+        self.field = field
+        self.message = f'{field} is required'
