@@ -6,7 +6,7 @@ from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFou
 
 
 class TestApiClean(unittest.TestCase):
-    def test_clean_fails_when_current_directory_is_not_a_chromos_project(self):
+    def test_clean_fails_when_current_directory_is_not_a_cpm_project(self):
         compilation_service = MagicMock()
         compilation_service.clean.side_effect = ProjectDescriptorNotFound()
 

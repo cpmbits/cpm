@@ -4,7 +4,7 @@ from cpm.api.result import OK
 from cpm.api.result import FAIL
 from cpm.domain.cmake.cmakelists_builder import CMakeListsBuilder
 from cpm.domain.compilation_service import CompilationService
-from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound, ParseError
 from cpm.domain.project.project_loader import ProjectLoader
 from cpm.domain.project_commands import ProjectCommands
 
@@ -14,6 +14,8 @@ def prep_project(compilation_service, target='default'):
         compilation_service.update(target)
     except ProjectDescriptorNotFound:
         return Result(FAIL, f'error: not a cpm project')
+    except ParseError as e:
+        return Result(FAIL, f'error: {e.message}')
 
     return Result(OK, f'CMakeLists.txt ready')
 

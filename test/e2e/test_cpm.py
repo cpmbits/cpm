@@ -2,10 +2,11 @@ import unittest
 import mock
 import os
 import shutil
-import yaml
 import zipfile
 
+from cpm.domain.constants import PROJECT_DESCRIPTOR_FILE
 from cpm.infrastructure import filesystem
+from cpm.infrastructure import yaml_parser
 from cpm.api import create
 from cpm.api import install
 from cpm.api import build
@@ -195,8 +196,7 @@ version: 0.0.1
 '''
         with open('project.yaml', 'w') as stream:
             stream.write(project_yaml)
-        with open('test_cflags.yaml', 'w') as stream:
-            yaml.dump(['-std=c++11'], stream)
+        yaml_parser.dump(['-std=c++11'], 'test_cflags.yaml')
         install.execute(['-s', 'http://localhost:8000'])
         result = test.execute(['tests'])
         assert result.status_code == 0
@@ -267,8 +267,7 @@ version: 0.0.1
 '''
         with open('project.yaml', 'w') as stream:
             stream.write(project_yaml)
-        with open('test_cflags.yaml', 'w') as stream:
-            yaml.dump(['-std=c++11'], stream)
+        yaml_parser.dump(['-std=c++11'], 'test_cflags.yaml')
         os.mkdir('empty_package')
         project_descriptor = project_descriptor_parser.parse_from('.')
         pack = ProjectPackager().pack(project_descriptor, 'dist')
@@ -277,15 +276,13 @@ version: 0.0.1
         assert 'test_cflags.yaml' in files_in_zip
 
     def add_bit(self, plan, name, version):
-        with open(f'project.yaml') as stream:
-            project_descriptor = yaml.safe_load(stream)
+        project_descriptor = yaml_parser.load(PROJECT_DESCRIPTOR_FILE)
         if plan not in project_descriptor or not project_descriptor[plan]:
             project_descriptor[plan] = {}
         project_descriptor[plan]['bits'] = {
             name: version
         }
-        with open(f'project.yaml', 'w') as stream:
-            yaml.dump(project_descriptor, stream)
+        yaml_parser.dump(project_descriptor, PROJECT_DESCRIPTOR_FILE)
 
     def add_test(self, file_name, fails=False):
         if not filesystem.directory_exists('tests'):
@@ -373,11 +370,9 @@ version: 0.0.1
         )
 
     def modify_descriptor(self, modify):
-        with open(f'project.yaml') as stream:
-            project_descriptor = yaml.safe_load(stream)
+        project_descriptor = yaml_parser.load(PROJECT_DESCRIPTOR_FILE)
         modify(project_descriptor)
-        with open(f'project.yaml', 'w') as stream:
-            yaml.dump(project_descriptor, stream)
+        yaml_parser.dump(project_descriptor, PROJECT_DESCRIPTOR_FILE)
 
     def add_main_with_user_include(self):
         filesystem.create_file(

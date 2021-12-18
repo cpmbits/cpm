@@ -3,15 +3,24 @@ import mock
 
 from cpm.api.test import run_tests
 from cpm.domain.project_commands import BuildError
-from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound
+from cpm.domain.project.project_descriptor_parser import ProjectDescriptorNotFound, ParseError
 from cpm.domain.project_commands import TestsFailed
 from cpm.domain.test_service import NoTestsFound
 
 
 class TestApiTest(unittest.TestCase):
-    def test_run_tests_fails_when_current_directory_is_not_a_chromos_project(self):
+    def test_run_tests_fails_when_current_directory_is_not_a_cpm_project(self):
         test_service = mock.MagicMock()
         test_service.run_tests.side_effect = ProjectDescriptorNotFound()
+
+        result = run_tests(test_service)
+
+        assert result.status_code == 1
+        test_service.run_tests.assert_called_once_with((), 'default', ())
+
+    def test_build_fails_when_descriptor_contains_errors(self):
+        test_service = mock.MagicMock()
+        test_service.run_tests.side_effect = ParseError('project.yaml', 1, 1, 'error')
 
         result = run_tests(test_service)
 

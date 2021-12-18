@@ -1,4 +1,4 @@
-from cpm.infrastructure import yaml_handler
+from cpm.infrastructure import yaml_parser
 from cpm.infrastructure import filesystem
 
 GLOBAL_CONFIGURATION_FILENAME = '.cpm.yaml'
@@ -14,7 +14,7 @@ class CpmUserConfiguration(object):
 
     def load(self):
         if filesystem.file_exists(self.global_configuration_file):
-            configuration = yaml_handler.load(self.global_configuration_file)
+            configuration = yaml_parser.load(self.global_configuration_file)
             self.configuration.update(configuration)
 
     def __getitem__(self, item):
