@@ -162,26 +162,36 @@ class ProjectCommands(object):
             raise DockerImageNotFound(image_name)
         except docker.errors.NotFound:
             raise DockerImageNotFound(image_name)
-        return [self.__run_test_inside_container(project, client, image_name, test.name, test_args) for test in tests_to_run]
+        return self.__run_tests_inside_container(project, client, image_name, tests_to_run, test_args)
 
     def __run_tests_using_dockerfile(self, project, image_name, tests_to_run, test_args):
         client = docker.from_env()
-        return [self.__run_test_inside_container(project, client, image_name, test.name, test_args) for test in tests_to_run]
+        return self.__run_tests_inside_container(project, client, image_name, tests_to_run, test_args)
 
-    def __run_test_inside_container(self, project, client, image_name, executable, test_args):
+    def __run_tests_inside_container(self, project, client, image_name, tests_to_run, test_args):
         container = client.containers.run(
             image_name,
-            command=f'./{constants.BUILD_DIRECTORY}/{executable} {" ".join(test_args)}',
+            command=f'/bin/bash',
             working_dir=f'/{project.name}',
             volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
             user=f'{os.getuid()}:{os.getgid()}',
-            detach=True
+            detach=True,
+            stdin_open=True,
         )
-        for log in container.logs(stream=True):
-            sys.stdout.write(log.decode())
-        exit_code = container.wait()
-        result = exit_code['StatusCode']
+        container.start()
+        results = [self.__run_test_inside_container(project, container, test.name, test_args) for test in tests_to_run]
+        container.stop()
         container.remove()
+        return results
+
+    def __run_test_inside_container(self, project, container, executable, test_args):
+        (exit_code, output) = container.exec_run(
+            f'./{constants.BUILD_DIRECTORY}/{executable} {" ".join(test_args)}',
+            workdir=f'/{project.name}',
+            user=f'{os.getuid()}:{os.getgid()}'
+        )
+        sys.stdout.write(output.decode())
+        result = exit_code
         if result < 0:
             print(f'cpm: {executable} failed with {result} ({signal.Signals(-result).name})')
         return result
