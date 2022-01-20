@@ -104,7 +104,7 @@ class ProjectCommands(object):
         )
         container = client.containers.run(
             image_name,
-            command=f'bash /{project.name}/build/build.sh',
+            command=f'sh /{project.name}/build/build.sh',
             working_dir=f'/{project.name}/build',
             volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
             user=f'{os.getuid()}:{os.getgid()}',
