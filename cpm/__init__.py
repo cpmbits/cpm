@@ -7,9 +7,22 @@ import datetime
 import argparse
 
 from cpm.argument_parser import ArgumentParser
+from cpm.api.result import FAIL
 import cpm.api
 
 
+def handle_keyboard_interrupt(func):
+    def wrapper(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+        except:
+            print(f'\rcpm: cancelled')
+            sys.exit(FAIL)
+        return result
+    return wrapper
+
+
+@handle_keyboard_interrupt
 def main():
     commands = available_commands()
     top_level_parser = argument_parser(commands)
@@ -40,7 +53,6 @@ def main():
     result = commands[command_to_execute].execute(command_arguments)
 
     elapsed_time = datetime.datetime.now() - start_time
-
     finish(result, elapsed_time)
 
 
