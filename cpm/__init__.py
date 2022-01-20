@@ -15,7 +15,7 @@ def handle_keyboard_interrupt(func):
     def wrapper(*args, **kwargs):
         try:
             result = func(*args, **kwargs)
-        except:
+        except KeyboardInterrupt:
             print(f'\rcpm: cancelled')
             sys.exit(FAIL)
         return result
