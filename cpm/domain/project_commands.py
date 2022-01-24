@@ -171,7 +171,7 @@ class ProjectCommands(object):
     def __run_tests_inside_container(self, project, client, image_name, tests_to_run, test_args):
         container = client.containers.run(
             image_name,
-            command=f'/bin/bash',
+            command=f'/bin/sh',
             working_dir=f'/{project.name}',
             volumes={f'{os.getcwd()}': {'bind': f'/{project.name}', 'mode': 'rw'}},
             user=f'{os.getuid()}:{os.getgid()}',
