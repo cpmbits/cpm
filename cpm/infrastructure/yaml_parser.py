@@ -3,6 +3,7 @@ from pathlib import Path
 from ruamel.yaml import YAML, RoundTripConstructor
 from ruamel.yaml.nodes import SequenceNode, MappingNode
 
+from cpm.infrastructure import filesystem
 
 class CpmConstructor(RoundTripConstructor):
     def __init__(self, *args, **kwargs):
@@ -16,7 +17,7 @@ class CpmConstructor(RoundTripConstructor):
         yaml = YamlParser(typ=y.typ, pure=y.pure)
         self.child_parsers.append(yaml)
         yaml.composer.anchors = loader.composer.anchors
-        path = Path(node.value)
+        path = Path(filesystem.join(filesystem.path_to(self.parsing_file), node.value))
         self.files.append(path)
         return yaml.load_from(path)
 

@@ -45,6 +45,10 @@ def path_to(filename):
     return os.path.dirname(filename)
 
 
+def join(path, *paths):
+    return os.path.join(path, *paths)
+
+
 def directory_exists(name):
     return os.path.exists(name) and os.path.isdir(name)
 
